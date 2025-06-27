@@ -1,3 +1,3 @@
-# afi-docs
+# AFI Protocol Lore
 
-This repository contains the `afi-docs` module for AFI Protocol.
+This repo contains episodes and documentation for the AFI mentor protocol.
