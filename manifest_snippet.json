@@ -1,0 +1,13 @@
+{
+  "repo": "afi-docs",
+  "url": "https://github.com/AFI-Protocol/afi-docs",
+  "type": "documentation",
+  "description": "Central documentation repo for the AFI Protocol ecosystem. Includes specs, guides, and narrative lore.",
+  "tags": [
+    "docs",
+    "gitbook",
+    "specs",
+    "lore",
+    "factory-ready"
+  ]
+}
