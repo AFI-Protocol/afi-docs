@@ -1,9 +1,10 @@
 # Mentor Protocol Explained
-*Version 0.1 — 2025-06-27*
+*Version 0.1 — 2025‑06‑27*
 
 AFI’s **Mentor Protocol** is the middleware layer that pairs *mentor agents* with signals or production agents when anomalies or learning opportunities are detected.
 
 ---
+
 ## 1 · Why Mentors?
 | Challenge | Classical Fix | Mentor Fix |
 |-----------|---------------|------------|
@@ -14,10 +15,21 @@ AFI’s **Mentor Protocol** is the middleware layer that pairs *mentor agents* w
 Mentors therefore act as **soft‑governance guardians** and **training wheels** for new pipelines.
 
 ---
-## 2 · Core Types
+
+## 2 · Core Types & Tag Schema
 
 ```ts
-export type MentorTag = 'pattern' | 'sentiment' | 'macro' | 'risk' | 'ethics';
+/**
+ * Central tag list is defined in afi-core/config/mentor_tags.ts
+ * Contributors may propose new tags via governance.
+ */
+export type MentorTag =
+  | 'pattern'
+  | 'sentiment'
+  | 'macro'
+  | 'risk'
+  | 'ethics'
+  | 'sentinel'; // watches for *absence* of data
 
 export interface Mentor {
   id: string;
@@ -27,26 +39,34 @@ export interface Mentor {
 }
 ```
 
-*Full registry implementation lives in* `afi-core/runtime/mentor_registry.ts`.
-
 ---
+
 ## 3 · Pairing Flow
+
+<details>
+<summary><strong>Plain‑text overview (GitHub safe)</strong></summary>
+
+1. Signal arrives  
+2. If anomaly detected → call <code>pairMentor()</code> with anomaly tags  
+3. Registry selects first active mentor matching ≥1 tag  
+4. Mentor offers advice  
+   * If agent **complies** → recovery & score boost  
+   * If agent **refuses** → agent jail  
+
+</details>
 
 ```mermaid
 flowchart LR
   S(Signal Arrives) -->|Anomaly? YES| P(pairMentor)
-  P --> M{Mentor<br>Registry}
+  P --> M{Mentor Registry}
   M -->|match| A(Assigned Mentor)
-  A --> R(Mentor Dialogue / Advice)
-  R -->|Comply| OK(Recovery)<br/>Score ↑
+  A --> R(Mentor Advice)
+  R -->|Comply| OK(Recovery & Score Boost)
   R -->|Refuse| J(Jail Agent)
 ```
 
-1. `pairMentor()` receives the anomaly tags (`risk`, `ethics`, …).  
-2. Registry selects the first active mentor matching at least one tag (future: weight by reputation).  
-3. Mentor engages. Agent either **recovers** or is **jailed**.
-
 ---
+
 ## 4 · Event Schema (YAML)
 
 ```yaml
@@ -61,6 +81,7 @@ mentor_event:
 ```
 
 ---
+
 ## 5 · Episode Connection
 
 **Episode I – The Ghost of the DAO’s First Lesson** is a *worked example* of this protocol:
@@ -70,12 +91,14 @@ mentor_event:
 - Mentor dialogue leads to **rebalancing** instead of slashing.
 
 ---
+
 ## 6 · Future Extensions
 1. **Mentor Reputation Decay** – mentors that give poor guidance lose weight.  
 2. **Cross‑chain Mentor Broadcasting** – mentors registered on one chain can be consumed by OFT‑bridged agents.  
 3. **DAO‑gated Mentor Creation** – high‑tier contributors propose new archetypes via governance vote.
 
 ---
+
 ## 7 · Quick Code Reference
 
 ```ts
@@ -92,4 +115,5 @@ if (mentor) {
 *See* `afi-agents/examples/handleSignal.ts` *for a complete runtime snippet.*
 
 ---
+
 ### End of Spec
