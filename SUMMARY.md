@@ -12,6 +12,7 @@
 ## 📐 Core Specs
 * [Architecture](specs/architecture.md)
 * [Mentor Protocol (Agent Lifecycle)](specs/mentor_protocol.md)
+* [The Modal (Proof-of-Intelligence Arena)](specs/modal.md)
 * [Modules & Repos](specs/modules.md)
 * [Tokenomics](specs/tokenomics.md)
 * [Governance](specs/governance.md)
