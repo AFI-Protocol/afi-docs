@@ -1,0 +1,8 @@
+{
+  "repo": "afi-docs",
+  "type": "documentation",
+  "description": "Central documentation hub for AFI Protocol, including lore, specs, and GitBook seed structure.",
+  "tags": ["afi", "agentic", "lore", "specs", "docs"],
+  "factoryReady": true,
+  "maintainers": ["Gio2050"]
+}
