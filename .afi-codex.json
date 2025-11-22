@@ -1,0 +1,28 @@
+{
+  "repo": "afi-docs",
+  "role": "Official documentation hub (specs, guides, lore)",
+  "status": "active",
+  "language": "docs",
+  "entrypoints": [
+    "specs/",
+    "guides/",
+    "lore/"
+  ],
+  "provides": [
+    "protocol-specs",
+    "developer-guides",
+    "architecture-docs",
+    "droid-contributor-guide"
+  ],
+  "dependsOn": [],
+  "consumers": [
+    "all-repos"
+  ],
+  "droid_ready": true,
+  "notes": [
+    "Documentation-only repository",
+    "Has droid_contributor_guide.md",
+    "Central knowledge base"
+  ]
+}
+

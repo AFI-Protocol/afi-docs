@@ -7,6 +7,12 @@ This repository is the **official documentation hub** for every public facet of 
 protocol specs, developer guides, governance blueprints, and the
 illustrative *Signal-Lore* series.
 
+## 🤖 Droid Instructions
+
+**For AI agents and automated contributors**: See [AGENTS.md](./AGENTS.md) for canonical repo constraints, allowed tasks, and safe patch patterns.
+
+> **Note**: If AGENTS.md conflicts with this README, AGENTS.md wins.
+
 | Directory | What you’ll find |
 |-----------|------------------|
 | **`/specs`**  | Formal specifications — architecture, agent lifecycle, tokenomics, governance |
