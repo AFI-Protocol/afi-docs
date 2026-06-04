@@ -1,3 +1,6 @@
+> **Historical note:** This document describes a superseded LangGraph-era architecture plan. AFI Reactor now uses a custom deterministic TypeScript DAG under `afi-reactor/src/dag/`. This file is retained only for historical context and should not be treated as current implementation guidance.
+>
+
 # AFI LangGraphNode Analysis and Refactoring Report
 
 **Date:** 2025-12-28

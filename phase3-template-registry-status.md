@@ -1,6 +1,6 @@
 # Phase 3: Template Registry - Status & Resumption Plan
 
-**Project:** AFI-Reactor LangGraph Integration
+**Project:** AFI-Reactor pipeline / DAG integration
 **Phase:** Phase 3 - Template Registry in afi-factory
 **Status:** In Progress - Initial Information Gathering Complete
 **Last Updated:** 2025-12-26T16:13:00Z
@@ -294,7 +294,7 @@ Use **Code mode** for implementing the changes, as this involves writing and mod
 - **JSON schemas**: Complete in [`afi-config/schemas/`](../afi-config/schemas/)
 
 ### Known Issues
-- The implementation plan document mentioned in the task (`AFI_REACTOR_LANGGRAPH_IMPLEMENTATION.md`) was not found in the workspace
+- The LangGraph-era implementation plan is archived at `archive/langgraph-migration-2025/AFI_REACTOR_LANGGRAPH_IMPLEMENTATION_PLAN.md` (superseded; reactor uses `src/dag/`)
 - afi-factory currently has no test infrastructure - needs to be set up
 
 ### Success Criteria Verification
