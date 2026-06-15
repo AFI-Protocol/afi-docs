@@ -1,0 +1,119 @@
+{
+  "theme": "D-evidence-vault",
+  "summary": "The Evidence plane is anchored by one canonical TypeScript type, VaultedSignalRecord, defined in afi-infra/src/tssd/types.ts:331 together with its per-stage snapshot interfaces (RAW/ENRICHED/ANALYZED/SCORED/VALIDATOR/MINTED/REPLAYED) and the publicSurface/proprietaryDetail split. The write/read contract is ITSSDVaultClient (TSSDVaultClient.ts) with three implementations in afi-infra (InMemory, Mongo time-series, TenantScoped); the ONLY production writer of the canonical record is the afi-gateway ingest route (afi-gateway/src/http/app.ts:135), which persists a RAW-only record straight into Mongo afi_tssd.tssd_signals, and the only canonical reader beyond the clients is the v0.1 stub TSSDReplayRunner. In practice the public/proprietary separation is purely a structural type split: proprietaryDetail is stored plaintext in the same document and every read returns the whole record (no projection, no encryption, no record-level access control), and the spec's 'publicSurface drives on-chain receipt metadata' workflow is not implemented (Theme C confirms receipts anchor no publicSurface fields). Replay readiness is weak end-to-end: the canonical record carries no pinned DAG/plugin/scorer/codex version or content-hash, the reactor's scoring output is written to a divergent ReactorScoredSignalDocument in a separate collection rather than into stages.scored, and no code writes the ENRICHED/ANALYZED/SCORED/MINTED/REPLAYED stages or runs a real re-score, so most lifecycle stages are defined-but-unpopulated and not deterministically reproducible.",
+  "answers": [
+    {
+      "question": "D1: Where is VaultedSignalRecord (and its stage snapshots) DEFINED?",
+      "answer": "The canonical record and every stage snapshot are defined in a single file, afi-infra/src/tssd/types.ts. VaultedSignalRecord (interface) is at types.ts:331 with the lifecycle map SignalLifecycleStage = RAW|ENRICHED|ANALYZED|SCORED|MINTED|REPLAYED at types.ts:10-16 and the stages{} object at types.ts:336-351. The per-stage snapshot interfaces are: SignalIdentity types.ts:22, RawSignalSnapshot types.ts:45, EnrichmentSnapshot types.ts:60, AnalysisSnapshot types.ts:81, AnalystScoreSnapshot types.ts:104, ScoreSnapshot types.ts:167, MintSnapshot types.ts:187, PublicSurfaceView types.ts:206, ProprietaryDetailView types.ts:221, TrainingFlags types.ts:236, OutcomeSnapshot (the REPLAYED stage) types.ts:249, plus VaultVoteResult types.ts:263 and ValidatorSnapshot types.ts:291 (an extra challenge/mint stage not in the canonical 6-stage list). The storage contract ITSSDVaultClient (upsert/getBySignalId/query/listForTraining) and TSSDVaultQuery are defined in afi-infra/src/tssd/TSSDVaultClient.ts:36-68 and TSSDVaultClient.ts:9-23. The semantics are documented in afi-infra/docs/TSSD_VAULT_SPEC.md and the record is exported as the repo's contract via afi-infra/src/tssd/index.ts:3 and listed in afi-infra/.afi-codex.json:19. No other repo defines the canonical record; afi-gateway and tests only import it from afi-infra.",
+      "evidence": "afi-infra/src/tssd/types.ts:331; afi-infra/src/tssd/types.ts:10-16; afi-infra/src/tssd/types.ts:336-351; afi-infra/src/tssd/types.ts:45; afi-infra/src/tssd/types.ts:167; afi-infra/src/tssd/types.ts:206-234; afi-infra/src/tssd/types.ts:249; afi-infra/src/tssd/TSSDVaultClient.ts:36-68; afi-infra/src/tssd/index.ts:3; afi-infra/.afi-codex.json:19"
+    },
+    {
+      "question": "D2: Where is VaultedSignalRecord WRITTEN (upsert/persist sites)?",
+      "answer": "Write goes through ITSSDVaultClient.upsert, implemented three times in afi-infra: InMemoryTSSDVaultClient.upsert (afi-infra/src/tssd/TSSDVaultClient.ts:97, merge-only, no persistence/encryption/access-control by design), MongoTSSDVaultClient.upsert (afi-infra/src/tssd/MongoTSSDVaultClient.ts:120, which delete+insertOne's into a Mongo native time-series collection created with timeField=createdAt/metaField=identity/granularity=minutes at MongoTSSDVaultClient.ts:64-68,230 and serializes the whole record via toDb at MongoTSSDVaultClient.ts:278), and TenantScopedTSSDVaultClient.upsert (afi-infra/src/tssd/TenantScopedTSSDVaultClient.ts:29, which forces identity.analystId = tenantId). The ONLY production caller of upsert is the afi-gateway signal-ingest route: POST /api/v1/signals at afi-gateway/src/http/app.ts:135 calls vault.upsert(parsed.record) where the record is built by normalizeSignalPayload (afi-gateway/src/http/app.ts:33-58) and vault is a TenantScoped->Mongo client wired to afi_tssd.tssd_signals by afi-gateway/src/services/vaultFactory.ts:18-34. That write only populates identity + whatever stages the caller posts (default {}) — it is effectively a RAW-stage ingest. Critically, the reactor does NOT write the canonical record: afi-reactor/src/services/tssdVaultService.ts:104 persists a different type (ReactorScoredSignalDocument) into a separate Reactor-owned collection reactor_scored_signals_v1 (afi-reactor/src/services/tssdVaultService.ts:6,59), so no code writes stages.enriched/analyzed/scored/minted/replayed back into VaultedSignalRecord.",
+      "evidence": "afi-infra/src/tssd/TSSDVaultClient.ts:97; afi-infra/src/tssd/MongoTSSDVaultClient.ts:120; afi-infra/src/tssd/MongoTSSDVaultClient.ts:230; afi-infra/src/tssd/TenantScopedTSSDVaultClient.ts:29; afi-gateway/src/http/app.ts:135; afi-gateway/src/http/app.ts:33-58; afi-gateway/src/services/vaultFactory.ts:18-34; afi-reactor/src/services/tssdVaultService.ts:104; afi-reactor/src/services/tssdVaultService.ts:59"
+    },
+    {
+      "question": "D3: Where is VaultedSignalRecord READ (getBySignalId/query/consumers)?",
+      "answer": "Reads go through ITSSDVaultClient.getBySignalId / query / listForTraining, implemented in all three clients: Mongo at afi-infra/src/tssd/MongoTSSDVaultClient.ts:163 (getBySignalId), :171 (query, sort createdAt desc, limit default 100), :194 (listForTraining filters training.includeForModel !== false); InMemory at afi-infra/src/tssd/TSSDVaultClient.ts:128/135/158; TenantScoped at afi-infra/src/tssd/TenantScopedTSSDVaultClient.ts:41/48/57 (post-fetch analystId match for getBySignalId, forced analystId for query). The only canonical reader beyond the client classes themselves is the replay engine: replaySignalsFromTssd in afi-infra/src/tssd/TSSDReplayRunner.ts:64 calls vault.getBySignalId(signalId) and inspects record.stages?.scored (TSSDReplayRunner.ts:86). A grep for VaultedSignalRecord across the workspace shows no afi-reactor/afi-core/afi-econ/afi-benchkit consumer reading the canonical record for scoring, training, or analytics (afi-math/afi-econ/afi-tiny-brains recon records show 0 hits); the listForTraining 'training corpus' consumer promised by the spec is not wired to any caller. So in practice the record is write-mostly: ingested by the gateway and only read back by the stub replay runner (and tests).",
+      "evidence": "afi-infra/src/tssd/MongoTSSDVaultClient.ts:163; afi-infra/src/tssd/MongoTSSDVaultClient.ts:171-191; afi-infra/src/tssd/MongoTSSDVaultClient.ts:194; afi-infra/src/tssd/TSSDVaultClient.ts:128-160; afi-infra/src/tssd/TenantScopedTSSDVaultClient.ts:41-57; afi-infra/src/tssd/TSSDReplayRunner.ts:64; afi-infra/src/tssd/TSSDReplayRunner.ts:86; afi-docs/specs/audit/recon/per-repo/afi-econ.json:75"
+    },
+    {
+      "question": "D4: Public surface vs proprietary detail — in practice (not just spec), how is the separation enforced?",
+      "answer": "By spec (afi-infra/docs/TSSD_VAULT_SPEC.md) publicSurface (keyDrivers/summaryInsight/riskLabel/tags) is 'safe to expose via receipts, explorers, dashboards' and proprietaryDetail (internalNotes/featureNotes/externalRefs/opaqueBlobRef) is private and may be encrypted at rest. In practice the separation is ONLY a structural TypeScript split (PublicSurfaceView types.ts:206 vs ProprietaryDetailView types.ts:221); nothing enforces it at runtime: (a) MongoTSSDVaultClient.toDb (MongoTSSDVaultClient.ts:278-285) writes the ENTIRE record — proprietaryDetail included — as plaintext BSON into the same tssd_signals document; the 'optionally encrypt proprietaryDetail at rest' is explicitly future work in the spec and is not implemented. (b) getBySignalId/query return the full document with no field projection, so any holder of collection access reads proprietaryDetail alongside publicSurface (MongoTSSDVaultClient.ts:163-191); InMemory states outright 'No persistence, encryption, or access control' (TSSDVaultClient.ts:88). (c) The only isolation is analyst-tenant scoping by identity.analystId (TenantScopedTSSDVaultClient.ts:29-57), and even that is weak because the time-series collection cannot hold a unique index and falls back to non-unique (MongoTSSDVaultClient.ts:250-260). (d) The gateway ingest passes proprietaryDetail straight through with no redaction (afi-gateway/src/http/app.ts:53). (e) The spec workflow 'publicSurface is used to generate on-chain receipt metadata' is NOT realized: Theme C confirms on-chain receipts anchor no keyDrivers/summaryInsight and the receipt URI is a placeholder. Net: the public/proprietary boundary is a documentation/coding convention, not an enforced runtime surface.",
+      "evidence": "afi-infra/src/tssd/types.ts:206-234; afi-infra/docs/TSSD_VAULT_SPEC.md:32-72; afi-infra/src/tssd/MongoTSSDVaultClient.ts:278-285; afi-infra/src/tssd/MongoTSSDVaultClient.ts:163-191; afi-infra/src/tssd/MongoTSSDVaultClient.ts:250-260; afi-infra/src/tssd/TSSDVaultClient.ts:88; afi-gateway/src/http/app.ts:53"
+    },
+    {
+      "question": "D5: Replay readiness per lifecycle stage (RAW -> ENRICHED -> ANALYZED -> SCORED -> MINTED -> REPLAYED).",
+      "answer": "The record can hold an optional snapshot per stage, but end-to-end replay is design-only. CROSS-CUTTING BLOCKER: VaultedSignalRecord pins no determinism metadata — no DAG topology id, plugin-manifest version, scorer/codex version, or content/payload hash at the record level (only optional analystScore.strategyVersion at types.ts:112); the replay spec records the scorer version at RUN time, not in the document (afi-infra/docs/TSSD_REPLAY_CLI_SPEC.v0.1.md:18), so a stored record cannot be bound to the exact code that produced it. PER STAGE: RAW — RawSignalSnapshot has source/triggerSummary and an OPTIONAL payloadHash (types.ts:45-58); the gateway writer does not compute payloadHash and the raw payload body is not persisted, so enrichment cannot be re-derived from RAW (not replayable). ENRICHED — EnrichmentSnapshot stores indicators/patterns/sentiment as free-form Record<string,...> (types.ts:60-79) with no enrichment-engine version; replayable as data, not reproducible. ANALYZED — AnalysisSnapshot is narrative text/regime tags (types.ts:81-91); not deterministically reproducible. SCORED — ScoreSnapshot.analystScore is the canonical UWR score (types.ts:167-185), but the reactor writes its score to ReactorScoredSignalDocument in a SEPARATE collection (afi-reactor/src/services/tssdVaultService.ts:104), not into stages.scored, and the replay runner only checks presence of stages.scored (TSSDReplayRunner.ts:82) — it performs no re-scoring. MINTED — MintSnapshot has txHash/tokenAddress/chainId (types.ts:187-204) and is on-chain-verifiable, but no code writes the minted stage back to the vault. REPLAYED — OutcomeSnapshot (types.ts:249-261) is never populated by code: replaySignalsFromTssd is a v0.1 read-only stub (single-signal only, bulk filters TODO, no audit writes, no actual scoring) (afi-infra/src/tssd/TSSDReplayRunner.ts:40-103). So only RAW (partially, via gateway) and SCORED (in a divergent store) are actually written anywhere, and no stage is challenge-ready/deterministically reproducible from the canonical record alone.",
+      "evidence": "afi-infra/src/tssd/types.ts:112; afi-infra/docs/TSSD_REPLAY_CLI_SPEC.v0.1.md:11-18; afi-infra/src/tssd/types.ts:45-58; afi-infra/src/tssd/types.ts:60-79; afi-infra/src/tssd/types.ts:167-185; afi-infra/src/tssd/types.ts:187-204; afi-infra/src/tssd/types.ts:249-261; afi-infra/src/tssd/TSSDReplayRunner.ts:40-103; afi-reactor/src/services/tssdVaultService.ts:104"
+    }
+  ],
+  "findings": [
+    {
+      "title": "Canonical VaultedSignalRecord carries no pinned version / content-hash fields, so replays cannot be made deterministic or challenge-ready",
+      "severity": "P1",
+      "theme": "D-evidence-vault",
+      "evidence": "afi-infra/src/tssd/types.ts:331-362 (VaultedSignalRecord has identity/stages/publicSurface/proprietaryDetail/training but no DAG-topology/plugin/scorer/codex version or contentHash field); only afi-infra/src/tssd/types.ts:112 'strategyVersion?: string'; replay version capture is run-scoped at afi-infra/docs/TSSD_REPLAY_CLI_SPEC.v0.1.md:18 'record the code version ... the scoring/DAG version used for replay'",
+      "recommendation": "Add record-level pinned fields (codexVersion, dagTopologyHash, plugin/analyst/validator versions, payloadHash) to VaultedSignalRecord so a stored record self-describes the exact transform set; carry into AFI_REPLAY_READINESS_MATRIX.md and AFI_NORMATIVE_REGISTER.md as the headline evidence-plane determinism gap."
+    },
+    {
+      "title": "Reactor's scoring output bypasses the canonical vault: tssdVaultService writes a divergent ReactorScoredSignalDocument to a separate collection, never stages.scored",
+      "severity": "P1",
+      "theme": "D-evidence-vault",
+      "evidence": "afi-reactor/src/services/tssdVaultService.ts:6 'ISOLATION: This service uses Reactor-owned collections, isolated from afi-infra TSSD vault.'; afi-reactor/src/services/tssdVaultService.ts:59 default collection 'reactor_scored_signals_v1'; afi-reactor/src/types/ReactorScoredSignalV1.ts:63-125 ReactorScoredSignalDocument (signalId/pipeline.analystScore/rawUss) is a different shape than afi-infra/src/tssd/types.ts:331 VaultedSignalRecord",
+      "recommendation": "Either have the reactor persister write stages.scored into the canonical VaultedSignalRecord via ITSSDVaultClient, or document ReactorScoredSignalDocument as an operational mirror and define the mapping to the canonical record; otherwise the Evidence plane's SCORED stage is never populated and replay over canonical history is impossible."
+    },
+    {
+      "title": "Public/proprietary separation is structural only — proprietaryDetail is persisted plaintext in the same document and returned by every read (no projection, encryption, or record-level access control)",
+      "severity": "P1",
+      "theme": "D-evidence-vault",
+      "evidence": "afi-infra/src/tssd/MongoTSSDVaultClient.ts:278-285 toDb spreads the whole record (incl. proprietaryDetail) into the BSON doc; afi-infra/src/tssd/MongoTSSDVaultClient.ts:163-191 getBySignalId/query return the full document with no projection; afi-infra/src/tssd/TSSDVaultClient.ts:88 'No persistence, encryption, or access control is handled by this class.'",
+      "recommendation": "Enforce the boundary at runtime: project out proprietaryDetail on public/read paths, support at-rest encryption (or opaqueBlobRef-only storage) for proprietaryDetail as the spec promises, and add an access-control seam beyond analyst-tenant scoping before exposing the vault to explorers/dashboards."
+    },
+    {
+      "title": "The only production writer of the canonical record is afi-gateway ingest, and it writes a RAW-only record; no code writes ENRICHED/ANALYZED/MINTED/REPLAYED stages",
+      "severity": "P2",
+      "theme": "D-evidence-vault",
+      "evidence": "afi-gateway/src/http/app.ts:135 'await vault.upsert(parsed.record)'; afi-gateway/src/http/app.ts:33-58 normalizeSignalPayload defaults stages to payload.stages ?? {}; grep of VaultedSignalRecord writers shows no caller populating stages.enriched/analyzed/minted/replayed",
+      "recommendation": "Wire the DAG/mint/replay paths to upsert their respective stage snapshots into the canonical record so the lifecycle is actually captured, or relocate canonical writing out of the external gateway (see contradiction with gateway 'no direct DB access')."
+    },
+    {
+      "title": "TSSDReplayRunner is a v0.1 stub — single-signal only, no re-scoring, bulk filters and audit writes unimplemented",
+      "severity": "P2",
+      "theme": "D-evidence-vault",
+      "evidence": "afi-infra/src/tssd/TSSDReplayRunner.ts:51-52 'Bulk replay filters (epoch/analyst/strategy/time range) are TODO in v0.1.'; afi-infra/src/tssd/TSSDReplayRunner.ts:82-90 only sets hasScore from record.stages?.scored and writes nothing; afi-infra/docs/TSSD_REPLAY_CLI_SPEC.v0.1.md:1 'implementation lives in a future PR'",
+      "recommendation": "Treat replay readiness as design-only in the readiness matrix; track the replay engine (real re-score, bulk filters, dedicated tssd_replay_audit collection) as outstanding work needed before the Evidence plane can support challenge/regression replay."
+    },
+    {
+      "title": "Canonical vault client is Mongo-only while vault.schema.json advertises a multi-engine evidence plane",
+      "severity": "Info",
+      "theme": "D-evidence-vault",
+      "evidence": "afi-config/schemas/vault.schema.json:14-23 engine enum ['mongodb','postgresql','timescaledb','influxdb']; afi-infra has only MongoTSSDVaultClient.ts (mongodb) implementing ITSSDVaultClient (afi-infra/src/tssd/MongoTSSDVaultClient.ts:220-221 'import(\"mongodb\")')",
+      "recommendation": "Document that only the mongodb binding exists today; keep ITSSDVaultClient as the engine-neutral seam and mark postgresql/timescaledb/influxdb as schema-listed-but-unimplemented in the reference-impl map."
+    },
+    {
+      "title": "RAW payloadHash is optional and uncomputed; raw payload body is not persisted",
+      "severity": "Info",
+      "theme": "D-evidence-vault",
+      "evidence": "afi-infra/src/tssd/types.ts:51-57 'payloadHash?: string' (optional); afi-gateway/src/http/app.ts:33-58 builds the record without computing payloadHash or storing the raw body",
+      "recommendation": "Make payloadHash (and a stored or referenced raw payload) mandatory at ingest so the RAW stage can anchor and re-derive downstream enrichment for replay."
+    }
+  ],
+  "contradictions": [
+    {
+      "doc_says": "TSSD_VAULT_SPEC: 'the Vault record's publicSurface is used to generate on-chain receipt metadata' and the receipt links back to the Vault for full details.",
+      "code_does": "On-chain receipts (afi-token) anchor no publicSurface fields (no keyDrivers/summaryInsight) and the receipt URI is a placeholder; nothing reads publicSurface to build receipt metadata.",
+      "evidence": "afi-infra/docs/TSSD_VAULT_SPEC.md:108 vs afi-token/src/AFIMintCoordinator.sol:38-44; afi-token/script/DeployAFITokenMainnet.s.sol:103",
+      "severity": "P2",
+      "tension": "BASE-ledger"
+    },
+    {
+      "doc_says": "TSSD_VAULT_SPEC and TSSD_REPLAY_CLI_SPEC present the Vault as the canonical, replayable, deterministic record of each signal's full lifecycle.",
+      "code_does": "VaultedSignalRecord stores no pinned transform/version or content-hash fields, and the replay runner does no re-scoring, so a record is not deterministically reproducible from canonical data.",
+      "evidence": "afi-infra/docs/TSSD_REPLAY_CLI_SPEC.v0.1.md:11-18 vs afi-infra/src/tssd/types.ts:331-362; afi-infra/src/tssd/TSSDReplayRunner.ts:85-90",
+      "severity": "P1",
+      "tension": "other"
+    },
+    {
+      "doc_says": "afi-gateway AGENTS/README assert it is a pure HTTP/WS client with 'No direct DB access' and 'No AFI business logic here'.",
+      "code_does": "POST /api/v1/signals writes the canonical VaultedSignalRecord straight into Mongo afi_tssd.tssd_signals via TenantScoped->MongoTSSDVaultClient.",
+      "evidence": "afi-gateway/src/http/app.ts:135; afi-gateway/src/services/vaultFactory.ts:18-34 (vs afi-gateway AGENTS.md 'No direct DB access')",
+      "severity": "P2",
+      "tension": "stale-arch-docs"
+    },
+    {
+      "doc_says": "afi-reactor names src/services/tssdVaultService.ts and its persister 'TSSD Vault', implying it writes the canonical TSSD evidence record.",
+      "code_does": "It writes a different type (ReactorScoredSignalDocument) into a separate Reactor-owned collection (reactor_scored_signals_v1), explicitly isolated from the afi-infra TSSD vault.",
+      "evidence": "afi-reactor/src/services/tssdVaultService.ts:6; afi-reactor/src/services/tssdVaultService.ts:59; afi-reactor/src/types/ReactorScoredSignalV1.ts:63-125",
+      "severity": "P2",
+      "tension": "reactor-only"
+    },
+    {
+      "doc_says": "vault.schema.json defines the evidence plane as engine-pluggable (mongodb/postgresql/timescaledb/influxdb).",
+      "code_does": "Only a MongoDB time-series client implements ITSSDVaultClient; no Postgres/Timescale/Influx binding exists.",
+      "evidence": "afi-config/schemas/vault.schema.json:14-23 vs afi-infra/src/tssd/MongoTSSDVaultClient.ts:220-221",
+      "severity": "Info",
+      "tension": "Mongo-only"
+    }
+  ]
+}
