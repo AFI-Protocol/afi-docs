@@ -1,0 +1,123 @@
+{
+  "theme": "J-docs-drift",
+  "summary": "AFI's documentation surface carries substantial drift against the portable-protocol north star. (1) Stale/nonexistent repo names persist in current docs: afi-docs/AFI_Repository_Map.md still documents afi-pipeline and afi-agents as core repos with interdependency diagrams, the org map and afi-protocol onboarding still list the archived afi-agents/afi-construct, and several metadata files (afi-math/.afi-codex.json) name repos (afi-engine, afi-token-finalized) that do not exist in the workspace (28 afi-* repos + .github + afi-xerc20; no afi-pipeline/afi-agents/afi-construct present). (2) The contradiction register can be expanded along two axes documented here: reference-impl-presented-as-law (Orchestrator Doctrine 'Authoritative', reactor 'is the orchestrator', 'DAG is law') and Mongo-tunnel-vision (AFI_PIPELINE_AUDIT_REPORT equates the TSSD vault with MongoDB), plus an internal doc-hierarchy conflict in which README/AGENTS/ARCHITECTURE_STATUS/Doctrine each self-declare authority while none names AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md as the top normative reference. (3) Doc classification: only specs/AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md and the investigation charter are normative direction-setters; the architecture/status/atlas/pipeline-audit/doctrine files are reference-implementation descriptions; the langgraph-migration-2025 set is correctly archived with explicit supersession banners and is the model the rest of the hub should follow. The afi-token stale-metadata item (.droid.json hardhat/sepolia + .afi-codex.json src/AFICoordinator.sol while the repo is Foundry/Base with src/AFIMintCoordinator.sol) is captured here as a P3 stale-arch-docs entry per Theme C handoff.",
+  "answers": [
+    {
+      "question": "J1: Locate stale / renamed / nonexistent repo-name references in docs (e.g. historical afi-pipeline, afi-agents, afi-construct) and cite them.",
+      "answer": "Stale repo names are still embedded in current (non-archived) docs even though those repos do not exist in the workspace. GROUND TRUTH: the local org tree contains 28 afi-* repos plus .github and afi-xerc20, and NONE of afi-pipeline, afi-agents, or afi-construct is present; the in-repo census reflects this (afi-docs/AFI_REPO_CENSUS.md:5-29 lists every present repo and contains no afi-pipeline/afi-agents/afi-construct row). The north star explicitly flags these as stale: 'Also check for renamed, archived, or external-reference repos (e.g. historical afi-pipeline, afi-agents references in older docs)' (afi-docs/specs/AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md:181). STALE REFERENCES STILL LIVE: (a) afi-docs/AFI_Repository_Map.md documents 'afi-pipeline' as a core repo with a 'DAG execution engine' (afi-docs/AFI_Repository_Map.md:24) and 'afi-agents' as a collection of agent implementations (afi-docs/AFI_Repository_Map.md:54), wires them into the interdependency diagram 'afi-gateway -> afi-pipeline -> afi-reactor' and 'afi-factory -> afi-agents' (afi-docs/AFI_Repository_Map.md:168,170) and into the development workflow (afi-docs/AFI_Repository_Map.md:185-187,197-198); this whole map is stale. (b) The org-profile map lists afi-agents and afi-construct (correctly under an 'Archived (Historical Only)' heading, so this one is accurately classified) at .github/profile/README.md:73-74. (c) afi-protocol onboarding still hyperlinks the archived afi-agents as a live 'agent configs & runtime' repo (afi-protocol/contributor-manifest/onboarding.md:9). (d) Scattered afi-agents path references persist in the reactor doctrine copy (afi-docs/AFI_ORCHESTRATOR_DOCTRINE.md:20 'Pipeline logic scattered in afi-core or afi-agents'), in lore (afi-docs/lore/episode-2_return_of_the_mentor.md:15 'Registry-Path: afi-agents/registry/mentor_registry.ts') and in a spec snippet pointer (afi-docs/specs/mentor_protocol.md:115 'See afi-agents/examples/handleSignal.ts'). (e) Beyond afi-docs, codex metadata names nonexistent consumer repos: afi-math/.afi-codex.json:21-22 lists consumers 'afi-engine' and 'afi-token-finalized', neither of which exists locally. The afi-pipeline name appears only inside afi-docs (the historical Repository Map and the investigation/portable specs that flag it); it is not a live repo anywhere.",
+      "evidence": "afi-docs/AFI_Repository_Map.md:24; afi-docs/AFI_Repository_Map.md:54; afi-docs/AFI_Repository_Map.md:168; afi-docs/AFI_Repository_Map.md:185-187; afi-docs/AFI_REPO_CENSUS.md:5-29; afi-docs/specs/AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md:181; .github/profile/README.md:73-74; afi-protocol/contributor-manifest/onboarding.md:9; afi-docs/AFI_ORCHESTRATOR_DOCTRINE.md:20; afi-docs/lore/episode-2_return_of_the_mentor.md:15; afi-docs/specs/mentor_protocol.md:115; afi-math/.afi-codex.json:21-22"
+    },
+    {
+      "question": "J2: How should the Phase-1 contradiction register be expanded with documentation/drift conflicts (which doc-vs-code tensions and severities does the docs surface add)?",
+      "answer": "The docs surface contributes documentation-drift contradictions in three buckets that expand the draft register (drafts/AFI_CONTRADICTION_REGISTER.draft.md rows 29-34, 64, 103). BUCKET 1 - reference-impl-presented-as-law: a full copy of the reactor Orchestrator Doctrine lives in the docs hub headed 'Status: Authoritative' (afi-docs/AFI_ORCHESTRATOR_DOCTRINE.md:5), declares 'afi-reactor is the orchestrator of AFI' (:11) and 'The DAG is law / Every signal path ... must be expressible as a Reactor DAG' (:39), and closes 'This doctrine is authoritative. All afi-reactor code must comply.' (:290) - directly against the north star's reframe 'reactor is reference orchestrator; protocol law is conforming DAG outputs + pinned versions' (afi-docs/specs/AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md:133); classify P2 reactor-only (the in-reactor README/AGENTS originals are P1, see Theme E). BUCKET 2 - Mongo-tunnel-vision in docs: AFI_PIPELINE_AUDIT_REPORT.md presents the TSSD vault as MongoDB ('MongoDB TSSD vault persistence (Phase 1 complete)' afi-docs/AFI_PIPELINE_AUDIT_REPORT.md:16; 'afi-infra - TSSD vault (MongoDB), types, schemas' :41) with no 'reference engine' caveat, while vault.schema.json allows four engines (Theme B/D, Mongo-only); classify P2 Mongo-only. BUCKET 3 - internal doc-hierarchy / authority conflict: README, AGENTS, ARCHITECTURE_STATUS and the Doctrine each assert authority over the others (afi-docs/AGENTS.md:4 'If AGENTS.md conflicts with README or docs, AGENTS.md wins.'; afi-docs/AGENTS.md:25 'Codex + AOS are truth sources. Whitepaper is narrative, not canonical.'; afi-docs/ARCHITECTURE_STATUS.md:4 'Single source of truth for how AFI orchestration is implemented today.'; afi-docs/AFI_ORCHESTRATOR_DOCTRINE.md:290 'This doctrine is authoritative.') yet none names AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md as the top normative doc, so the north star is hosted but not asserted as canonical; classify P2 other. Additional pure stale-arch-docs rows to add: the afi-token metadata mismatch (see J3 / finding #1), afi-math/.afi-codex.json stale consumers (afi-math/.afi-codex.json:21-22), the broken SUMMARY.md sitemap (afi-docs/SUMMARY.md:13-18), and the AFI_Repository_Map stale-name row (J1). All draft rows in these buckets currently read 'Verified? = no'; Phase 3 should re-open each cited line (the citations here are re-opened and current).",
+      "evidence": "afi-docs/AFI_ORCHESTRATOR_DOCTRINE.md:5; afi-docs/AFI_ORCHESTRATOR_DOCTRINE.md:11; afi-docs/AFI_ORCHESTRATOR_DOCTRINE.md:39; afi-docs/AFI_ORCHESTRATOR_DOCTRINE.md:290; afi-docs/specs/AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md:133; afi-docs/AFI_PIPELINE_AUDIT_REPORT.md:16; afi-docs/AFI_PIPELINE_AUDIT_REPORT.md:41; afi-docs/AGENTS.md:4; afi-docs/AGENTS.md:25; afi-docs/ARCHITECTURE_STATUS.md:4; afi-docs/SUMMARY.md:13-18; afi-math/.afi-codex.json:21-22"
+    },
+    {
+      "question": "J3: Classify the docs as normative vs reference vs archive, with rationale.",
+      "answer": "NORMATIVE (direction-setting protocol law for the docs hub): afi-docs/specs/AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md - the portable-protocol charter that 'distinguish[es] normative rules from reference implementations' (afi-docs/specs/AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md:7) - and the investigation charter specs/AFI_PROTOCOL_INVESTIGATION_PROMPT.md (methodology). These are documents, not enforced artifacts; the binding machine-checkable normative law lives outside afi-docs in afi-config schemas, afi-infra/src/tssd/types.ts, afi-reactor VALIDATOR_REPLAY_SPEC and afi-token/src/*.sol (Theme A). REFERENCE (accurate-but-implementation-specific descriptions that must be labeled 'reference', not law): afi-docs/ARCHITECTURE_STATUS.md (calls itself 'Single source of truth for how AFI orchestration is implemented today' and correctly notes a custom TS DAG, afi-docs/ARCHITECTURE_STATUS.md:4,10), afi-docs/AFI_ORCHESTRATOR_DOCTRINE.md (a duplicated reactor doctrine, 'Authoritative'), afi-docs/AFI_PIPELINE_AUDIT_REPORT.md, AFI_System_Atlas.md and AFI_Full_Architecture.md - all describe the reference spine (reactor + Mongo vault + BASE) and should carry a reference banner per the north star (afi-docs/specs/AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md:133). ARCHIVE: afi-docs/archive/langgraph-migration-2025/ is correctly archived and explicitly marked superseded ('Documents in this folder describe superseded planning ... AFI does not use LangChain, LangGraph...' afi-docs/archive/langgraph-migration-2025/README.md:1-9), reinforced by ARCHITECTURE_STATUS.md:48,52 ('are archived and superseded'; 'Do not treat archived files as current implementation guidance.') - this is the model archive-hygiene pattern. SHOULD-BE-ARCHIVED-OR-CORRECTED (stale, currently presented as live): afi-docs/AFI_Repository_Map.md (stale afi-pipeline/afi-agents topology, J1) and afi-docs/SUMMARY.md (sitemap pointing at nonexistent files, afi-docs/SUMMARY.md:8-10,13-18). The repo's own metadata classifies it as active DOCS (afi-docs/.afi-codex.json) and README frames it as 'the official documentation hub' (afi-docs/README.md:6); the classification problem is intra-repo (mixing normative direction, reference description, and un-banner'd stale docs), not the repo type.",
+      "evidence": "afi-docs/specs/AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md:7; afi-docs/ARCHITECTURE_STATUS.md:4; afi-docs/ARCHITECTURE_STATUS.md:10; afi-docs/ARCHITECTURE_STATUS.md:48; afi-docs/ARCHITECTURE_STATUS.md:52; afi-docs/AFI_ORCHESTRATOR_DOCTRINE.md:5; afi-docs/archive/langgraph-migration-2025/README.md:1-9; afi-docs/specs/AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md:133; afi-docs/AFI_Repository_Map.md:24; afi-docs/SUMMARY.md:8-10; afi-docs/README.md:6; afi-docs/.afi-codex.json:4"
+    }
+  ],
+  "findings": [
+    {
+      "title": "AFI_Repository_Map.md documents stale/nonexistent repos (afi-pipeline, afi-agents) as core repos with topology + workflow",
+      "severity": "P3",
+      "theme": "J-docs-drift",
+      "evidence": "afi-docs/AFI_Repository_Map.md:24 '### afi-pipeline ... Signal processing pipeline with DAG execution'; afi-docs/AFI_Repository_Map.md:54 '### afi-agents'; afi-docs/AFI_Repository_Map.md:168 'afi-gateway -> afi-pipeline -> afi-reactor'; neither repo exists locally and afi-docs/AFI_REPO_CENSUS.md:5-29 lists neither",
+      "recommendation": "Archive or rewrite AFI_Repository_Map.md against the current repo set; reconcile with AFI_REPO_CENSUS.md and the north-star repo inventory. Mark it superseded with a banner like the langgraph-migration-2025 archive."
+    },
+    {
+      "title": "afi-token metadata is stale / wrong-toolchain: .droid.json declares hardhat/sepolia and .afi-codex.json references non-existent src/AFICoordinator.sol while the repo is Foundry/Base (src/AFIMintCoordinator.sol)",
+      "severity": "P3",
+      "theme": "J-docs-drift",
+      "evidence": "afi-token/.droid.json:3-4 '\"preferred_chain\": \"sepolia\", \"toolchain\": \"hardhat\"'; afi-token/.afi-codex.json:8 '\"src/AFICoordinator.sol\"' (no such file) vs actual afi-token/src/AFIMintCoordinator.sol:1 and AGENTS.md Foundry/Base toolchain (forge build); grep AFICoordinator in afi-token/src = 0 hits (only AFIMintCoordinator.sol)",
+      "recommendation": "Update afi-token/.droid.json toolchain->foundry and preferred_chain->base, and fix .afi-codex.json entrypoints to src/AFIMintCoordinator.sol (and src/AFISignalReceipt.sol). Carries the Theme C cross-repo handoff into the docs-drift register (stale-arch-docs)."
+    },
+    {
+      "title": "Internal doc-hierarchy conflict: README/AGENTS/ARCHITECTURE_STATUS/Doctrine each self-declare authority; none names the portable-protocol spec as the top normative doc",
+      "severity": "P2",
+      "theme": "J-docs-drift",
+      "evidence": "afi-docs/AGENTS.md:4 'If AGENTS.md conflicts with README or docs, AGENTS.md wins.'; afi-docs/AGENTS.md:25 'Codex + AOS are truth sources.'; afi-docs/ARCHITECTURE_STATUS.md:4 'Single source of truth for how AFI orchestration is implemented today.'; afi-docs/AFI_ORCHESTRATOR_DOCTRINE.md:290 'This doctrine is authoritative.' - none point to specs/AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md as canonical",
+      "recommendation": "Establish an explicit doc hierarchy that names AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md as the top normative direction; scope AGENTS.md authority to editing behavior, not protocol semantics; mark ARCHITECTURE_STATUS/Doctrine as reference."
+    },
+    {
+      "title": "Reactor Orchestrator Doctrine ('Authoritative', reactor is THE orchestrator, 'DAG is law') duplicated into the docs hub",
+      "severity": "P2",
+      "theme": "J-docs-drift",
+      "evidence": "afi-docs/AFI_ORCHESTRATOR_DOCTRINE.md:5 'Status: Authoritative'; afi-docs/AFI_ORCHESTRATOR_DOCTRINE.md:11 'afi-reactor is the orchestrator of AFI'; afi-docs/AFI_ORCHESTRATOR_DOCTRINE.md:39 'The DAG is law' vs afi-docs/specs/AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md:133 'Reframe: reactor is reference orchestrator'",
+      "recommendation": "Re-banner the docs-hub copy as reference orchestration; defer to Theme E for the in-reactor originals. Protocol law is conforming DAG outputs + pinned versions, not the reactor codebase."
+    },
+    {
+      "title": "AFI_PIPELINE_AUDIT_REPORT equates the TSSD vault with MongoDB (Mongo tunnel vision) with no reference-engine caveat",
+      "severity": "P2",
+      "theme": "J-docs-drift",
+      "evidence": "afi-docs/AFI_PIPELINE_AUDIT_REPORT.md:16 '- MongoDB TSSD vault persistence (Phase 1 complete)'; afi-docs/AFI_PIPELINE_AUDIT_REPORT.md:41 'afi-infra - TSSD vault (MongoDB), types, schemas' vs multi-engine vault.schema.json (Theme B/D)",
+      "recommendation": "Label Mongo as the default reference vault engine and cite vault.schema.json's PostgreSQL/TimescaleDB/InfluxDB support; align with the AFI_REFERENCE_IMPL_MAP and AFI_CONTRADICTION_REGISTER (Mongo-only)."
+    },
+    {
+      "title": "afi-math/.afi-codex.json lists stale/nonexistent consumer repos (afi-engine, afi-token-finalized)",
+      "severity": "P3",
+      "theme": "J-docs-drift",
+      "evidence": "afi-math/.afi-codex.json:21-22 'consumers: [\"afi-engine\", \"afi-token-finalized\", ...]' - neither repo exists locally (workspace has afi-token, not afi-token-finalized; no afi-engine)",
+      "recommendation": "Update consumers to the real repo names (afi-token, afi-reactor, afi-core, afi-mint, afi-config, afi-plugins); add a codex-metadata lint that resolves repo names against the org inventory."
+    },
+    {
+      "title": "Broken SUMMARY.md sitemap references many nonexistent doc files",
+      "severity": "P3",
+      "theme": "J-docs-drift",
+      "evidence": "afi-docs/SUMMARY.md:8-10 links guides/dev_setup.md, guides/validator.md, guides/factory.md; afi-docs/SUMMARY.md:13-18 links specs/architecture.md, specs/modules.md, specs/tokenomics.md, specs/governance.md - none of these exist in the tree",
+      "recommendation": "Prune or create the missing files; fix README Reference Index links too. Low risk but erodes navigability of the docs hub."
+    },
+    {
+      "title": "LangGraph-era docs are correctly archived and explicitly marked superseded (positive: model archive hygiene)",
+      "severity": "Info",
+      "theme": "J-docs-drift",
+      "evidence": "afi-docs/archive/langgraph-migration-2025/README.md:1-9 'Documents in this folder describe superseded planning ... AFI does not use LangChain, LangGraph...'; afi-docs/ARCHITECTURE_STATUS.md:48 'are archived and superseded'; afi-docs/ARCHITECTURE_STATUS.md:52 'Do not treat archived files as current implementation guidance.'",
+      "recommendation": "Apply this explicit-archive banner pattern to AFI_Repository_Map.md, AFI_ORCHESTRATOR_DOCTRINE.md and AFI_PIPELINE_AUDIT_REPORT.md so reference/stale docs are unambiguously classified."
+    }
+  ],
+  "contradictions": [
+    {
+      "doc_says": "AFI_Repository_Map.md presents afi-pipeline (DAG execution engine) and afi-agents (agent implementations) as core repos with interdependency diagrams and a development workflow.",
+      "code_does": "No afi-pipeline, afi-agents (or afi-construct) repo exists in the workspace; the current census lists 28 afi-* repos + .github + afi-xerc20 and none of these names; the north star flags them as historical/stale.",
+      "evidence": "afi-docs/AFI_Repository_Map.md:24; afi-docs/AFI_Repository_Map.md:54; afi-docs/AFI_Repository_Map.md:168 vs afi-docs/AFI_REPO_CENSUS.md:5-29; afi-docs/specs/AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md:181",
+      "severity": "P3",
+      "tension": "stale-arch-docs"
+    },
+    {
+      "doc_says": "afi-token metadata declares a Hardhat/Sepolia toolchain and an entrypoint src/AFICoordinator.sol.",
+      "code_does": "The repo is a Foundry/Base project (forge build) whose coordinator contract is src/AFIMintCoordinator.sol; there is no AFICoordinator.sol and no hardhat config.",
+      "evidence": "afi-token/.droid.json:3-4; afi-token/.afi-codex.json:8 vs afi-token/src/AFIMintCoordinator.sol:1",
+      "severity": "P3",
+      "tension": "stale-arch-docs"
+    },
+    {
+      "doc_says": "Multiple docs-hub files each self-declare top authority (AGENTS.md wins; ARCHITECTURE_STATUS is the single source of truth; the Doctrine is authoritative).",
+      "code_does": "None of them names AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md - the actual north-star direction doc the hub hosts - as the canonical top of the hierarchy.",
+      "evidence": "afi-docs/AGENTS.md:4; afi-docs/ARCHITECTURE_STATUS.md:4; afi-docs/AFI_ORCHESTRATOR_DOCTRINE.md:290 vs afi-docs/specs/AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md:7",
+      "severity": "P2",
+      "tension": "other"
+    },
+    {
+      "doc_says": "The Orchestrator Doctrine (copied into the docs hub, 'Status: Authoritative') states afi-reactor is THE orchestrator of AFI and 'the DAG is law'.",
+      "code_does": "The north star reframes reactor as the REFERENCE orchestrator and defines protocol law as conforming DAG outputs + pinned versions (any conforming orchestrator allowed).",
+      "evidence": "afi-docs/AFI_ORCHESTRATOR_DOCTRINE.md:5; afi-docs/AFI_ORCHESTRATOR_DOCTRINE.md:11; afi-docs/AFI_ORCHESTRATOR_DOCTRINE.md:39 vs afi-docs/specs/AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md:133",
+      "severity": "P2",
+      "tension": "reactor-only"
+    },
+    {
+      "doc_says": "AFI_PIPELINE_AUDIT_REPORT presents the TSSD vault as MongoDB ('MongoDB TSSD vault persistence', 'afi-infra - TSSD vault (MongoDB)').",
+      "code_does": "The canonical vault.schema.json defines a multi-engine vault (mongodb/postgresql/timescaledb/influxdb), so MongoDB is one reference engine, not the vault itself.",
+      "evidence": "afi-docs/AFI_PIPELINE_AUDIT_REPORT.md:16; afi-docs/AFI_PIPELINE_AUDIT_REPORT.md:41 vs afi-config/schemas/vault.schema.json:14-23",
+      "severity": "P2",
+      "tension": "Mongo-only"
+    },
+    {
+      "doc_says": "afi-math codex metadata names its consumers as afi-engine and afi-token-finalized (among others).",
+      "code_does": "Those repos do not exist in the org; the actual downstream consumers are afi-token, afi-reactor, afi-core and afi-mint.",
+      "evidence": "afi-math/.afi-codex.json:21-22 vs afi-docs/AFI_REPO_CENSUS.md:5-29",
+      "severity": "P3",
+      "tension": "stale-arch-docs"
+    }
+  ]
+}
