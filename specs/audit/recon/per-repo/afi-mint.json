@@ -1,0 +1,176 @@
+{
+  "repo": "afi-mint",
+  "visibility": "PRIVATE",
+  "archived": false,
+  "classification": "REFERENCE_IMPL",
+  "classification_rationale": "afi-mint is the off-chain minting *coordination* spine of the reference stack, not a protocol-normative source. package.json:3 \"AFI signal validation and token minting coordination\"; AGENTS.md:3 \"coordinates signal-driven token minting... but does NOT contain token contracts or on-chain economics logic\"; AGENTS.md:79 \"afi-mint = minting coordination (off-chain logic...)\". It implements one concrete spine: a Snapshot-governance appeal pipeline (ValidatorDaemon, SignalStateManager) and an emissions/goldpaper data provider, calling an interface IMintCoordinatorContract.mintForSignal() (MintExecutor.ts:32-37). The on-chain contracts here are empty stubs (contracts/MintManager.sol:4-5 \"// Stub for minting logic\"), and the canonical receipt/emissions definitions live elsewhere (afi-token contracts, afi-math). It is a working reference implementation, but a few artifacts (mint_receipt_schema.json, the signalId/epoch/beneficiary/receiptId/extraData breadcrumb shape) carry near-normative weight for on-chain<->off-chain linkage.",
+  "primary_purpose": "Off-chain coordination of signal-driven AFI token minting: an appeal-based validator pipeline (auto qualify/reject by decay score, challenge window, Snapshot dispute voting) that finalizes signals and invokes an on-chain AFIMintCoordinator.mintForSignal() to emit a per-signal mint breadcrumb (signalId, epoch, beneficiary, receiptId).",
+  "protocol_touchpoints": [
+    "mint/receipt",
+    "emissions",
+    "replay/determinism",
+    "schemas",
+    "contracts (stubs)",
+    "registries/reputation (placeholder)",
+    "TSSD/vault (interface only)",
+    "DAG/pipeline (consumer of scored signals)",
+    "SDK/API (Snapshot GraphQL governance)"
+  ],
+  "normative_artifacts": [
+    "/home/user/AFI-Protocol/afi-mint/codex/mint_receipt_schema.json",
+    "/home/user/AFI-Protocol/afi-mint/src/orchestrator/MintExecutor.ts (MintRequest / IMintCoordinatorContract.mintForSignal breadcrumb shape, lines 19-47)",
+    "/home/user/AFI-Protocol/afi-mint/schemas/MintTrigger.schema.ts (MintRequestSchema, lines 11-19)",
+    "/home/user/AFI-Protocol/afi-mint/src/orchestrator/types.ts (SignalValidatorState state machine, lines 33-150)",
+    "/home/user/AFI-Protocol/afi-mint/schemas/SignalValidatorState.schema.ts",
+    "/home/user/AFI-Protocol/afi-mint/src/adapters/EmissionsMintDataProvider.ts (goldpaper emissions formula, lines 50-288)"
+  ],
+  "reference_only_assumptions": [
+    {
+      "path": "/home/user/AFI-Protocol/afi-mint/src/orchestrator/types.ts",
+      "quote": "snapshotSpaceId: 'afi.eth' ... DEFAULT_VALIDATOR_CONFIG"
+    },
+    {
+      "path": "/home/user/AFI-Protocol/afi-mint/src/snapshot/SnapshotClient.ts",
+      "quote": "DEFAULT_SNAPSHOT_CONFIG: { hubUrl: 'https://hub.snapshot.org', sequencerUrl: 'https://seq.snapshot.org' }"
+    },
+    {
+      "path": "/home/user/AFI-Protocol/afi-mint/AGENTS.md",
+      "quote": "afi-reactor = signal orchestration (DAG pipeline, signal scoring); afi-mint = signal consumption ... Dependency direction: afi-mint -> afi-reactor (never reverse)"
+    },
+    {
+      "path": "/home/user/AFI-Protocol/afi-mint/src/adapters/EmissionsMintDataProvider.ts",
+      "quote": "Implements IMintDataProvider using the canonical AFI emissions schedule ... Based on the goldpaper formula: ΔAFIᵢ = clamp(B(t) × Qᵢ × Nᵢ × R_val,i × E_epoch, ...)"
+    },
+    {
+      "path": "/home/user/AFI-Protocol/afi-mint/src/snapshot/ProposalBuilder.ts",
+      "quote": "choices: ['For', 'Against', 'Abstain'] ... Standard AFI proposal format"
+    }
+  ],
+  "contradictions": [
+    {
+      "title": "Two divergent SignalValidatorState state machines (Zod schema vs TS types)",
+      "detail": "The canonical TS state machine in src/orchestrator/types.ts uses kinds pending/qualified/rejected/challenge_window/contested/dispute_resolved/finalized/minted/rejected_final, while the Zod validation schema in schemas/SignalValidatorState.schema.ts uses a completely different, older set: pending/decay_pass/challenge_open/voting_complete/minted/rejected. An external validator using the published @afi-protocol/afi-mint/schemas Zod schema to validate state records would reject every record produced by the actual orchestrator. This breaks interoperability of the signal lifecycle dialect.",
+      "evidence": "schemas/SignalValidatorState.schema.ts:13-20 z.enum(['pending','decay_pass','challenge_open','voting_complete','minted','rejected']) vs src/orchestrator/types.ts:33-42 'pending'|'qualified'|'rejected'|'challenge_window'|'contested'|'dispute_resolved'|'finalized'|'minted'|'rejected_final'",
+      "severity": "P1"
+    },
+    {
+      "title": "Reputation/governance can override deterministic mint outcome and amount",
+      "detail": "North-star rule 5 says reputation/registries/governance influence SELECTION & ALLOCATION only and MUST NOT override deterministic scoring or protocol finality. Here a Snapshot governance vote (DisputeResolver) can OVERTURN the validator's deterministic decay-score decision (qualified->reject / rejected->mint), directly flipping mint finality; and per-signal token amount is multiplied by reputationWeight and a governance-controlled epochPulseFactor. This conflates governance with deterministic scoring/finality.",
+      "evidence": "src/orchestrator/SignalStateManager.ts:284-286 'if (challengeSucceeded) { finalDecision = state.validatorDecision === \\'qualified\\' ? \\'reject\\' : \\'mint\\'; }'; src/adapters/EmissionsMintDataProvider.ts:270-281 'R = metadata.reputationWeight ... adjustedAmount = baseAmount * this.config.epochPulseFactor'",
+      "severity": "P1"
+    },
+    {
+      "title": "Non-deterministic constructs in a replay-critical mint path",
+      "detail": "Reference spine claims deterministic audit/replay (README.md:59 'deterministic audit trails'), but mint amount and state records embed wall-clock time (Date.now/new Date().toISOString throughout), and the emissions calc depends on mutable epoch-shared state (getEpochMintedAmount/getEpochTotalWeight) plus floating-point Math.exp/division before BigInt floor. Same inputs do not guarantee same scored/minted outputs across stacks unless time and epoch accumulation are snapshotted, which is not enforced here.",
+      "evidence": "src/adapters/EmissionsMintDataProvider.ts:284 'BigInt(Math.floor(adjustedAmount * 10 ** this.config.decimals))'; :261-263 'getEpochTotalWeight(...) ... getEpochMintedAmount(...) ... remainingBudget'; src/orchestrator/SignalStateManager.ts:128 'new Date().toISOString()'",
+      "severity": "P2"
+    },
+    {
+      "title": "On-chain commitment presented as full mint engine but contracts are empty stubs",
+      "detail": "README.md:44 advertises 'Solidity Contracts for On-Chain Mint Management' and contracts/ lists ChallengeRegistry/MintManager/ThresholdRules, yet all three are empty stub contracts. The actual on-chain commitment plane (mint events, supply caps, receipts) lives in afi-token. This matches the 'BASE = full ledger (vision) vs receipt-only (reality)' tension and risks readers treating these stubs as the commitment layer.",
+      "evidence": "contracts/MintManager.sol:4-5 'contract MintManager { // Stub for minting logic }'; contracts/ThresholdRules.sol:4 '// Stub for DAO-approved minting thresholds'; contracts/ChallengeRegistry.sol:4 '// Stub for handling signal mint challenges'",
+      "severity": "P2"
+    },
+    {
+      "title": "Single-beneficiary mint model, no econ splits / gauge",
+      "detail": "MintRequest carries exactly one beneficiary and one tokenAmount per signal; there is no split/gauge/multi-beneficiary distribution anywhere in the repo. This is consistent with the known 'single beneficiary mint vs econ splits/gauge' tension and means the reference coordinator cannot express revenue/emission splits described in broader econ vision.",
+      "evidence": "src/orchestrator/MintExecutor.ts:19-27 'interface MintRequest { beneficiary: string; tokenAmount: bigint; ... }'; grep for split|gauge|beneficiaries returned no logic hits",
+      "severity": "P3"
+    },
+    {
+      "title": "Stale root-level placeholder files and broken CLI references",
+      "detail": "Root contains legacy single-line placeholders (mint_trigger.ts, challenge_window.ts, threshold_checker.ts) and duplicate CLI/script stubs that predate the src/ implementation. cli/simulate-mint.ts calls runMintFlow() with no args, but mint/mint.ts exports runMintFlow(daemon: ValidatorDaemon) requiring a daemon -> the simulate CLI cannot run. .aider.conf.json declares repo_name 'afi-core' and references nonexistent dirs (runtime/, mentor/, signal_schema_test/).",
+      "evidence": "cli/simulate-mint.ts:2-3 'import { runMintFlow } from \\'../mint/mint\\'; runMintFlow();' vs mint/mint.ts:14 'export async function runMintFlow(daemon: ValidatorDaemon)'; .aider.conf.json:31 '\"repo_name\": \"afi-core\"'; threshold_checker.ts:1 '// Placeholder for score threshold validation logic.'",
+      "severity": "P3"
+    }
+  ],
+  "replay_relevance": "partial",
+  "dependencies": {
+    "upstream": [
+      "@afi-protocol/afi-core (peerDependency, validators/schemas; reputation_bridge references afi-core/validators/ValidatorDecision.ts)",
+      "@afi-protocol/afi-infra (peerDependency; reputation_bridge references afi-infra/src/tssd/types.ts)",
+      "afi-math (emissions schedule inlined 'to avoid circular dependency', canonical source afi-math/src/emissions/emissionsSchedule.ts)",
+      "afi-config (validator config + REGISTRIES_AND_REPUTATION.v0.1.md + AFI_DROID_CHARTER governance)",
+      "afi-reactor (consumes scored signals via IAnalystScoreFetcher)",
+      "ethers (peerDependency, optional)",
+      "Snapshot.org hub/sequencer (external governance API)"
+    ],
+    "downstream": [
+      "afi-token (afi-mint invokes IMintCoordinatorContract.mintForSignal on-chain; AGENTS.md dependency afi-mint -> afi-token)",
+      "afi-ops (deployment; AGENTS.md 'Consumed by: afi-ops')"
+    ]
+  },
+  "recommended_action": "clarify reference-vs-normative",
+  "notable_findings": [
+    {
+      "title": "Mint breadcrumb shape matches 'receipt, not full payload' on-chain reality",
+      "severity": "Info",
+      "theme": "mintForSignal|coordinateMint|beneficiary|epoch",
+      "evidence": "src/orchestrator/MintExecutor.ts:19-27 'interface MintRequest { beneficiary; tokenAmount; receiptId; receiptAmount; signalId; epoch; extraData }' and :146 'receiptAmount: 1n, ... extraData: \\'0x\\''",
+      "recommendation": "Confirm this MintRequest is the canonical on-chain anchor shape and that extraData is the slot for future content/payload hashes; cross-check against afi-token AFIMintCoordinator.mintForSignal signature. Promote to spec if it is the interoperability contract."
+    },
+    {
+      "title": "Mint receipt schema is the audit/replay anchor but is minimal",
+      "severity": "P2",
+      "theme": "replay|determinism|codex",
+      "evidence": "codex/mint_receipt_schema.json:6-13 required ['signal_id','score','mint_amount','validator_id','challenge_status','timestamp'] (no epoch, no beneficiary, no content/payload hash, no pinned-rule/version fields)",
+      "recommendation": "The receipt lacks epoch, beneficiary, and any pinned-transform/version or content-hash fields needed for challenge-ready replay. Align it with MintRequest and add determinism-anchoring fields (epoch, beneficiary, rulesetVersion, payloadHash)."
+    },
+    {
+      "title": "Snapshot governance vote determines mint finality (selection vs finality boundary)",
+      "severity": "P1",
+      "theme": "registries/reputation; replay/determinism",
+      "evidence": "src/orchestrator/DisputeResolver.ts:106-122 evaluateChallengeOutcome + src/orchestrator/SignalStateManager.ts:280-290 'if (challengeSucceeded) { ... overturn original decision }'",
+      "recommendation": "Document whether governance overturning a deterministic validator decision is intended protocol behavior. Per north-star rule 5 governance must not override deterministic scoring/finality; clarify this as appeal-of-record vs finality override."
+    },
+    {
+      "title": "TSSD/vault touched only via interface; no DB engine assumed (good for portability)",
+      "severity": "Info",
+      "theme": "mongodb|TSSD|vault",
+      "evidence": "src/adapters/EmissionsMintDataProvider.ts:162-166 'Interface for fetching signal metadata from TSSD vault. interface ISignalMetadataFetcher { getMetadata(...) }'; src/orchestrator/SignalStateManager.ts:57-62 'interface ISignalStateStore' with only InMemory impl",
+      "recommendation": "Positive: persistence is abstracted behind ISignalStateStore/ISignalMetadataFetcher with no Mongo/Postgres hardcoding. Note as evidence that afi-mint does NOT exhibit Mongo tunnel vision."
+    },
+    {
+      "title": "No USS/CPJ ingest-dialect validation present",
+      "severity": "Info",
+      "theme": "usignal|USS|cpj|CPJ",
+      "evidence": "grep for usignal|USS|cpj|CPJ across repo returned zero hits",
+      "recommendation": "Expected: afi-mint consumes already-scored signals (analyst score) not raw USS/CPJ; ingest-dialect validation belongs to afi-gateway/afi-core. No action."
+    },
+    {
+      "title": "Emissions/goldpaper math inlined and duplicated from afi-math",
+      "severity": "P2",
+      "theme": "normative|canonical|goldpaper",
+      "evidence": "src/adapters/EmissionsMintDataProvider.ts:18-21 'Inlined from afi-math to avoid circular dependency issues. Canonical source: afi-math/src/emissions/emissionsSchedule.ts'; cap 86_000_000_000n at :51",
+      "recommendation": "Duplicated emissions constants/algorithm risk drift from the canonical afi-math source, undermining deterministic replay. Replace the inlined copy with a versioned import or pin a shared emissions ruleset version recorded in the receipt."
+    },
+    {
+      "title": "BigQuery/Kafka/warehouse and Postgres/Timescale/Influx entirely absent",
+      "severity": "Info",
+      "theme": "BigQuery|kafka|warehouse|postgres",
+      "evidence": "grep for BigQuery|kafka|warehouse|postgresql|timescaledb|influxdb returned zero hits",
+      "recommendation": "Consistent with afi-mint being commitment-coordination, not the analytics/market or evidence-vault plane. No action for this repo; multi-engine concern lives in vault.schema.json / afi-infra."
+    },
+    {
+      "title": "reputation_bridge is an unimplemented placeholder that explicitly defers to canonical invariants",
+      "severity": "Info",
+      "theme": "registries/reputation",
+      "evidence": "src/reputation_bridge.ts:95-99 'TODO: implement reputation-weighted emission logic ... return []'; :8 'does NOT modify vault finality or the Universal Weighting Rule (UWR)'",
+      "recommendation": "Good guardrail comments; ensure the eventual implementation imports canonical reputation types rather than re-declaring 'Minimal' views (types.ts:18-39 TODO 'Replace with a direct import')."
+    },
+    {
+      "title": "DEFAULT_VALIDATOR_CONFIG hardcodes economic/governance parameters in code",
+      "severity": "P3",
+      "theme": "pipeline|orchestrator|emissions",
+      "evidence": "src/orchestrator/types.ts:199-217 minDecayScoreThreshold 0.5, challengeSuccessThreshold 0.66, minChallengeStake '100000000000000000000', challengeSlashRate 0.5, snapshotSpaceId 'afi.eth'",
+      "recommendation": "AGENTS.md:135 forbids hardcoding minting parameters ('use config from afi-config'). These defaults are reasonable for a reference impl but should be clearly marked reference-only and sourced from afi-config in production paths."
+    },
+    {
+      "title": "Root .ts placeholders and CLI/script duplication are stale",
+      "severity": "P3",
+      "theme": "stale naming/placeholders",
+      "evidence": "mint_trigger.ts:1 '// Placeholder for mint event trigger to xERC20-compatible cross-chain contract.'; scripts/mint_trigger.ts:1 '// CLI hook for triggering a mint event'; cli/mint_trigger.ts:2 'Mint trigger CLI stub'",
+      "recommendation": "Tag stale: remove or consolidate the root-level placeholder .ts files and the three near-empty CLI/script trigger stubs that are superseded by src/orchestrator + mint/mint.ts."
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "repo": "afi-sdk-python",
+  "visibility": "PRIVATE",
+  "archived": false,
+  "classification": "STALE",
+  "classification_rationale": "Repository contains only README.md and pyproject.toml with no source code, package, schemas, contracts, or tests. The afi_sdk package referenced in README usage examples does not exist. README Status line states \"New repository created during multi-repo reorganization (2025-11-14)\" and the single git commit is \"chore: initialize new repository\". It is an empty scaffold/placeholder, not yet a functioning SDK. Classified STALE (empty placeholder created during reorg, no implementation); could alternatively be SUPPORTING once built, but currently holds no protocol surface.",
+  "primary_purpose": "Intended official Python SDK for building on AFI Protocol (signal submission/validation helpers, agent integration, ML/AI integration), but currently an empty scaffold with only README and pyproject.toml — no implementation exists.",
+  "replay_relevance": "none",
+  "protocol_touchpoints": [
+    "USS/CPJ ingest (aspirational only: 'Signal submission and validation helpers')",
+    "SDK/API (intended client surface, not implemented)"
+  ],
+  "normative_artifacts": [],
+  "reference_only_assumptions": [
+    {
+      "path": "/home/user/AFI-Protocol/afi-sdk-python/README.md:11",
+      "quote": "- Pythonic API clients for afi-reactor"
+    },
+    {
+      "path": "/home/user/AFI-Protocol/afi-sdk-python/README.md:30",
+      "quote": "client = AFIClient(api_url=\"https://api.afi.protocol\")"
+    }
+  ],
+  "contradictions": [
+    {
+      "title": "SDK targets afi-reactor as the API client surface",
+      "detail": "README lists 'Pythonic API clients for afi-reactor' as the headline feature, coupling the official SDK to the reference orchestrator/runtime (afi-reactor) rather than to the portable protocol dialects (USS v1.1 / CPJ v0.1) or the gateway ingest boundary. A portable-protocol SDK should target the canonical ingest dialect + schema validation, not a specific stack component. This is aspirational text only (no code), so impact is low for now.",
+      "evidence": "README.md:11 '- Pythonic API clients for afi-reactor'",
+      "severity": "P2"
+    },
+    {
+      "title": "pyproject declares version 1.0.0 for an empty scaffold",
+      "detail": "pyproject.toml sets version = \"1.0.0\" while the repo has zero implementation, no afi_sdk package, and no tests. The README example `from afi_sdk import AFIClient` cannot work. Version signaling contradicts actual maturity.",
+      "evidence": "pyproject.toml:3 'version = \"1.0.0\"' vs README.md:41 '🚧 New repository created during multi-repo reorganization (2025-11-14)'",
+      "severity": "P3"
+    }
+  ],
+  "dependencies": {
+    "upstream": [
+      "afi-reactor (named as API client target in README.md:11; not declared as a code dependency)"
+    ],
+    "downstream": []
+  },
+  "recommended_action": "clarify reference-vs-normative",
+  "notable_findings": [
+    {
+      "title": "Empty scaffold repo — no implementation, schemas, or contracts present",
+      "severity": "Info",
+      "theme": "stale/placeholder",
+      "evidence": "git ls-files -> only 'README.md' and 'pyproject.toml'; find . -type f (excl .git) returns only those two; single commit '08c24dd chore: initialize new repository'",
+      "recommendation": "Tag as not-yet-implemented placeholder; revisit classification (SUPPORTING) once SDK code lands. No protocol surface to audit currently."
+    },
+    {
+      "title": "Referenced afi_sdk Python package does not exist",
+      "severity": "P3",
+      "theme": "doc/code contradiction",
+      "evidence": "README.md:28 'from afi_sdk import AFIClient' but no afi_sdk/ directory or .py files exist in repo",
+      "recommendation": "Mark README usage as aspirational or scaffold the package; current README implies a working install that fails."
+    },
+    {
+      "title": "SDK feature set names afi-reactor instead of portable dialect/gateway",
+      "severity": "P2",
+      "theme": "reference-impl-as-protocol-law",
+      "evidence": "README.md:11 '- Pythonic API clients for afi-reactor'",
+      "recommendation": "When built, target USS v1.1 / CPJ v0.1 ingest dialect + afi-config schema validation via the gateway boundary, keeping reactor as one optional backend, so the SDK stays portable across stacks."
+    },
+    {
+      "title": "No replay/determinism, vault/TSSD, mint/receipt, or schema artifacts",
+      "severity": "Info",
+      "theme": "replay/determinism",
+      "evidence": "grep over README.md/pyproject.toml for mongodb|TSSD|vault|usignal|CPJ|mintForSignal|epoch|replay|determinism|BigQuery|postgresql|... returns only README copy 'afi-reactor', 'Signal submission', 'Submit a signal'",
+      "recommendation": "None — repo holds no replay-critical artifacts and no determinism rules."
+    }
+  ]
+}

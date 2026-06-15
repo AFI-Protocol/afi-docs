@@ -1,0 +1,62 @@
+{
+  "repo": "afi-research-site",
+  "visibility": "PRIVATE",
+  "archived": false,
+  "classification": "OUT_OF_SCOPE",
+  "classification_rationale": "This is a Next.js marketing/brochure website built on the purchased \"Axleo\" ThemeForest template (package.json name \"axleo-next\", README:3 \"AFI Research Institute website (Next.js), adapted from the Axleo template\"). It is the public portal for research programs, services, team, blog, and a fiat-only Stripe \"Adopt-an-Agent\" donation flow (README:26-33). It contains zero protocol code: no schemas, no contracts, no TSSD/vault/mint/DAG logic, no API routes (find for api dir returned 0), and the README explicitly states it is separate from the AFI Network (\"Keep a clear separation from the AFI Network (registry/explorer live elsewhere; we link out when ready)\" README:33). The repo carries no normative, reference-implementation, or replay-relevant artifacts and therefore sits outside the portable-protocol surface.",
+  "primary_purpose": "Public-facing marketing/brochure website (Next.js App Router, Axleo template skin) for the AFI Research Institute, presenting research programs, services, team/careers, blog, and a fiat-only Stripe \"Adopt-an-Agent\" donation flow; explicitly separate from the AFI Network protocol stack.",
+  "replay_relevance": "none",
+  "protocol_touchpoints": [],
+  "normative_artifacts": [],
+  "recommended_action": "none",
+  "reference_only_assumptions": [],
+  "contradictions": [],
+  "dependencies": {
+    "upstream": [],
+    "downstream": []
+  },
+  "notable_findings": [
+    {
+      "title": "Repo is the Axleo Next.js marketing template, not protocol code",
+      "severity": "Info",
+      "theme": "classification/scope",
+      "evidence": "package.json:2 \"name\": \"axleo-next\"; README.md:3 \"AFI Research Institute website (Next.js), adapted from the Axleo template and tailored to our information architecture and the Adopt-an-Agent donation flow.\"",
+      "recommendation": "Treat as OUT_OF_SCOPE for the portable-protocol audit; it is a brochure site with no normative or replay artifacts."
+    },
+    {
+      "title": "No protocol patterns present anywhere in source",
+      "severity": "Info",
+      "theme": "mongodb|TSSD|vault|usignal|CPJ|mint|epoch|replay|reactor|BigQuery|kafka|postgresql",
+      "evidence": "grep -rniE 'mongodb|MongoTSSD|TSSD|VaultedSignalRecord|usignal|USS v1|cpj|mintForSignal|coordinateMint|epoch|ReplaySession|determinism|publicSurface|AFIMintCoordinator|froggy|doctrine|BigQuery|kafka|timescaledb|influxdb' over *.js/jsx/ts/tsx/json/md/mjs/sol returned zero matches (excluding lockfile/node_modules).",
+      "recommendation": "No action; confirms repo holds no schema, contract, vault, DAG, or replay surface."
+    },
+    {
+      "title": "Apparent protocol keywords are marketing copy / template radio labels only",
+      "severity": "Info",
+      "theme": "normative|canonical|signal|vault false-positives",
+      "evidence": "README.md:40 banner tiles 'Market Observability, Signal Robustness, Governance & Attestation'; README.md:102 'canonical PDFs/notebooks/datasets'; src/utils/ChoosePaymentMethod.js:24 className 'stripe' (UI radio next to PayPal, no backend).",
+      "recommendation": "None; 'signal'/'canonical' here are research-marketing nouns, and 'stripe'/'supabase' hits are stock template e-commerce UI, not integrations."
+    },
+    {
+      "title": "Site explicitly decoupled from the AFI Network; donations confer no rights and accept no crypto",
+      "severity": "Info",
+      "theme": "scope boundary / commitment plane",
+      "evidence": "README.md:33 'Keep a clear separation from the AFI Network (registry/explorer live elsewhere; we link out when ready).'; README.md:170 'The Institute does not accept crypto/tokens.'; CONTRIBUTING.md:57 'Donations are not purchases and confer no financial rights.'",
+      "recommendation": "None; correctly avoids collapsing marketing/donation flow into the commitment/evidence planes."
+    },
+    {
+      "title": "Planned data backend is Supabase/Postgres + Stripe + SendGrid, fully off the protocol path",
+      "severity": "Info",
+      "theme": "pluggable storage (non-protocol)",
+      "evidence": ".env.example 'NEXT_PUBLIC_SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY / STRIPE_SECRET_KEY / SENDGRID_API_KEY'; README.md:84-86 'Stripe Checkout (donations; webhook -> Supabase) ... Supabase (Postgres) for adopt_requests'.",
+      "recommendation": "None; this Postgres usage is donation CRM, unrelated to the evidence-plane vault.schema.json multi-engine requirement."
+    },
+    {
+      "title": "Large raw datasets (IRS990, NBER, USASpending, etc.) excluded from git, moved to undocumented external storage",
+      "severity": "P3",
+      "theme": "research data provenance / reproducibility",
+      "evidence": "data/raw/README.md:7 'Large data files ... are excluded from version control'; :13 'Storage location: [To be documented by team]'; :39-40 'Excluded large data files from git to reduce repo size from 1.6GB to <100MB ... Multi-repo reorganization (Phase 1.6)'.",
+      "recommendation": "Tag for follow-up: document the external storage location so the cited research datasets remain reproducible/auditable, consistent with the site's stated reproducibility claims; not a protocol-surface concern."
+    }
+  ]
+}

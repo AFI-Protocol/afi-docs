@@ -1,0 +1,99 @@
+{
+  "repo": "afi-tiny-brains",
+  "visibility": "PRIVATE",
+  "archived": false,
+  "classification": "REFERENCE_IMPL",
+  "classification_rationale": "A self-contained Python/FastAPI AI/ML microservice (\"Tiny Brains\") that provides ML enrichment predictions for the Froggy lane and is explicitly invoked by the reference spine (afi-reactor) over HTTP. README.md:3 \"AFI's AI/ML microservice for Froggy enrichment pipeline\"; README.md:11 \"This service is called by `afi-reactor` via the Tiny Brains client\". It implements ONE pluggable scoring/enrichment helper inside the Scoring-DAG/Evidence plane: no schemas, no contracts, no vault/TSSD store, no mint/receipt logic, no replay/canon artifacts. It is a candidate transform within the DAG, not a protocol rule, so REFERENCE_IMPL (a concrete pluggable component of the reference spine) rather than NORMATIVE.",
+  "primary_purpose": "A FastAPI microservice exposing POST /predict/froggy that runs a three-brain ensemble (Chronos time-series, HMM regime, LightGBM meta-learner) over Froggy enrichment context and returns a FroggyAiMlV1 prediction (convictionScore/direction/regime/riskFlag/notes), with heuristic fallbacks so it never errors.",
+  "replay_relevance": "partial",
+  "protocol_touchpoints": [
+    "DAG/pipeline (Froggy enrichment scoring transform)",
+    "SDK/API (HTTP /predict/froggy contract)",
+    "replay/determinism (model versions/seeds at inference not pinned in outputs)"
+  ],
+  "normative_artifacts": [],
+  "reference_only_assumptions": [
+    {
+      "path": "README.md:11",
+      "quote": "This service is called by `afi-reactor` via the Tiny Brains client (`src/aiMl/tinyBrainsClient.ts`) when Froggy enrichment has `aiMl.enabled = true`."
+    },
+    {
+      "path": "tiny_brains_service/models.py:70",
+      "quote": "Mirrors TinyBrainsFroggyInput from src/aiMl/tinyBrainsClient.ts"
+    },
+    {
+      "path": "tiny_brains_service/models.py:90",
+      "quote": "Mirrors FroggyAiMlV1 from afi-core/analysts/froggy.enrichment_adapter.ts"
+    },
+    {
+      "path": "README.md:120",
+      "quote": "X-AFI-Client: afi-reactor-froggy-v1"
+    }
+  ],
+  "contradictions": [
+    {
+      "title": "I/O contract hand-mirrored from afi-reactor TS types, not validated against afi-config canonical schemas",
+      "detail": "Input/output Pydantic models are documented as manual mirrors of TypeScript types in afi-reactor/afi-core rather than generated from or validated against the canonical USS/CPJ/afi-config schemas. This duplicates the ingest/scoring dialect by hand and risks silent drift from the canonical schema surface, weakening the rule that all data on the protocol surface should validate against afi-config schemas. It is reference-impl scope (not a production normative path), hence P2.",
+      "evidence": "tiny_brains_service/models.py:12 \"# Input Models (mirror TinyBrainsFroggyInput from src/aiMl/tinyBrainsClient.ts)\"; models.py:90 \"Mirrors FroggyAiMlV1 from afi-core/analysts/froggy.enrichment_adapter.ts\"",
+      "severity": "P2"
+    },
+    {
+      "title": "Inference is non-deterministic / model versions not pinned in output (replay rule)",
+      "detail": "Training scripts pin seeds (random_state=42, seed=42) but the serving path does not record or pin model id/version/hash in its output, and the Chronos path uses stochastic sampling (num_samples=10) on a synthetically-constructed price series with no fixed inference RNG. Per determinism + pinned-transforms replay rules, a scored output produced through this transform would not be reproducible from inputs alone, nor self-describing about which model version produced it (only a free-text 'notes' string distinguishes model vs heuristic). The reactor/vault layer must capture this; the service does not surface it. Scoped P2 since this component is pluggable and the canon lives upstream.",
+      "evidence": "tiny_brains_service/brains/chronos_brain.py:146 \"num_samples=10,  # Generate multiple samples for uncertainty\"; service.py:131 notes only \"final_notes = \\\" | \\\".join(notes_parts)\"",
+      "severity": "P2"
+    }
+  ],
+  "dependencies": {
+    "upstream": [
+      "afi-reactor (HTTP caller via src/aiMl/tinyBrainsClient.ts; provides run scripts/.env config)",
+      "afi-core (source of FroggyAiMlV1 type definition)"
+    ],
+    "downstream": []
+  },
+  "recommended_action": "clarify reference-vs-normative",
+  "notable_findings": [
+    {
+      "title": "No commitment/evidence/analytics persistence: pure stateless transform",
+      "severity": "Info",
+      "theme": "mongodb|vault|TSSD|postgres|bigquery|kafka",
+      "evidence": "Pattern searches for vault|TSSD|VaultedSignalRecord|mongodb|postgresql|timescaledb|influxdb|bigquery|kafka|warehouse returned ZERO hits across .py/.md/.toml. Only persistence is local model files: .gitignore \"models/*.joblib ... models/*.txt\".",
+      "recommendation": "Confirm this stays a stateless scoring helper; it does not and should not collapse commitment/evidence/analytics planes. No persistence-store coupling exists, so no multi-engine tension here."
+    },
+    {
+      "title": "No on-chain / mint / receipt / emissions surface",
+      "severity": "Info",
+      "theme": "mintForSignal|coordinateMint|beneficiary|epoch|AFIMintCoordinator|AFISignalReceipt|EmissionsMinted",
+      "evidence": "Pattern searches for mintForSignal|coordinateMint|beneficiary|epoch|AFIMintCoordinator|AFISignalReceipt|EmissionsMinted|MintCoordinated returned ZERO hits.",
+      "recommendation": "None. This repo is entirely off-chain enrichment; it is correctly outside the Commitment plane."
+    },
+    {
+      "title": "No USS/CPJ ingest dialect usage; signalId carried only as opaque string",
+      "severity": "Info",
+      "theme": "usignal|USS|cpj|CPJ",
+      "evidence": "Searches for usignal|USS|cpj|CPJ returned ZERO hits. models.py:72 only \"signalId: str\" and traceId, with no reference to USS v1.1 / CPJ v0.1 envelopes.",
+      "recommendation": "Document that the /predict/froggy payload is a reactor-internal enrichment sub-contract, NOT a canonical ingest dialect, to avoid future readers treating TinyBrainsFroggyInput as a protocol entry dialect."
+    },
+    {
+      "title": "No replay/determinism/codex machinery present",
+      "severity": "Info",
+      "theme": "replay|ReplaySession|determinism|codex",
+      "evidence": "Searches for replay|ReplaySession|determinism|deterministic|codex returned ZERO hits. Service is fail-soft and stateless (service.py:144 except -> neutral fallback).",
+      "recommendation": "Replay canon and pinned-topology recording must live in the reactor/vault layer; this service should be made to echo model id/version/hash so the upstream replay record can pin its transform version."
+    },
+    {
+      "title": "Output regime/direction vocabulary is internal, not schema-anchored",
+      "severity": "P3",
+      "theme": "normative|canonical|reference implementation",
+      "evidence": "hmm_brain.py:118 state_map produces \"calm_bull\"/\"panic_bear\"/\"choppy_neutral\"/\"unknown\" while models.py:102 regime is a free-form Optional[str]; README examples also use \"calm_bull\". No canonical enum is referenced.",
+      "recommendation": "If regime labels flow into scored/vaulted records, define a canonical enum in afi-config and validate against it; otherwise tag as reference-impl-internal vocabulary."
+    },
+    {
+      "title": "Fail-soft neutral fallback can mask scoring failures in a deterministic pipeline",
+      "severity": "P2",
+      "theme": "pipeline|DAG|orchestrator",
+      "evidence": "service.py:148-153 returns convictionScore=0.5/direction=neutral on ANY exception; README.md:21-22 \"Service always returns a valid response (never errors)\".",
+      "recommendation": "For challenge-ready/reproducible evidence, the upstream reactor should distinguish a genuine neutral prediction from an error-induced neutral (the 'notes' field carries this, but the structured fields do not), so a replay cannot silently diverge on transient failures."
+    }
+  ]
+}

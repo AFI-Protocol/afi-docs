@@ -1,0 +1,157 @@
+{
+  "repo": "afi-token",
+  "visibility": "PRIVATE",
+  "classification": "REFERENCE_IMPL",
+  "primary_purpose": "afi-token implements the AFI Protocol's on-chain Commitment plane on BASE: an xERC20-based ERC-20 emissions token (AFIToken, 86B hard cap), an ERC-1155 provenance receipt (AFISignalReceipt), and an AFIMintCoordinator orchestrator that links token+receipt mints to off-chain signal/epoch metadata via the MintCoordinated event.",
+  "classification_rationale": "The repo's Solidity contracts (src/*.sol) are listed in the North Star as NORMATIVE commitment-plane artifacts, yet the repo as a whole is a concrete BASE/xERC20/Foundry reference deployment with a SPECIFIC stack (defi-wonderland xERC20, OpenZeppelin AccessControl, single Treasury Safe role pattern). README.md:3 'AFI Protocol token implementation with xERC20 cross-chain compatibility ... on Base.' The on-chain shape (breadcrumb events, off-chain DAG/TSSD policy) is the reference spine, not a portable rule set. The .sol sources themselves are normative anchors; surrounding TS/docs are reference-impl scaffolding. Net classification: REFERENCE_IMPL containing embedded normative contract artifacts.",
+  "replay_relevance": "partial",
+  "protocol_touchpoints": [
+    "mint/receipt",
+    "emissions",
+    "contracts",
+    "schemas",
+    "registries/reputation",
+    "replay/determinism",
+    "DAG/pipeline"
+  ],
+  "normative_artifacts": [
+    "/home/user/AFI-Protocol/afi-token/src/AFIToken.sol",
+    "/home/user/AFI-Protocol/afi-token/src/AFIMintCoordinator.sol",
+    "/home/user/AFI-Protocol/afi-token/src/AFISignalReceipt.sol",
+    "/home/user/AFI-Protocol/afi-token/script/DeployAFITokenMainnet.s.sol"
+  ],
+  "reference_only_assumptions": [
+    {
+      "path": "/home/user/AFI-Protocol/afi-token/src/AFIToken.sol",
+      "quote": "mintEmissions is the ONLY emissions entrypoint, gated by EMISSIONS_ROLE. This role is granted to the MintCoordinator contract, which enforces off-chain policy (DAG/TSSD, Epoch Pulse, signal provenance)"
+    },
+    {
+      "path": "/home/user/AFI-Protocol/afi-token/README.md",
+      "quote": "Built on defi-wonderland's xERC20 standard ... Initially deployed on Base as the canonical chain"
+    },
+    {
+      "path": "/home/user/AFI-Protocol/afi-token/script/DeployAFITokenMainnet.s.sol",
+      "quote": "Pattern A: Both admin and emissions controller are the same Treasury Safe ... address admin_ = treasurySafe; address emissionsController_ = treasurySafe;"
+    },
+    {
+      "path": "/home/user/AFI-Protocol/afi-token/docs/sections/agent_registry_&_codex_logging.md",
+      "quote": "Every token minted via emissions is logged in the `.afi-codex.json` stream"
+    },
+    {
+      "path": "/home/user/AFI-Protocol/afi-token/AGENTS.md",
+      "quote": "All agents operating in AFI Protocol repos must follow afi-config/codex/governance/droids/AFI_DROID_CHARTER.v0.1.md ... the Charter wins"
+    }
+  ],
+  "contradictions": [
+    {
+      "title": "On-chain mint is single-beneficiary; no econ split / gauge despite agentic-reward vision",
+      "detail": "MintCoordinator.mintForSignal mints the full tokenAmount to a single req.beneficiary with no split/gauge/multi-payee logic. The portable-protocol KNOWN TENSION (econ splits/gauge vs single beneficiary mint) is realized here as single-beneficiary. This is acceptable as a reference impl but should be marked reference-vs-normative since docs imply richer reward distribution.",
+      "evidence": "src/AFIMintCoordinator.sol:76 'token.mintEmissions(req.beneficiary, req.tokenAmount);' (single beneficiary, no split)",
+      "severity": "P2"
+    },
+    {
+      "title": "Decentralization claims contradict single-Safe admin+emissions role concentration",
+      "detail": "README markets 'No centralized control'. The mainnet deploy (Pattern A) assigns BOTH DEFAULT_ADMIN_ROLE and EMISSIONS_ROLE to one Treasury Safe, which can mint up to the 86B cap and grant/revoke all roles. This contradicts the decentralization framing and the North Star rule that reputation/registries influence selection/allocation only.",
+      "evidence": "README.md:225 '✅ No centralized control' vs script/DeployAFITokenMainnet.s.sol:62-63 'address admin_ = treasurySafe; address emissionsController_ = treasurySafe;'",
+      "severity": "P2"
+    },
+    {
+      "title": "Local SignalSchema.zod.ts is not the canonical USS v1.1 dialect",
+      "detail": "Decentralization rule (1) requires the canonical dialect validate vs afi-config schemas. This repo defines its own bespoke Zod SignalSchema (id, provider_id, content, score, novelty_score) with no reference to USS v1.1 / afi-config/schemas/usignal/v1. USS|CPJ strings are entirely absent from the repo. Reward math (emissions_with_novelty.ts) parses against this local schema, risking dialect drift from the normative ingest boundary.",
+      "evidence": "models/SignalSchema.zod.ts:3-15 'export const SignalSchema = z.object({ id, provider_id, content, timestamp, score, novelty_score ... })' (grep for usignal|USS|cpj returns zero hits)",
+      "severity": "P2"
+    },
+    {
+      "title": "Replay/'Codex replayable' claim unbacked on-chain; receipt is breadcrumb only",
+      "detail": "README:227 asserts 'Codex replayable & auditable' and docs claim every mint is logged to .afi-codex.json with novelty/challenge history, but on-chain only signalId/epoch/amounts/beneficiary are anchored (no payload hash, no UWR axes, no pinned-version anchor). Replay determinism depends entirely on off-chain afi-mint/afi-reactor. Matches CURRENT ON-CHAIN REALITY (breadcrumb, not dense brain); aspirational richer anchors not present.",
+      "evidence": "src/AFIMintCoordinator.sol:84-85 'emit MintCoordinated(req.signalId, req.epoch, req.beneficiary, req.tokenAmount, req.receiptAmount);' vs README.md:227 '✅ Codex replayable & auditable'",
+      "severity": "P2"
+    },
+    {
+      "title": "Stale toolchain and entrypoint metadata",
+      "detail": ".droid.json declares toolchain 'hardhat' and preferred_chain 'sepolia' while the repo is Foundry-based on Base (foundry.toml, README). .afi-codex.json lists a non-existent entrypoint src/AFICoordinator.sol (actual file is src/AFIMintCoordinator.sol). agentops notes reference stale repo name afi-agents. .aider.conf.json repo_name is 'afi-core'.",
+      "evidence": ".droid.json:4 '\"toolchain\": \"hardhat\"'; .afi-codex.json:8 '\"src/AFICoordinator.sol\"' (file does not exist); .aider.conf.json:31 '\"repo_name\": \"afi-core\"'",
+      "severity": "P3"
+    }
+  ],
+  "dependencies": {
+    "upstream": [
+      "afi-xerc20 (lib/xERC20 submodule, branch afi-oz-v5-compat)",
+      "openzeppelin-contracts",
+      "forge-std",
+      "afi-config (AFI_DROID_CHARTER governance authority)"
+    ],
+    "downstream": [
+      "afi-mint (consumes contracts; .droid.json: integrate with afi-mint mint_trigger.ts; calls EMISSIONS_ROLE on coordinator)",
+      "afi-governance (Epoch Pulse, role evolution)",
+      "afi-ops (deployment)"
+    ]
+  },
+  "recommended_action": "clarify reference-vs-normative",
+  "notable_findings": [
+    {
+      "title": "On-chain anchor matches North Star breadcrumb model (signalId/epoch/amounts only)",
+      "severity": "Info",
+      "theme": "mint/receipt",
+      "evidence": "src/AFIMintCoordinator.sol:38-44 'event MintCoordinated(bytes32 indexed signalId, uint256 indexed epochId, address indexed beneficiary, uint256 tokenAmount, uint256 receiptAmount);'",
+      "recommendation": "Affirm in afi-docs that this minimal receipt is the canonical commitment surface; track aspirational payload-hash anchor as a separate normative extension."
+    },
+    {
+      "title": "86B hard supply cap enforced on-chain as immutable constant",
+      "severity": "Info",
+      "theme": "emissions",
+      "evidence": "src/AFIToken.sol:35,97-99 'uint256 public constant TOTAL_SUPPLY_CAP = 86_000_000_000 * 1e18; ... if (totalSupply() + amount > TOTAL_SUPPLY_CAP) revert CapExceeded();'",
+      "recommendation": "Record emissions cap as a normative commitment-plane invariant in the protocol surface spec."
+    },
+    {
+      "title": "DAG/TSSD/Epoch Pulse described as off-chain policy outside the token contract",
+      "severity": "Info",
+      "theme": "DAG/pipeline",
+      "evidence": "src/AFIToken.sol:19-21 'Epoch-specific logic and DAG/TSSD integration are handled at the coordinator/off-chain policy layers, NOT in this token contract.'",
+      "recommendation": "Good separation of commitment vs scoring DAG plane; keep DAG framework pluggable (reactor is reference, not mandatory)."
+    },
+    {
+      "title": "EMISSIONS_ROLE concentration is the only gate on minting",
+      "severity": "P1",
+      "theme": "registries/reputation",
+      "evidence": "src/AFIToken.sol:92 'function mintEmissions(address beneficiary, uint256 amount) external onlyRole(EMISSIONS_ROLE)' with mainnet Pattern A granting EMISSIONS_ROLE to the Treasury Safe (DeployAFITokenMainnet.s.sol:63)",
+      "recommendation": "Document that protocol finality / determinism must be enforced off-chain by afi-mint before this role mints; an external validator cannot verify scoring legitimacy from on-chain data alone. Clarify trust assumption in VALIDATOR_REPLAY_SPEC."
+    },
+    {
+      "title": "No multi-engine vault / no analytics layer present (and none should be) but no USS/CPJ ingest validation either",
+      "severity": "P2",
+      "theme": "USS/CPJ ingest",
+      "evidence": "grep usignal|USS|cpj => 0 hits; grep BigQuery|kafka|postgresql|timescaledb|influxdb => 0 hits; models/SignalSchema.zod.ts:3 bespoke local schema",
+      "recommendation": "Correctly scoped to commitment plane (no vault/analytics here). However the local Zod SignalSchema and reward math should validate against canonical USS v1.1 from afi-config rather than a private schema, or be explicitly marked illustrative/non-canonical."
+    },
+    {
+      "title": "ERC-1155 receipt metadata (URI) is a TODO placeholder for mainnet",
+      "severity": "P2",
+      "theme": "mint/receipt",
+      "evidence": "script/DeployAFITokenMainnet.s.sol:103 '\"https://afi.protocol/receipts/{id}.json\", // TODO: Update to production URI'",
+      "recommendation": "Resolve receipt URI before mainnet; if receipts are to carry provenance, define a canonical metadata schema (content hash linkage) in afi-config."
+    },
+    {
+      "title": "Stale/placeholder TS artifacts and inconsistent cross-repo references",
+      "severity": "P3",
+      "theme": "pipeline/orchestrator",
+      "evidence": "config/emissions_config.ts:1 '// Pseudocode implementing AFII/AAG-based exponential decay with halving logic.'; proposals/era_transition_proposal.schema.json:1 '// Schema for submitting formal SES/AFII era change proposals.' (stub only)",
+      "recommendation": "Tag emissions_config.ts / proposal schemas as pseudocode/stubs or remove; they imply functionality not present and could mislead replay/econ readers."
+    },
+    {
+      "title": "Codex/registry replay claims live in docs only, not enforced by code",
+      "severity": "P2",
+      "theme": "replay/determinism",
+      "evidence": "docs/sections/agent_registry_&_codex_logging.md:3-7 'Every token minted via emissions is logged in the `.afi-codex.json` stream—capturing ... Novelty score ... Challenge history ... Final emission value'",
+      "recommendation": "Either extract codex logging schema to a normative spec (afi-config) with reproducibility guarantees, or relabel as aspirational. Current .afi-codex.json is a repo manifest, not a per-mint provenance stream."
+    },
+    {
+      "title": "MintCoordinator does not grant itself receipt/token roles; relies on manual post-deploy wiring",
+      "severity": "Info",
+      "theme": "contracts",
+      "evidence": "script/DeployAFITokenMainnet.s.sol:140-143 'From Treasury Safe, grant roles: token.grantRole(EMISSIONS_ROLE, coordinator); receipts.grantRole(MINT_COORDINATOR_ROLE, coordinator); coordinator.grantRole(EMISSIONS_ROLE, <emissions_agent>)'",
+      "recommendation": "Reference-impl operational detail; document the canonical role topology so external implementers can reproduce the commitment wiring on a different chain."
+    }
+  ],
+  "archived": false
+}

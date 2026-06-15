@@ -1,0 +1,185 @@
+{
+  "repo": "afi-artifacts",
+  "classification": "SUPPORTING",
+  "classification_rationale": "This is a static \"paper reproducibility bundle\" (release tag paper-2025-v2.2) accompanying the AFI paper, not a runtime or a normative spec source. repro/README.md:4-5 \"It is a validation pack: schemas, example records, Codex manifest, and a deterministic mock replay. It does not include the AFI runtime, scorers, or DAG engine.\" The schemas it ships are explicitly described as \"snapshots\" of what appears in the paper Appendix (repro/README.md:8 \"minimal JSON Schemas for snapshots shown in Appendix A\"), and the replay tool is a stub (repro/tools/replay/afi-replay.js:2 \"Deterministic replay stub (replace with your implementation)\"). It supports/documents the protocol (citation, DOI, reproducibility evidence) but is not itself the authoritative schema/spec home (that is afi-config). Not NORMATIVE (snapshot copies, not the canonical schema source), not REFERENCE_IMPL (no working spine — mock_score is a hash, not real scoring), not pure DOCS (it ships runnable schemas/scripts/CI), not STALE (actively the canonical v2.2 release, last commit 2026-01-07).",
+  "primary_purpose": "Versioned, citable (Zenodo DOI 10.5281/zenodo.16857347) reproducibility bundle for the \"Agentic Financial Intelligence\" paper, packaging snapshot JSON Schemas (USS ingestion, vaulted TSSD, universal proposal), an example codex replay manifest, sample vault-ready records, and a deterministic mock-replay smoke test so reviewers can verify schema compliance and replay wiring without the full AFI engine.",
+  "protocol_touchpoints": [
+    "USS ingest (snapshot schema)",
+    "TSSD/vault (vaulted_tssd snapshot schema + example record)",
+    "DAG/pipeline (referenced as out-of-scope; pipeline field in schema)",
+    "schemas (USS, vaulted TSSD, universal proposal snapshots)",
+    "replay/determinism (codex manifest + mock_replay + canonicalizeSignal)",
+    "registries/reputation (validators/scorers listed in codex; proposal voting/governance schema)",
+    "SDK/API (canonicalizeSignal ingestion->validator helper)"
+  ],
+  "normative_artifacts": [
+    "/home/user/AFI-Protocol/afi-artifacts/repro/schemas/universal_signal_ingestion.schema.json (snapshot of USS ingestion, NOT the canonical afi-config/schemas/usignal/v1)",
+    "/home/user/AFI-Protocol/afi-artifacts/repro/schemas/vaulted_tssd.schema.json (snapshot of vault.schema.json TSSD shape)",
+    "/home/user/AFI-Protocol/afi-artifacts/repro/schemas/universal_proposal_schema.json (CPJ-like proposal v0.1 snapshot)",
+    "/home/user/AFI-Protocol/afi-artifacts/repro/schemas/universal_signal_schema.mjs",
+    "/home/user/AFI-Protocol/afi-artifacts/repro/schemas/vaulted_signal_schema.mjs",
+    "/home/user/AFI-Protocol/afi-artifacts/repro/schemas/universal_proposal_schema.mjs",
+    "/home/user/AFI-Protocol/afi-artifacts/repro/codex/afi-codex.json (replay manifest: epoch, scorers, validators, seed, deterministic)",
+    "/home/user/AFI-Protocol/afi-artifacts/repro/tools/replay/canonicalizeSignal.js (ingestion->validator canonicalization rules)"
+  ],
+  "reference_only_assumptions": [
+    {
+      "path": "/home/user/AFI-Protocol/afi-artifacts/repro/schemas/universal_signal_schema.mjs",
+      "quote": "// Canonical validator spec is the strict Zod schema in the paper."
+    },
+    {
+      "path": "/home/user/AFI-Protocol/afi-artifacts/repro/tests/replay_smoke_test.md",
+      "quote": "For complete pipeline replays (scoring modules, DAG execution, validator attestations), use the AFI engine (out of scope here)."
+    },
+    {
+      "path": "/home/user/AFI-Protocol/afi-artifacts/AGENTS.md",
+      "quote": "afi-artifacts is the build artifacts and compiled outputs repository for AFI Protocol. It contains repro bundles, compiled binaries, and deterministic build outputs"
+    }
+  ],
+  "contradictions": [
+    {
+      "title": "Repo self-description (compiled binaries/build artifacts) contradicts actual content (paper repro bundle)",
+      "detail": "package.json and AGENTS.md frame this as a build-artifacts/compiled-binaries store, but the repo contains only paper reproducibility material (snapshot schemas, examples, a mock-replay stub). No binaries exist. This mislabels the repo's role in the protocol surface.",
+      "evidence": "package.json:4 \"description\": \"AFI build artifacts and compiled outputs\"; AGENTS.md:3 \"It contains repro bundles, compiled binaries, and deterministic build outputs\" vs README.md:1 \"AFI Artifacts — Paper Reproducibility Bundle\"",
+      "severity": "P3"
+    },
+    {
+      "title": "Ships its own snapshot copies of USS/vault/CPJ schemas separate from the canonical afi-config source",
+      "detail": "The bundle carries forked snapshot schemas (universal_signal_ingestion, vaulted_tssd, universal_proposal) described as 'snapshots shown in Appendix A'. These can drift from the normative afi-config/schemas/usignal/v1 and vault.schema.json with no linkage/version pin back to the canonical source, risking divergent USS/TSSD definitions across the org.",
+      "evidence": "repro/README.md:8 \"schemas/ — minimal JSON Schemas for snapshots shown in Appendix A (A.1/A.2/A.3)\"; repro/schemas/universal_signal_schema.mjs:3 \"Canonical validator spec is the strict Zod schema in the paper.\"",
+      "severity": "P2"
+    },
+    {
+      "title": "Two divergent codex replay manifests; the example one is unchecksummed and inconsistent with the canonical one",
+      "detail": "repro/codex/afi-codex.json (epoch 2025-08-10, scorers signal-scorer@v0.3.1, validators validator-a/b) diverges from repro/codex/examples/.afi-codex.json (epoch 2025-08-12, scorers SignalScorer/1.0, validator validator:agent_mcp_001). The examples copy is NOT listed in SHA256SUMS, so the pinned-version replay context is ambiguous and partly unverified.",
+      "evidence": "repro/codex/afi-codex.json:2-8 \"epoch\":\"2025-08-10...\",\"scorers\":[\"signal-scorer@v0.3.1\"] vs repro/codex/examples/.afi-codex.json:2-4 \"epoch\":\"2025-08-12...\",\"scorers\":[\"SignalScorer/1.0\"],\"validators\":[\"validator:agent_mcp_001\"]",
+      "severity": "P2"
+    },
+    {
+      "title": "Reproducibility/integrity guarantee covers only a subset of the bundle; replay logic itself is unverified",
+      "detail": "SHA256SUMS pins only 7 files (3 schemas, 2 examples, codex twins, smoke-test md). The scripts that actually run in CI and produce the replay output — mock_replay.js, canonicalizeSignal.js, the .mjs schemas, sample_tssd.jsonl, and check-repro.sh — are NOT checksummed. A repo that markets byte-for-byte reproducibility leaves its determinism-bearing code outside its own integrity manifest.",
+      "evidence": "repro/SHA256SUMS:1-8 (only codex/, data/examples/{valid-proposal,vault-ready-record}, schemas/{3 json}, tests/replay_smoke_test.md); comm shows tests/mock_replay.js, tools/replay/*.js, schemas/*.mjs, data/sample_tssd.jsonl NOT in SHA256SUMS",
+      "severity": "P2"
+    },
+    {
+      "title": "Determinism rule met only by a hash mock, not by pinned-transform scoring",
+      "detail": "REPRODUCIBILITY.md asserts strong determinism (byte-for-byte, seeded), but the only executed 'replay' is SHA256(line+epoch) producing a mock_score; the codex seed=42 is never consumed, and no real pinned scorer/validator versions are exercised. This is honestly disclosed but means the bundle does NOT actually demonstrate the protocol's determinism rule (same inputs+pinned rules => same scored outputs).",
+      "evidence": "repro/tests/mock_replay.js:17-18 \"crypto.createHash('sha256').update(line + String(codex.epoch))... score = (parseInt(h.slice(0,8),16) % 10000)/10000\"; REPRODUCIBILITY.md:120-123 \"Mock Scoring: the mock_score is a deterministic hash, not a real signal score\"",
+      "severity": "P3"
+    },
+    {
+      "title": "Inconsistent score-scale across example records (0-1 vs 0-100)",
+      "detail": "vault-ready-record.jsonl uses fractional scores (overall 0.78) while sample_tssd.jsonl uses 0-100 (overall 89). The vaulted_tssd schema types score.* only as 'number', so both pass, but the canonical scale is unspecified — an external validator cannot infer the normative score range from these artifacts.",
+      "evidence": "repro/data/examples/vault-ready-record.jsonl:1 \"score\":{\"overall\":0.78,...} vs repro/data/sample_tssd.jsonl:1 \"score\":{\"overall\":89,\"technical\":93,...}; repro/schemas/vaulted_tssd.schema.json:124 \"overall\":{\"type\":\"number\"}",
+      "severity": "P3"
+    }
+  ],
+  "replay_relevance": "partial",
+  "dependencies": {
+    "upstream": [
+      "afi-config (canonical schemas/codex/governance: AGENTS.md cites afi-config/codex/governance/droids/AFI_DROID_CHARTER.v0.1.md; schemas here are snapshots of afi-config USS/vault/CPJ)",
+      "AFI paper / SSRN-arXiv (source of the snapshots — schemas labeled 'shown in Appendix A')"
+    ],
+    "downstream": [
+      "External reviewers / Zenodo citers (the bundle's primary consumers)",
+      "CI (.github/workflows/reproducibility.yml runs npm test)",
+      "AGENTS.md claims consumed by 'CI/CD pipelines, deployment workflows, audit processes'"
+    ]
+  },
+  "recommended_action": "clarify reference-vs-normative",
+  "notable_findings": [
+    {
+      "title": "Schemas are paper SNAPSHOTS, not the canonical afi-config schema source",
+      "severity": "P2",
+      "theme": "normative|canonical|reference implementation",
+      "evidence": "repro/README.md:8 \"schemas/ — minimal JSON Schemas for snapshots shown in Appendix A (A.1/A.2/A.3)\"; repro/schemas/universal_signal_schema.mjs:3 \"Canonical validator spec is the strict Zod schema in the paper.\"",
+      "recommendation": "Add explicit provenance pins (afi-config schema path + version/commit) to each snapshot so reviewers know these are frozen copies, not the live normative source, and to detect drift."
+    },
+    {
+      "title": "TSSD/vault snapshot schema present and validated against example record",
+      "severity": "Info",
+      "theme": "mongodb|vault|TSSD|VaultedSignalRecord",
+      "evidence": "repro/schemas/vaulted_tssd.schema.json:3 \"title\":\"VaultedTSSDSignal\"; repro/schemas/vaulted_signal_schema.mjs:1 \"// Vaulted Signal Schema (strict) for T.S.S.D. records\"; repro/data/examples/vault-ready-record.jsonl validated OK",
+      "recommendation": "None — good: vault shape is documented schema-first with no storage-engine coupling (no Mongo/Postgres/Timescale/Influx references anywhere in repo)."
+    },
+    {
+      "title": "No storage-engine or analytics coupling anywhere (no Mongo/Postgres/Timescale/Influx/BigQuery/Kafka/warehouse)",
+      "severity": "Info",
+      "theme": "mongodb|postgresql|timescaledb|influxdb / BigQuery|kafka|warehouse",
+      "evidence": "grep across repo for mongodb|MongoTSSD|postgresql|timescaledb|influxdb|bigquery|kafka|warehouse returned zero hits",
+      "recommendation": "None — consistent with portable-protocol direction (vault treated as a schema, not a specific DB)."
+    },
+    {
+      "title": "USS ingestion vs vaulted TSSD separation is correctly modeled (lenient edge vs strict canon)",
+      "severity": "Info",
+      "theme": "usignal|USS|cpj|CPJ",
+      "evidence": "repro/schemas/universal_signal_schema.mjs:5-7 \"action: 'hold' => no-op... only 'buy'|'sell' normative; market free-form -> {crypto,forex,...}; timestamp -> ms\"; repro/tools/replay/canonicalizeSignal.js:14 throws \"Non-normative action (e.g., 'hold'); excluded from scoring.\"",
+      "recommendation": "None — this is a clean reference example of the ingest-boundary -> canonical-validator-spec transform; could be extracted to spec as illustrative."
+    },
+    {
+      "title": "CPJ-style Universal Proposal v0.1 schema present but doc is a stub",
+      "severity": "P3",
+      "theme": "usignal|USS|cpj|CPJ",
+      "evidence": "repro/schemas/universal_proposal_schema.json:110-113 \"version\":{\"enum\":[\"0.1\"]}; repro/schemas/UNIVERSAL_PROPOSAL_SCHEMA.md:1-3 only \"# Universal Proposal Schema / Details for proposal formatting...\" (placeholder)",
+      "recommendation": "Either populate UNIVERSAL_PROPOSAL_SCHEMA.md or point it at the canonical CPJ v0.1 spec in afi-config to avoid an empty doc shipping in a citable release."
+    },
+    {
+      "title": "JSON proposal example uses voting.method 'weighted' but .json schema leaves method unconstrained while .mjs enumerates it",
+      "severity": "P3",
+      "theme": "normative|canonical|reference implementation",
+      "evidence": "repro/schemas/universal_proposal_schema.json:76-78 voting.method \"type\":\"string\" (no enum) vs repro/schemas/universal_proposal_schema.mjs:12 method:[\"quadratic\",\"simple\",\"weighted\"]; example repro/data/examples/valid-proposal.json:19 \"method\":\"weighted\"",
+      "recommendation": "Align the JSON Schema enum with the .mjs/normative definition so the two shipped representations of the same schema do not diverge."
+    },
+    {
+      "title": "Codex manifest = replay context (epoch + pinned scorer/validator versions + seed)",
+      "severity": "Info",
+      "theme": "replay|determinism|codex",
+      "evidence": "repro/codex/afi-codex.json:2-12 \"epoch\":\"2025-08-10T00:00:00Z\",\"scorers\":[\"signal-scorer@v0.3.1\"],\"validators\":[\"validator-a\",\"validator-b\"],\"replay\":{\"seed\":42,\"deterministic\":true}\"; README.md:63 \"The codex is the authoritative registry of schema + replay context.\"",
+      "recommendation": "None for shape — but see contradiction: the example/codex twin diverges and the seed is never consumed by mock_replay."
+    },
+    {
+      "title": "Two divergent codex examples; examples copy unchecksummed",
+      "severity": "P2",
+      "theme": "replay|determinism|codex",
+      "evidence": "repro/codex/.afi-codex.json:2 epoch 2025-08-10 / scorers signal-scorer@v0.3.1 vs repro/codex/examples/.afi-codex.json:2-4 epoch 2025-08-12 / scorers SignalScorer/1.0 / validators validator:agent_mcp_001; examples copy absent from SHA256SUMS",
+      "recommendation": "Remove or reconcile codex/examples/.afi-codex.json and add it to SHA256SUMS, so there is a single authoritative replay manifest with consistent pinned versions."
+    },
+    {
+      "title": "SHA256SUMS covers only 7 of ~21 files; determinism-bearing code is unverified",
+      "severity": "P2",
+      "theme": "replay|determinism|codex",
+      "evidence": "repro/SHA256SUMS:1-8 (codex twins, 3 schemas json, 2 examples, smoke-test md); NOT covered: tests/mock_replay.js, tools/replay/{afi-replay,canonicalizeSignal}.js, schemas/*.mjs, data/sample_tssd.jsonl, scripts/check-repro.sh",
+      "recommendation": "Extend SHA256SUMS to cover the executable replay/canonicalization code and all shipped schema variants so the integrity guarantee matches the bundle's reproducibility claim."
+    },
+    {
+      "title": "Replay is a stub / mock hash, not real pinned-transform scoring; seed unused",
+      "severity": "P3",
+      "theme": "replay|determinism|codex",
+      "evidence": "repro/tools/replay/afi-replay.js:2 \"Deterministic replay stub (replace with your implementation)\"; repro/tests/mock_replay.js:17 sha256(line+epoch) -> mock_score; seed=42 from codex never read",
+      "recommendation": "Acceptable for a paper validation pack (honestly disclosed in repro/tests/replay_smoke_test.md:3-4), but it means VALIDATOR_REPLAY_SPEC determinism is demonstrated only nominally; flag that real-replay belongs to the AFI engine/reactor repo."
+    },
+    {
+      "title": "AGENTS.md mislabels repo as compiled-binaries store",
+      "severity": "P3",
+      "theme": "normative|canonical|reference implementation",
+      "evidence": "AGENTS.md:3 \"It contains repro bundles, compiled binaries, and deterministic build outputs\"; AGENTS.md:41 \"Do not manually edit compiled artifacts.\" — no binaries exist in repo",
+      "recommendation": "Tag stale: update AGENTS.md/package.json description to reflect the actual role (paper reproducibility bundle), or split true build-artifact storage to a different repo."
+    },
+    {
+      "title": "Score-scale ambiguity between example records (0-1 vs 0-100)",
+      "severity": "P3",
+      "theme": "publicSurface|proprietaryDetail / vault|TSSD",
+      "evidence": "repro/data/examples/vault-ready-record.jsonl:1 score.overall 0.78 vs repro/data/sample_tssd.jsonl:1 score.overall 89; schema vaulted_tssd.schema.json:124 only constrains type number",
+      "recommendation": "Pin the canonical score range in the vaulted_tssd schema (min/max) so external validators can reproduce/interpret scores deterministically."
+    },
+    {
+      "title": "v2.1 -> v2.2 references and stale paper-2025-v2 metadata",
+      "severity": "P3",
+      "theme": "stale naming",
+      "evidence": "repro/schemas/universal_signal_schema.mjs:9 \"See artifact bundle paper-2025-v2.1 for examples & replay notes.\"; CITATION.cff:10 version: paper-2025-v2; .zenodo.json:19 \"...releases/tag/paper-2025-v2\" while README.md:1 declares snapshot paper-2025-v2.2",
+      "recommendation": "Tag stale: bump CITATION.cff/.zenodo.json to v2.2 and fix the v2.1 in-code reference to match the canonical release."
+    }
+  ],
+  "archived": false,
+  "visibility": "PUBLIC"
+}

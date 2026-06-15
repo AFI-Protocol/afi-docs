@@ -1,0 +1,47 @@
+{
+  "repo": "afi-cli-shared",
+  "visibility": "PRIVATE",
+  "archived": false,
+  "classification": "SUPPORTING",
+  "classification_rationale": "Generic Click-based CLI framework with zero AFI protocol surface. README.md:3 \"A shared CLI framework for AFI Python projects, built on Click.\" pyproject.toml:13 description \"Shared CLI framework for AFI Python projects using Click\". Source (src/afi_cli_shared/*.py) contains only BaseCli, ConfigManager, validation helpers, error handling, and an Extension system; scripts/lib/afi-shared.sh adds bash logging/docker/file utilities. A full pattern sweep for mongodb|TSSD|vault|USS|CPJ|mint|epoch|replay|determinism|DAG|reactor|BigQuery|schema|receipt|signal|emission returned NO MATCHES anywhere in source, tests, or docs. It is shared tooling consumed by AFI Python repos, not a protocol artifact.",
+  "primary_purpose": "A reusable, domain-agnostic shared CLI framework for AFI Python projects built on Click — providing BaseCli (a click.Group subclass), a hierarchical ConfigManager (defaults -> .afi-cli.json -> AFI_CLI_* env vars), validation/error-handling helpers, an Extension/ExtensionManager plugin system, plus a Bash utility library (scripts/lib/afi-shared.sh) for logging, docker/podman, and file operations.",
+  "protocol_touchpoints": [],
+  "normative_artifacts": [],
+  "reference_only_assumptions": [],
+  "contradictions": [],
+  "replay_relevance": "none",
+  "dependencies": {
+    "upstream": [
+      "click (PyPI runtime dependency)",
+      "pytest (optional, test extra)",
+      "sphinx (optional, docs extra)"
+    ],
+    "downstream": [
+      "AFI Python CLI repos that pip install afi-cli-shared and extend BaseCli, or source scripts/lib/afi-shared.sh (consumers not enumerable from within this repo)"
+    ]
+  },
+  "recommended_action": "none",
+  "notable_findings": [
+    {
+      "title": "No protocol surface present",
+      "severity": "Info",
+      "theme": "classification",
+      "evidence": "ripgrep over all non-pyc files for mongodb|TSSD|vault|USS|CPJ|mint|epoch|beneficiary|replay|determinism|DAG|orchestrator|BigQuery|kafka|normative|canonical|postgresql|timescaledb|influxdb|signalId|on-chain|emission returned 'NO MATCHES'; a second sweep of tests/ and src/ for signal|score|mint|reactor|gateway|schema|anchor|receipt|registr|reputation|enrich returned 'NO DOMAIN MATCHES'",
+      "recommendation": "Classify as SUPPORTING tooling; exclude from protocol-surface synthesis."
+    },
+    {
+      "title": "Single-commit, recent repo",
+      "severity": "Info",
+      "theme": "provenance",
+      "evidence": "git log -1 -> 'fc9d0f0 2026-01-02 00:13:42 -0500 Initial commit'",
+      "recommendation": "none"
+    },
+    {
+      "title": "Sole runtime dependency is click (stack-agnostic)",
+      "severity": "Info",
+      "theme": "stack-agnostic",
+      "evidence": "pyproject.toml:21-25 dependencies = [\"click\"]",
+      "recommendation": "none; confirms no coupling to any mandated AFI stack (Mongo, reactor, BASE, etc.)."
+    }
+  ]
+}

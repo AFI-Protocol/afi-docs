@@ -1,0 +1,67 @@
+{
+  "repo": "afi-sdk-ts",
+  "visibility": "PRIVATE",
+  "archived": false,
+  "classification": "STALE",
+  "classification_rationale": "Repo contains only README.md and package.json with a single git commit \"chore: initialize new repository\" (c770140). No src/, schemas, contracts, or tests. README.md:43 states it is a \"New repository created during multi-repo reorganization (2025-11-14)\". package.json:6 points main to ./dist/index.js which does not exist; package.json:16 test is echo 'Test script TBD'. It is an empty placeholder scaffold with zero implemented protocol surface.",
+  "primary_purpose": "Intended (currently unimplemented) official TypeScript/JavaScript SDK for building on AFI Protocol (README.md:3 \"TypeScript SDK for AFI Protocol\"; package.json:3).",
+  "protocol_touchpoints": [
+    "SDK/API (aspirational only, no code)",
+    "USS/CPJ ingest (implied by README 'Signal submission and validation helpers' but NOT implemented)"
+  ],
+  "normative_artifacts": [],
+  "reference_only_assumptions": [
+    {
+      "path": "/home/user/AFI-Protocol/afi-sdk-ts/README.md:11",
+      "quote": "Type-safe API clients for afi-reactor"
+    },
+    {
+      "path": "/home/user/AFI-Protocol/afi-sdk-ts/README.md:34-38",
+      "quote": "// Submit a signal\nawait client.signals.submit({ type: 'market-data', data: { ... } });"
+    }
+  ],
+  "contradictions": [
+    {
+      "title": "SDK narrative anchored to afi-reactor (reference impl) rather than canonical dialect/schemas",
+      "detail": "README presents the SDK's primary feature as clients for the reactor, reinforcing the reactor-as-THE-orchestrator tension instead of pointing consumers at USS/CPJ schemas and afi-config validation. Currently harmless because nothing is implemented, but the framing should target the portable protocol's canonical surface.",
+      "evidence": "/home/user/AFI-Protocol/afi-sdk-ts/README.md:11 'Type-safe API clients for afi-reactor'",
+      "severity": "P3"
+    }
+  ],
+  "replay_relevance": "none",
+  "dependencies": {
+    "upstream": [],
+    "downstream": []
+  },
+  "recommended_action": "tag stale",
+  "notable_findings": [
+    {
+      "title": "Repo is an empty scaffold with no implementation",
+      "severity": "Info",
+      "theme": "stale/scaffold",
+      "evidence": "git ls-files => README.md, package.json only; single commit c770140; README.md:43 'New repository created during multi-repo reorganization (2025-11-14)'",
+      "recommendation": "Tag as stale placeholder; revisit when SDK implementation lands and verify it validates against USS v1.1 / CPJ v0.1 and afi-config schemas rather than coupling solely to afi-reactor."
+    },
+    {
+      "title": "All protocol pattern-group searches return ZERO hits",
+      "severity": "Info",
+      "theme": "no protocol surface",
+      "evidence": "No source files exist to match mongodb/TSSD/vault, usignal/USS/cpj/CPJ, mintForSignal/coordinateMint/beneficiary/epoch, replay/determinism/codex, publicSurface/proprietaryDetail, AFIMintCoordinator/AFISignalReceipt/EmissionsMinted, pipeline/DAG/froggy/orchestrator/doctrine, BigQuery/kafka/warehouse, normative/canonical, postgresql/timescaledb/influxdb",
+      "recommendation": "None until implementation begins."
+    },
+    {
+      "title": "package.json points to non-existent build output and stub test",
+      "severity": "Info",
+      "theme": "scaffold",
+      "evidence": "/home/user/AFI-Protocol/afi-sdk-ts/package.json:6 '\"main\": \"./dist/index.js\"'; package.json:16 '\"test\": \"echo Test script TBD\"'",
+      "recommendation": "None until implementation begins."
+    },
+    {
+      "title": "README example signal shape unvalidated against canonical ingest dialects",
+      "severity": "P3",
+      "theme": "usignal/USS/CPJ",
+      "evidence": "/home/user/AFI-Protocol/afi-sdk-ts/README.md:35-38 \"client.signals.submit({ type: 'market-data', data: { ... } })\"",
+      "recommendation": "When implemented, ensure submit payloads conform to USS v1.1 / CPJ v0.1 schemas in afi-config rather than an ad-hoc shape."
+    }
+  ]
+}

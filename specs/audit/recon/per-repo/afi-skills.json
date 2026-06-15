@@ -1,0 +1,154 @@
+{
+  "repo": "afi-skills",
+  "visibility": "PUBLIC",
+  "archived": false,
+  "classification": "SUPPORTING",
+  "classification_rationale": "This is a versioned library of agent \"skills\" (markdown docs with YAML front-matter describing typed I/O, risk levels, determinism flags, and golden eval cases), plus TypeScript tooling (Zod schema, linter, manifest builder) and agent skillsets. README.md:28 calls it \"the canonical source of truth for AFI agent capabilities\" and .afi-codex.json:3 role is \"Canonical, versioned library of AFI Agent Skills\". It is consumed by afi-core/afi-reactor/afi-factory (AGENTS.md:55) and depends on afi-config (.afi-codex.json:15). It defines an agent-capability registry, not protocol interoperability rules. It is \"canonical\" only for the skill front-matter contract (docs/skill_contract_v1.md), not for USS/CPJ/vault/pipeline/contract schemas. It carries no replay-critical artifacts itself: skills like vault-replay-determinism and receipt-verification only describe expected behavior/I-O for agents; the normative determinism rules live elsewhere (VALIDATOR_REPLAY_SPEC, afi-config schemas). Hence SUPPORTING (agent-capability descriptions feeding the reference spine) rather than NORMATIVE, REFERENCE_IMPL, or DOCS.",
+  "primary_purpose": "A canonical, versioned library of AFI agent \"skills\" -- discrete reusable capabilities defined as markdown + YAML front-matter (typed I/O, risk level, determinism flag, golden evals) with TS tooling (Zod schema, linter, manifest builder) and agent skillsets, consumed by afi-core/afi-reactor/afi-factory.",
+  "replay_relevance": "partial",
+  "protocol_touchpoints": [
+    "TSSD/vault (tool token tssd:read only; vault-replay-determinism skill)",
+    "mint/receipt (receipt-verification skill; epoch-pulse-emissions skill)",
+    "emissions (epoch-pulse-emissions skill describes proportional distribution, supply cap, decay)",
+    "replay/determinism (vault-replay-determinism skill, codex:replay tool, determinism_required flag, golden cases)",
+    "DAG/pipeline (referenced only as out-of-scope: orchestration belongs to afi-reactor)",
+    "schemas (own skill front-matter Zod schema + skill_contract_v1; NOT USS/CPJ/vault/pipeline schemas)",
+    "registries/reputation (signal-scoring-core describes reputation scoring inputs)",
+    "SDK/API (skill manifest/index consumed by agent runtimes)"
+  ],
+  "normative_artifacts": [
+    "/home/user/AFI-Protocol/afi-skills/docs/skill_contract_v1.md (AFI Skill Contract v1.0, status Locked -- canonical for skill front-matter only, scoped to this repo)",
+    "/home/user/AFI-Protocol/afi-skills/scripts/shared/frontmatter-schema.ts (Zod SkillFrontMatterSchema enforcing the contract)",
+    "/home/user/AFI-Protocol/afi-skills/scripts/shared/risk-patterns.ts (security risk pattern set used in PR gating)"
+  ],
+  "reference_only_assumptions": [
+    {
+      "path": "/home/user/AFI-Protocol/afi-skills/docs/skill_contract_v1.md:133-138",
+      "quote": "`tssd:read`: Read-only TSSD access; `tssd:write`: Write access to TSSD (requires justification); `codex:replay`: Historical event replay"
+    },
+    {
+      "path": "/home/user/AFI-Protocol/afi-skills/skills/README.md:86-87",
+      "quote": "`[\"tssd:read\"]`: Read-only access to TSSD (Time-Series Signal Database); `[\"codex:replay\"]`: Replay historical events from Codex"
+    },
+    {
+      "path": "/home/user/AFI-Protocol/afi-skills/AGENTS.md:55",
+      "quote": "Consumed by: afi-core (loads skills at runtime), afi-reactor (uses skills in DAG nodes), afi-factory (references skills in agent templates)"
+    },
+    {
+      "path": "/home/user/AFI-Protocol/afi-skills/skills/provenance/receipt-verification.md:154-156",
+      "quote": "Use secp256k1 for signature verification (Ethereum-compatible); Merkle proofs use keccak256 hashing"
+    }
+  ],
+  "contradictions": [
+    {
+      "title": "TSSD bound to a single named engine ('Time-Series Signal Database')",
+      "detail": "skills/README.md expands the tssd:read tool token as 'TSSD (Time-Series Signal Database)'. The portable protocol treats the evidence/vault plane as multi-engine (Mongo/PostgreSQL/TimescaleDB/InfluxDB per vault.schema.json). Here TSSD appears only as an opaque tool-permission token (good), but the parenthetical gloss implies one fixed time-series store. Minor/documentation-level: no code mandates an engine.",
+      "evidence": "skills/README.md:86 '`[\"tssd:read\"]`: Read-only access to TSSD (Time-Series Signal Database)'",
+      "severity": "P3"
+    },
+    {
+      "title": "Determinism declared as protocol-critical but not enforced by tooling (TODO stub)",
+      "detail": "Skills set determinism_required:true and the docs claim golden cases enable 'consensus verification' and 'bit-for-bit' replay, yet the linter explicitly leaves determinism checking as a TODO and only prints an informational note; it never validates that golden cases pass or that no Date.now()/Math.random() is used. A replay-relevant guarantee is asserted in docs but unimplemented in the gate.",
+      "evidence": "scripts/lint-skills.ts:82-84 'if (fm.determinism_required) { // TODO: Add more determinism checks (e.g., no Date.now(), Math.random()) console.log(\"  ℹ️  Determinism required: ...\") }'",
+      "severity": "P2"
+    },
+    {
+      "title": "Repo self-described as 'canonical source of truth' could be misread as protocol-canonical",
+      "detail": "README and AGENTS describe afi-skills as the 'canonical source of truth for AFI agent capabilities' and skill_contract_v1 as 'the source of truth'. This is correctly scoped to the skill front-matter contract, but 'canonical/source of truth' phrasing risks being read as protocol-normative for scoring/emissions/provenance, which are reference behaviors here, not the normative specs (those live in afi-config/afi-token/VALIDATOR_REPLAY_SPEC).",
+      "evidence": "README.md:28 '`afi-skills` is the **canonical source of truth** for AFI agent capabilities.' ; docs/skill_contract_v1.md:20 'This document is the **source of truth** for skill front-matter schema.'",
+      "severity": "P3"
+    }
+  ],
+  "dependencies": {
+    "upstream": [
+      "afi-config (declared dependsOn in .afi-codex.json:15; AGENTS.md/Charter authority afi-config/codex/governance/droids/AFI_DROID_CHARTER.v0.1.md)"
+    ],
+    "downstream": [
+      "afi-core (loads skills at runtime)",
+      "afi-reactor (uses skills in DAG nodes)",
+      "afi-factory (references skills in agent templates)",
+      "afi-docs (generates public documentation)",
+      "afi-evals (runs golden case validation)"
+    ]
+  },
+  "recommended_action": "clarify reference-vs-normative",
+  "notable_findings": [
+    {
+      "title": "TSSD/vault present only as opaque tool-permission token, no engine mandate in code",
+      "severity": "Info",
+      "theme": "mongodb|TSSD|vault",
+      "evidence": "docs/skill_contract_v1.md:133-134 '`tssd:read`: Read-only TSSD access; `tssd:write`: Write access to TSSD (requires justification)'; skills/scoring/signal-scoring-core.md:31 'allowed_tools: - tssd:read'",
+      "recommendation": "Keep TSSD as an abstract tool token; drop or soften the 'Time-Series Signal Database' gloss in skills/README.md:86 to avoid implying a single engine, consistent with multi-engine vault.schema.json."
+    },
+    {
+      "title": "No USS/CPJ ingest dialect references anywhere in repo",
+      "severity": "Info",
+      "theme": "usignal|USS|cpj|CPJ",
+      "evidence": "grep for usignal|USS|cpj|CPJ across repo returns only unrelated 'discussions'/'SEC' substrings (e.g., skills/news-sentiment/headline-sentiment-rules.md:136 'SEC schedules meeting'); no canonical signal-dialect schema present.",
+      "recommendation": "None. Skills consume already-validated signal objects; ingest-dialect validation correctly lives in afi-gateway/afi-config, not here."
+    },
+    {
+      "title": "epoch-pulse-emissions describes single-pool proportional emissions, supply cap, decay -- reference behavior not normative spec",
+      "severity": "Info",
+      "theme": "mintForSignal|coordinateMint|beneficiary|epoch",
+      "evidence": "skills/scoring/epoch-pulse-emissions.md:66 'emissions[i] = (score[i] / total_score) * total_emissions_budget'; :167 'Supply cap is global across all epochs; once hit, emissions cease'",
+      "recommendation": "Clarify this skill is descriptive of one emissions model; on-chain emission caps/receipts are governed by afi-token/afi-mint, not this skill. Note: describes proportional split among validators (relevant to econ-splits-vs-single-beneficiary tension)."
+    },
+    {
+      "title": "Determinism enforcement is a documented-but-unimplemented gate (TODO)",
+      "severity": "P2",
+      "theme": "replay|determinism|codex",
+      "evidence": "scripts/lint-skills.ts:82-84 'if (fm.determinism_required) { // TODO: Add more determinism checks (e.g., no Date.now(), Math.random()) ... }'; evals/README.md:5-7 claims golden cases enable 'Deterministic validation', 'Consensus verification'",
+      "recommendation": "Fix in follow-up: linter/manifest test (package.json:10 'test': lint+manifest) never executes golden cases, so determinism_required is unverified. Implement golden-case execution + banned-API scan or downgrade the consensus/replay claims."
+    },
+    {
+      "title": "Provenance skills document replay/receipt SEMANTICS but hold no replay-critical artifacts",
+      "severity": "Info",
+      "theme": "publicSurface|proprietaryDetail|replay",
+      "evidence": "skills/provenance/vault-replay-determinism.md:177-181 'Use seeded RNG ... Avoid Date.now(), Math.random() ... Epsilon tolerance for FP: 1e-10'; receipt-verification.md:154 'Use secp256k1 ... keccak256'",
+      "recommendation": "Treat as guidance that should align with (not define) VALIDATOR_REPLAY_SPEC and afi-config schemas; cross-check epsilon/RNG/crypto choices against the normative replay spec to avoid drift."
+    },
+    {
+      "title": "Only mention of public/proprietary surface is a security note on eval data, not the protocol surface model",
+      "severity": "Info",
+      "theme": "publicSurface|proprietaryDetail",
+      "evidence": "evals/README.md:142-145 'Golden cases are public and may be used by adversaries ... Do NOT include: ... Sensitive market data or proprietary signals'",
+      "recommendation": "None; consistent with public-vs-proprietary evidence-surface intent (keep proprietary signals out of public golden cases)."
+    },
+    {
+      "title": "No on-chain contract sources, MintCoordinator/Receipt types, or BASE references",
+      "severity": "Info",
+      "theme": "AFIMintCoordinator|AFISignalReceipt|EmissionsMinted",
+      "evidence": "grep for AFIMintCoordinator|AFISignalReceipt|EmissionsMinted|MintCoordinated|.sol returns zero hits across repo.",
+      "recommendation": "None. Commitment plane correctly absent; this repo is off-chain agent-capability descriptions only."
+    },
+    {
+      "title": "DAG/orchestration explicitly delegated to afi-reactor (reference spine boundary respected)",
+      "severity": "Info",
+      "theme": "pipeline|DAG|orchestrator|doctrine",
+      "evidence": "droids/00_repo_orientation.md:29 'DAG orchestration (that's afi-reactor)'; .factory/skills/add-skill-from-template/SKILL.md:307 'Do NOT modify afi-reactor DAGs or configs'; .factory/droids/skillsmith-droid.md:97 'afi-reactor orchestrates when and where skills run'",
+      "recommendation": "None. Boundary is clean: skills define capabilities, afi-reactor (reference orchestrator) wires them. No claim here that reactor is THE protocol orchestrator."
+    },
+    {
+      "title": "No BigQuery/Kafka/warehouse and no Postgres/Timescale/Influx references",
+      "severity": "Info",
+      "theme": "BigQuery|kafka|warehouse|postgresql|timescaledb|influxdb",
+      "evidence": "grep for BigQuery|kafka|warehouse|pubsub|data lake and postgresql|postgres|timescaledb|influxdb returns zero hits across repo.",
+      "recommendation": "None. Analytics and storage-engine concerns correctly absent from this capability library."
+    },
+    {
+      "title": "'Canonical/source of truth' phrasing is scoped to skills but invites protocol-law misreading",
+      "severity": "P3",
+      "theme": "normative|canonical|reference implementation",
+      "evidence": "README.md:28 'canonical source of truth for AFI agent capabilities'; docs/skill_contract_v1.md:3 'Status: Locked' :20 'source of truth for skill front-matter schema'",
+      "recommendation": "Clarify reference-vs-normative: add a one-line scope note that 'canonical' here means the skill front-matter contract only, and that scoring/emissions/provenance skill bodies are reference behaviors subordinate to afi-config/afi-token normative specs."
+    },
+    {
+      "title": "Charter/governance authority points to afi-config (correct upstream normative anchor)",
+      "severity": "Info",
+      "theme": "registries/reputation|normative",
+      "evidence": "AGENTS.md:5 'All agents ... must follow afi-config/codex/governance/droids/AFI_DROID_CHARTER.v0.1.md. If this AGENTS.md conflicts with the Charter, the Charter wins.'",
+      "recommendation": "None. Correctly defers normative governance to afi-config; reinforces SUPPORTING classification."
+    }
+  ]
+}

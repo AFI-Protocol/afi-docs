@@ -1,0 +1,109 @@
+{
+  "repo": "afi-protocol",
+  "visibility": "PRIVATE",
+  "archived": false,
+  "classification": "DOCS",
+  "classification_rationale": "This is a thin meta-repo containing ONLY documentation, governance, and agent-orchestration manifests — zero code, schemas, contracts, or canonical type definitions. package.json self-describes it: \"description\": \"AFI Protocol documentation and specifications\" with stub scripts (\"build\": \"echo 'Build script TBD'\", \"test\": \"echo 'Test script TBD'\"). README.md:1 calls it \"AFI Protocol (Meta-Repo)\". File inventory is exhaustively: README.md, architecture_overview.md, droid_registry.md, package.json, .aider.conf.json, LICENSE.md (0 bytes), factory/agent_manifest.json, contributor-manifest/*.md, .github/workflows/lint.yml. find for *.ts/*.sol/*.schema.json returned nothing. It documents/points at other repos but defines no protocol surface itself, so DOCS (not NORMATIVE/REFERENCE_IMPL).",
+  "primary_purpose": "A governance/onboarding meta-repo that orchestrates the AFI (\"Agentic Financial Intelligence\") ecosystem by pointing human contributors and Factory.ai/augmentcode droids at the other AFI repos (afi-core, afi-reactor, afi-config, afi-infra, afi-docs, afi-gateway, afi-ops) via README, an architecture overview, a droid registry, and a contributor manifest.",
+  "protocol_touchpoints": [
+    "DAG/pipeline (described only, in architecture_overview.md — reactor as 'source of truth')",
+    "validators/scoring (described only, afi-core)",
+    "registries/reputation (mentioned in faq/announcement: reputation, DAO votes, mentor registry)",
+    "schemas (referenced only as 'persona schemas'/'Codex definitions' pointing at afi-config; none present)"
+  ],
+  "normative_artifacts": [],
+  "reference_only_assumptions": [
+    {
+      "path": "architecture_overview.md:23",
+      "quote": "| **Reactor**    | DAG orchestration (source of truth)       | `afi-reactor` |"
+    },
+    {
+      "path": "architecture_overview.md:6",
+      "quote": "**Canonical orchestration status:** AFI Reactor uses a **custom deterministic TypeScript DAG** (`afi-reactor/src/dag/`), not LangChain/LangGraph."
+    },
+    {
+      "path": "architecture_overview.md:22",
+      "quote": "| **Gateway**    | Optional Eliza client (not orchestrator)  | `afi-gateway` |"
+    }
+  ],
+  "contradictions": [
+    {
+      "title": "Reactor framed as the single 'source of truth' orchestrator, not a reference implementation",
+      "detail": "The architecture table elevates afi-reactor's DAG to 'source of truth' / 'Canonical orchestration status' for the whole ecosystem. Under the portable-protocol north star, the reactor is ONE reference spine; the canonical surface is the schemas/lifecycle/determinism rules. Calling reactor 'source of truth' / 'canonical' in the org's top-level meta-repo entrenches a specific stack as protocol law. Note: line 6 does scope 'Canonical' to orchestration-engine choice (custom DAG vs LangGraph), which softens but does not remove the framing.",
+      "evidence": "architecture_overview.md:23 '| **Reactor** | DAG orchestration (source of truth) | `afi-reactor` |'; architecture_overview.md:6 '**Canonical orchestration status:** AFI Reactor uses a **custom deterministic TypeScript DAG**'",
+      "severity": "P2"
+    },
+    {
+      "title": "Stale repo names referenced in onboarding (afi-agents, afi-labs) and droid manifest doc path",
+      "detail": "onboarding.md recommends forking `afi-agents` (a known-stale repo name per audit tensions) and `afi-labs`; the architecture overview's repo set (afi-core/reactor/infra/config/ops/docs/gateway) does not include afi-agents, indicating drift. factory/agent_manifest.json also points documentation at ../afi-docs/droid_contributor_guide.md (cross-repo relative path that only resolves in a mono-checkout).",
+      "evidence": "contributor-manifest/onboarding.md:9 '[`afi-agents`](https://github.com/AFI-Protocol/afi-agents) – agent configs & runtime'; onboarding.md:11 'The `afi-labs` repo hosts experimental code and is **private**.'",
+      "severity": "P3"
+    },
+    {
+      "title": "Architecture overview references a non-existent local diagrams/ directory",
+      "detail": "architecture_overview.md depicts a `diagrams/` folder ('high level PNG/SVG diagrams') in the repo tree, but no such directory exists in the checkout. Minor doc/repo drift.",
+      "evidence": "architecture_overview.md:11 '├─ diagrams/                  ← high level PNG/SVG diagrams (add as you build)'; find shows no diagrams/ dir",
+      "severity": "P3"
+    }
+  ],
+  "replay_relevance": "none",
+  "dependencies": {
+    "upstream": [],
+    "downstream": [
+      "afi-reactor (referenced as DAG source of truth)",
+      "afi-core (validators/mentors/scoring; agent_manifest entries)",
+      "afi-infra (signal templates/simulators; agent_manifest entry)",
+      "afi-config (codex/persona schemas)",
+      "afi-ops (deployment/health)",
+      "afi-docs (documentation; ARCHITECTURE_STATUS.md, droid_contributor_guide.md, archive/langgraph-migration-2025)",
+      "afi-gateway (optional Eliza client)",
+      "afi-agents (stale, onboarding only)",
+      "afi-labs (private, onboarding only)"
+    ]
+  },
+  "recommended_action": "clarify reference-vs-normative",
+  "notable_findings": [
+    {
+      "title": "No normative artifacts present — purely documentation meta-repo",
+      "severity": "Info",
+      "theme": "schemas/contracts",
+      "evidence": "find for *.ts/*.sol/*.schema.json returned nothing; only files are README.md, architecture_overview.md, droid_registry.md, package.json, .aider.conf.json, LICENSE.md (0B), factory/agent_manifest.json, contributor-manifest/*.md, .github/workflows/lint.yml",
+      "recommendation": "Treat as DOCS/governance only. The portable-protocol normative surface (USS, CPJ, vault/pipeline/blueprint/plugin schemas, contracts, TSSD types, replay spec) lives in afi-config/afi-docs/afi-token/afi-infra, not here."
+    },
+    {
+      "title": "package.json scripts are stubs (no build/test)",
+      "severity": "Info",
+      "theme": "tooling",
+      "evidence": "package.json:7-8 '\"build\": \"echo \\'Build script TBD\\'\", \"test\": \"echo \\'Test script TBD\\'\"'",
+      "recommendation": "None; consistent with a docs meta-repo. Note the ESLint CI (lint.yml:22) is explicitly non-blocking ('|| true # non-blocking for early droid commits') and there are no .ts files for it to lint."
+    },
+    {
+      "title": "Reactor labeled 'source of truth' / 'canonical' in org-level architecture",
+      "severity": "P2",
+      "theme": "pipeline|DAG|orchestrator|doctrine",
+      "evidence": "architecture_overview.md:23 '| **Reactor** | DAG orchestration (source of truth) | `afi-reactor` |'; architecture_overview.md:6 '**Canonical orchestration status:** AFI Reactor uses a **custom deterministic TypeScript DAG**'",
+      "recommendation": "Reframe reactor as the reference orchestration spine; make explicit that the protocol's canonical surface is the schemas/lifecycle/determinism rules, and that conformant alternative DAGs (custom / Mage blocks) are permitted per AFI_PORTABLE_PROTOCOL_SURFACE."
+    },
+    {
+      "title": "Stale repo references (afi-agents) and cross-repo relative doc paths",
+      "severity": "P3",
+      "theme": "stale naming/archived refs",
+      "evidence": "contributor-manifest/onboarding.md:9 '`afi-agents` – agent configs & runtime'; factory/agent_manifest.json:20 '\"documentation\": \"../afi-docs/droid_contributor_guide.md\"'; agent_manifest entries use '@afi-core/...' / '@afi-infra/...' paths",
+      "recommendation": "Tag stale; reconcile onboarding repo list with the current repo set (afi-core/reactor/infra/config/ops/docs/gateway) and fix/relocate the relative afi-docs link."
+    },
+    {
+      "title": "Registries/reputation mentioned only as governance aspiration",
+      "severity": "Info",
+      "theme": "registries/reputation",
+      "evidence": "contributor-manifest/faq.md:9-10 'How are contributions recognized? Via reputation, DAO votes, and protocol mentions.'; announcement_contributor_2025.md:27 'opening up the **mentor registry** for new personas and utility behaviors.'",
+      "recommendation": "None here; the normative REGISTRIES_AND_REPUTATION spec lives elsewhere. Consistent with the rule that reputation/registries influence selection/allocation, not deterministic scoring (no scoring code present in this repo)."
+    },
+    {
+      "title": "Pattern searches found no mongodb/TSSD/vault/USS/CPJ/mint/replay/BigQuery/kafka/postgres references",
+      "severity": "Info",
+      "theme": "schemas/contracts/vault/mint/replay",
+      "evidence": "grep -rinE across *.md/*.json/*.ts/*.sol/*.yml for the full audit pattern set returned only incidental hits: 'Codex definitions' (architecture_overview.md:26), 'pipelines' (pathways.md:8, working-groups.md:5), 'LangGraph/DAG' (architecture_overview.md:6)",
+      "recommendation": "Confirms zero replay/determinism/vault/mint surface in this repo. No follow-up needed beyond the reference-vs-normative clarification for reactor."
+    }
+  ]
+}

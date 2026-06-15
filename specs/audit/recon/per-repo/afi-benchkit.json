@@ -1,0 +1,117 @@
+{
+  "repo": "afi-benchkit",
+  "visibility": "PUBLIC",
+  "archived": false,
+  "classification": "SUPPORTING",
+  "classification_rationale": "A standalone Python package (pyproject.toml:6 name=\"afi-benchkit\", entrypoint afi-bench=afi_benchkit.cli:main) for deterministic validator benchmarking. README.md:22-26 explicitly bounds it: \"This is a benchmark and verification toolkit only... Does NOT contain DAG/engine/scoring runtime logic... Does NOT contain smart contracts or on-chain code.\" It defines no protocol schemas, no contracts, no canonical type defs, and is not part of the reference ingest->DAG->vault->mint spine. It produces benchmark metrics (PoI capability, PoInsight usefulness) and a benchmark-local validator \"reputation\" score that influences selection/allocation, not protocol finality. It is a supporting/verification tool, not NORMATIVE (no spec/schema authority) and not the protocol REFERENCE_IMPL spine.",
+  "primary_purpose": "A standalone, container-packaged Python toolkit that runs deterministic, seeded validator benchmarks (PoI capability and PoInsight usefulness suites) over CSV datasets, emitting hash-stamped canonical artifacts, metrics, calibration/capability plots, and a composite \"reputation\" score with confidence intervals for reproducible validator verification.",
+  "protocol_touchpoints": [
+    "replay/determinism (hash-locked reproducible benchmark outputs, golden-image verification)",
+    "registries/reputation (computes benchmark-derived validator reputation scores influencing selection/allocation)",
+    "scoring/metrics (PoI/PoInsight benchmark metrics: IC, hit-rate, Sharpe, coverage, vitality, latency)",
+    "SDK/CLI (afi-bench CLI)"
+  ],
+  "normative_artifacts": [],
+  "reference_only_assumptions": [
+    {
+      "path": "README.md:35-36",
+      "quote": "docker run ... ghcr.io/AFI-Protocol/afi-benchkit:stable afi-bench run --suite poinsight ... --seed 1337 ... --emit-scores  (presents a specific org-hosted container image as the canonical run vehicle)"
+    },
+    {
+      "path": "scripts/generate_benchmarks.sh:8",
+      "quote": "source \"$REPO_ROOT/../afi-cli-shared/scripts/lib/afi-shared.sh\"  (hard sibling-path dependency on afi-cli-shared org tooling for benchmark generation)"
+    },
+    {
+      "path": "README.md:13",
+      "quote": "Tier-3 verification - Hash-locked dependencies, bit-for-bit outputs  (a specific determinism/packaging tier is implied as the required verification mode)"
+    }
+  ],
+  "contradictions": [
+    {
+      "title": "Benchmark 'reputation' score risks being read as protocol-canonical scoring",
+      "detail": "reputation.py computes a composite validator reputation (alpha*PoI + beta*PoInsight) with CIs and an env-tunable composite. The North Star says reputation/registries influence SELECTION & ALLOCATION only and MUST NOT override deterministic scoring or protocol finality. The repo's README does scope it as 'benchmark and verification toolkit only', so this is a presentation/clarity risk rather than a production violation, but the term 'reputation' plus tunable AFI_BENCHKIT_ALPHA/BETA could be mistaken for protocol-level reputation canon.",
+      "evidence": "src/afi_benchkit/reputation.py:65 \"reputation_score = alpha * poi_score + beta * poinsight_score\"; README.md:112 \"Composite Reputation: Weighted combination (alpha=0.3 PoI + beta=0.7 PoInsight)\"",
+      "severity": "P3"
+    },
+    {
+      "title": "Hardcoded heuristic N=10 and assumed determinism=1.0/uptime=1.0 weaken claimed determinism rigor",
+      "detail": "The reputation bridge fabricates an effective sample size of 10 for PoInsight when canonical CSV is absent, and assumes determinism=1.0 and uptime=1.0 in the PoI raw score (weights are 0 so they do not affect output, but the comment 'Assume deterministic for now' indicates a placeholder). This undercuts the 'deterministic / evidence-weighted' framing for downstream consumers, though it is internal to a benchmark tool, not a protocol scoring path.",
+      "evidence": "src/afi_benchkit/reputation.py:119-120 \"Could not determine exact sample size for PoInsight, using estimated N=10\"; reputation.py:150 \"determinism = 1.0  # Assume deterministic for now\"",
+      "severity": "Info"
+    }
+  ],
+  "replay_relevance": "partial",
+  "dependencies": {
+    "upstream": [
+      "afi-cli-shared (scripts/generate_benchmarks.sh:8, scripts/capsule_run.sh:12, scripts/lock/{compile,refresh}.sh source afi-cli-shared/scripts/lib/afi-shared.sh)",
+      "ghcr.io/AFI-Protocol/afi-benchkit container registry (README.md:177, ci.yml:80)"
+    ],
+    "downstream": []
+  },
+  "recommended_action": "clarify reference-vs-normative",
+  "notable_findings": [
+    {
+      "title": "Self-declared boundaries: not protocol runtime, contracts, or DAG",
+      "severity": "Info",
+      "theme": "scope/classification",
+      "evidence": "README.md:22-26 \"This is a benchmark and verification toolkit only - Does NOT contain DAG/engine/scoring runtime logic - Does NOT contain smart contracts or on-chain code - Does NOT contain UI components\"",
+      "recommendation": "Accept as SUPPORTING; no protocol-law claims. Keep these boundaries visible in any cross-repo map so it is not mistaken for the scoring DAG or token layer."
+    },
+    {
+      "title": "Determinism is real but local: re-run SHA256 equality + golden-image hashes + fixed timestamp for golden tests",
+      "severity": "Info",
+      "theme": "replay/determinism",
+      "evidence": "src/afi_benchkit/tasks/poi01.py:123 \"determinism_pass = hash_original == hash_rerun\"; src/afi_benchkit/stamp.py:37-38 \"if os.environ.get(\\\"AFI_BENCHKIT_GOLDEN_TEST\\\") == \\\"1\\\": utc_ts = \\\"2025-01-01T00:00:00Z\\\"\"; README.md:13 \"Tier-3 verification - Hash-locked dependencies, bit-for-bit outputs\"",
+      "recommendation": "This determinism model (pinned deps via requirements.lock.txt + bit-for-bit golden outputs) is a good candidate pattern to reference in VALIDATOR_REPLAY_SPEC, but it is benchmark-scoped and does NOT implement the protocol's signal replay (no signalId/epoch/vault/TSSD). Tag as partial replay relevance only."
+    },
+    {
+      "title": "Provenance Stamp captures data_hash + git_sha + utc_ts but NOT protocol linkage fields",
+      "severity": "Info",
+      "theme": "replay/determinism",
+      "evidence": "src/afi_benchkit/stamp.py:14-19 frozen dataclass Stamp(data_hash, cfg_hash, git_sha, utc_ts); footer format poi01.py:211 \"data={short_hash} sha={git_sha} ts={stamp.utc_ts}\"",
+      "recommendation": "Stamp is a benchmark provenance record; it has no signalId/epoch/content-hash anchoring to on-chain commitment. No action; note it is not a replay-critical protocol artifact."
+    },
+    {
+      "title": "No mint/receipt/emissions/vault/TSSD/USS/CPJ touchpoints present",
+      "severity": "Info",
+      "theme": "protocol-surface coverage",
+      "evidence": "grep across .py/.md/.toml/.sh/.yml/.json for mongodb|vault|TSSD, usignal|USS|cpj|CPJ, mintForSignal|coordinateMint|beneficiary, AFIMintCoordinator|AFISignalReceipt|EmissionsMinted, BigQuery|kafka|postgresql|timescaledb|influxdb -> ZERO hits",
+      "recommendation": "Confirms this repo touches none of the commitment/evidence/ingest planes; it is orthogonal benchmark tooling. No portable-protocol normative obligations apply."
+    },
+    {
+      "title": "Composite reputation weights are env-tunable (alpha/beta/N0) and recomputed on merge",
+      "severity": "P3",
+      "theme": "registries/reputation",
+      "evidence": "src/afi_benchkit/reputation.py:258-263 get_env_overrides() reads AFI_BENCHKIT_ALPHA/BETA/N0; reputation.py:318-324 merge recomputes \"reputation_score = alpha * poi_score + beta * poinsight_score\"",
+      "recommendation": "Clarify in README that this 'reputation' is a benchmark-local validator score (selection/allocation input), explicitly NOT protocol reputation canon and NOT authoritative over deterministic scoring or finality, to avoid future conflation with REGISTRIES_AND_REPUTATION spec."
+    },
+    {
+      "title": "Hardcoded N=10 heuristic and placeholder determinism/uptime in reputation bridge",
+      "severity": "P3",
+      "theme": "scoring rigor",
+      "evidence": "src/afi_benchkit/reputation.py:117-120 \"For the sample dataset, we know it has 10 rows after cleaning ... using estimated N=10\"; reputation.py:150-153 \"determinism = 1.0  # Assume deterministic for now ... uptime = 1.0\"",
+      "recommendation": "Fix-in-follow-up: derive N from actual report/CSV in all paths and remove sample-specific magic constant; either implement or remove the unused determinism/uptime terms to avoid misleading evidence-weighting claims."
+    },
+    {
+      "title": "Stale/relative cross-repo source path to afi-cli-shared",
+      "severity": "P3",
+      "theme": "stale naming / cross-repo coupling",
+      "evidence": "scripts/generate_benchmarks.sh:8 \"source \\\"$REPO_ROOT/../afi-cli-shared/scripts/lib/afi-shared.sh\\\"\"; scripts/lock/compile.sh:8 and refresh.sh:8 use \"../../afi-cli-shared/...\"",
+      "recommendation": "Tag: benchmark generation/lock scripts assume a sibling-checkout layout of afi-cli-shared; document this hard dependency or vendor the shared lib so the public toolkit is runnable standalone."
+    },
+    {
+      "title": "Reference-suite artifacts mostly untracked; only METADATA.txt committed and references a non-HEAD git SHA",
+      "severity": "P3",
+      "theme": "reproducibility / stale artifact",
+      "evidence": "git ls-files examples/ -> only examples/reference-suite/METADATA.txt; METADATA.txt:3 \"Git SHA: 9eb3a14\" (HEAD is e3bb1b8); scores.json/plots/metrics are generated, not committed",
+      "recommendation": "Tag stale: the committed METADATA.txt records a stale generation SHA and the canonical reference-suite outputs it advertises (README.md:51-58) are not in the repo, so the 'canonical reference artifacts' cannot be byte-verified from the checkout; regenerate and either commit or clearly mark as build-time only."
+    },
+    {
+      "title": "Tier-3 strict build enforces hash-locked deps (genuine determinism guarantee)",
+      "severity": "Info",
+      "theme": "replay/determinism",
+      "evidence": "Dockerfile:27-28 STRICT=1 -> \"pip download --require-hashes -r requirements.lock.txt\"; Dockerfile:47-48 \"pip install --no-index --find-links=/wheelhouse --require-hashes -r requirements.lock.txt\"; Dockerfile:15 PYTHONHASHSEED=0",
+      "recommendation": "Solid hermetic-build pattern; worth citing as a reference for how reference-impl repos should pin transform/dependency versions for replay, even though this repo is not itself replay-critical to the protocol."
+    }
+  ]
+}

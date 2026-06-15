@@ -1,0 +1,165 @@
+{
+  "repo": "afi-gateway",
+  "visibility": "PUBLIC",
+  "archived": false,
+  "classification": "REFERENCE_IMPL",
+  "classification_rationale": "README.md:3-5 and package.json:3 describe this as \"AFI's universal gateway framework for custom character development\" / \"universal gateway for multiple interfaces and integrations\" — an ElizaOS-based external client + character framework. It is the ingest-boundary plane in the five-plane model. It is REFERENCE_IMPL (not pure SUPPORTING/DOCS) because it contains a working, deployable signal-ingest API (src/server.ts, src/http/app.ts) that exercises the protocol surface: it normalizes a signal payload into the canonical VaultedSignalRecord type (imported from afi-infra) and persists it. It does not define normative schemas/specs itself, but it consumes them, so it is one concrete implementation of the ingest spine rather than the canon.",
+  "primary_purpose": "An ElizaOS-based universal gateway / framework: it lets community developers build custom characters with skills, provides AFI-specific Eliza plugins and HTTP/WS clients that call AFI services (afi-reactor Froggy pipeline), and exposes a tenant-scoped HTTP API (api-keys, skills discovery, and a /api/v1/signals ingest endpoint that writes into the TSSD vault).",
+  "protocol_touchpoints": [
+    "USS/CPJ ingest (referenced, not validated)",
+    "TSSD/vault (direct writes via afi-infra VaultedSignalRecord)",
+    "DAG/pipeline (HTTP client to afi-reactor Froggy)",
+    "schemas (consumes VaultedSignalRecord, AfiScoutSignalDraft)",
+    "epoch/signalId identity",
+    "replay/determinism (skills manifest determinism_required flag; Codex referenced as replay service)",
+    "SDK/API (api-key auth, rate limiting, skills discovery)",
+    "mint/receipt (only described in TSSD readiness report, no code)"
+  ],
+  "normative_artifacts": [
+    "(none authored here) — gateway consumes afi-infra/src/tssd/types.ts (VaultedSignalRecord) imported at /home/user/AFI-Protocol/afi-gateway/src/http/app.ts:8",
+    "/home/user/AFI-Protocol/afi-gateway/src/afiscout/types/afi-scout-signal.ts (AfiScoutSignalDraft — explicitly NON-canonical draft type)",
+    "/home/user/AFI-Protocol/afi-gateway/src/afiClient.ts:50-80 (ReactorScoredSignalV1 response-contract shape, gateway-side mirror of reactor's contract)"
+  ],
+  "reference_only_assumptions": [
+    {
+      "path": "src/services/vaultFactory.ts:7-22",
+      "quote": "function baseMongoConfig(): MongoTSSDVaultClientConfig { const mongoUri = process.env.AFI_TSSD_MONGODB_URI || ... dbName: ... 'afi_tssd', collectionName: ... 'tssd_signals' }"
+    },
+    {
+      "path": "src/services/vaultFactory.ts:24-33",
+      "quote": "export function createVaultFactoryFromEnv(): VaultFactory { const config = baseMongoConfig(); ... new TenantScopedTSSDVaultClient({ tenantId, ...config }) }"
+    },
+    {
+      "path": "src/http/app.ts:8",
+      "quote": "import type { VaultedSignalRecord } from \"afi-infra/src/tssd/types.js\";"
+    },
+    {
+      "path": "src/lib/db/mongo.ts:43-52",
+      "quote": "const uri = process.env.MONGODB_URI; if (!uri) { ... throw new Error(\"MONGODB_URI environment variable is required\"); }"
+    },
+    {
+      "path": "README.md:48-50",
+      "quote": "Dependency Direction: Gateway (this repo) -> depends on -> AFI services; AFI services -> never depend on -> Gateway"
+    },
+    {
+      "path": "AGENTS.md:88-89",
+      "quote": "No AFI business logic here ... No direct DB access: All AFI data access happens via AFI HTTP/WS APIs."
+    }
+  ],
+  "contradictions": [
+    {
+      "title": "Stated client-only / no-direct-DB principle contradicted by direct Mongo TSSD vault writes on a live route",
+      "detail": "README and AGENTS assert this repo is a pure HTTP/WS client with 'No direct database access' and 'No AFI business logic here'. But src/http/app.ts POST /api/v1/signals calls vault.upsert(record) where vault = TenantScopedTSSDVaultClient -> MongoTSSDVaultClient (afi-infra), writing the canonical VaultedSignalRecord straight into Mongo (afi_tssd.tssd_signals). server.ts mounts buildApp() with the real Mongo-backed factory, so this is a deployable path (Railway-targeted, binds 0.0.0.0), not test-only.",
+      "evidence": "src/http/app.ts:133-136 'const vault = vaultFactory(tenantId); await vault.upsert(parsed.record);' + README.md:69 '4. No direct DB access — All AFI data access happens via AFI HTTP/WS APIs' + src/server.ts:56 'const { app, apiKeyStore } = buildApp();'",
+      "severity": "P1"
+    },
+    {
+      "title": "Ingest boundary does not validate against canonical USS/CPJ dialect",
+      "detail": "Decentralization rule (1) requires the canonical dialect validate vs afi-config schemas at the ingest boundary. The gateway's signal ingest only checks presence of 4 identity fields (signalId, epochId, market, timeframe) and shallow-copies the rest; no USS v1.1 / CPJ v0.1 / vault.schema.json validation is performed before persisting to the vault. afi-scout drafts are explicitly non-canonical and merely logged with a TODO outbox.",
+      "evidence": "src/http/app.ts:26-30 'const required = [\"signalId\",\"epochId\",\"market\",\"timeframe\"]; const missing = required.filter((k) => !identity[k]);' and stages/publicSurface/proprietaryDetail passed through unvalidated (app.ts:44-51)",
+      "severity": "P1"
+    },
+    {
+      "title": "Vault layer hardcoded to MongoDB only, ignoring multi-engine vault.schema.json",
+      "detail": "vault.schema.json (afi-config) is normative for multi-engine vaults (mongodb/postgresql/timescaledb/influxdb). The gateway's only persistence wiring is Mongo (vaultFactory baseMongoConfig + MongoTSSDVaultClient). No engine selection or config-schema reference exists; this is the Mongo-tunnel-vision tension manifesting in an ingest implementation.",
+      "evidence": "src/services/vaultFactory.ts:19-21 'dbName: process.env.AFI_TSSD_DB_NAME || \"afi_tssd\", collectionName: process.env.AFI_TSSD_COLLECTION || \"tssd_signals\"' (no postgres/timescale/influx path)",
+      "severity": "P2"
+    },
+    {
+      "title": "Tenant scope mutates canonical signal identity (analystId overwritten)",
+      "detail": "TenantScopedTSSDVaultClient.upsert overrides identity.analystId with the API-key tenantId on every write. The gateway accepts an analystId in the payload (app.ts:42) but it is silently replaced. This couples a gateway auth/tenant concept to the canonical SignalIdentity.analystId used for replay/training queries, risking provenance ambiguity for replay and on-chain<->off-chain linkage.",
+      "evidence": "afi-infra/src/tssd/TenantScopedTSSDVaultClient.ts:30-37 'identity: { ...record.identity, analystId: this.tenantId }'; test asserts it: tests/api-gateway.test.ts:49 'expect(stored?.identity.analystId).toBe(\"tenant-a\")'",
+      "severity": "P2"
+    },
+    {
+      "title": "Large cross-repo TSSD readiness report lives in gateway and is dated/Mongo-leaning",
+      "detail": "TSSD_VAULT_READINESS_REPORT.md (dated 2025-11-29, 741 lines) audits 8 other repos and recommends standardizing on MongoDB (afi_tssd / tssd_vault). It is useful design context but is reference/research material parked in a client repo, partly stale (e.g. says 'no production MongoDB implementation exists yet' though afi-infra/src/tssd/MongoTSSDVaultClient.ts now exists), and pushes a Mongo-default that conflicts with the multi-engine portable direction.",
+      "evidence": "TSSD_VAULT_READINESS_REPORT.md:26 'no production MongoDB implementation exists yet' vs afi-infra/src/tssd/MongoTSSDVaultClient.ts present; TSSD_VAULT_READINESS_REPORT.md:500 'Recommendation: Start with MongoDB ... evaluate TimescaleDB for production'",
+      "severity": "P3"
+    }
+  ],
+  "replay_relevance": "partial",
+  "dependencies": {
+    "upstream": [
+      "afi-infra (file:../afi-infra — TSSD VaultedSignalRecord types, TenantScopedTSSDVaultClient, MongoTSSDVaultClient, InMemoryTSSDVaultClient)",
+      "@afi/cli-framework (file:../afi-cli-framework)",
+      "@elizaos/core 1.6.4 (external SDK)",
+      "afi-reactor (runtime HTTP dependency — Froggy /api/webhooks/tradingview, /health, /api/ingest/cpj)",
+      "afi-config (docs reference: Droid Charter, vault.schema.json, codex governance)",
+      "afi-skills (skills manifest at ../afi-skills/manifest.json consumed by skillsService)",
+      "MongoDB (mongodb ^6.21.0)",
+      "openai (^4.77.3)"
+    ],
+    "downstream": [
+      "End users / community character developers",
+      "Discord/Telegram bots (dev:discord, dev:telegram scripts)",
+      "web UI via ElizaOS server-full"
+    ]
+  },
+  "recommended_action": "clarify reference-vs-normative",
+  "notable_findings": [
+    {
+      "title": "Live signal-ingest route writes VaultedSignalRecord directly to Mongo TSSD vault",
+      "severity": "P1",
+      "theme": "mongodb|vault|TSSD|VaultedSignalRecord",
+      "evidence": "src/http/app.ts:122-141 'app.post(\"/api/v1/signals\", auth, ... const vault = vaultFactory(tenantId); await vault.upsert(parsed.record); ... res.status(202).json({ status: \"accepted\", ... signalId })'; server.ts:76 advertises 'POST /api/v1/signals — Ingest signal into TSSD (tenant scoped)'",
+      "recommendation": "Clarify whether the gateway is an HTTP client (per README/AGENTS) or a first-class ingest+persistence node. If the latter, update the 'no direct DB access' docs and treat this as a reference ingest implementation that MUST validate USS/CPJ and route through the canonical engine selector, not hardcoded Mongo."
+    },
+    {
+      "title": "Ingest validation is 4-field presence check, no canonical schema validation",
+      "severity": "P1",
+      "theme": "usignal|USS|cpj|CPJ",
+      "evidence": "src/http/app.ts:20-57 normalizeSignalPayload: 'const required = [\"signalId\",\"epochId\",\"market\",\"timeframe\"]; ... stages: payload.stages ?? {}, publicSurface: payload.publicSurface ?? {...}, proprietaryDetail: payload.proprietaryDetail'",
+      "recommendation": "Validate inbound payloads against the canonical USS v1.1 / CPJ v0.1 / vault.schema.json (afi.usignal.v1) before persisting, to satisfy decentralization rule (1) at the ingest boundary."
+    },
+    {
+      "title": "Vault persistence is Mongo-only; ignores afi-config multi-engine vault schema",
+      "severity": "P2",
+      "theme": "mongodb|postgresql|timescaledb|influxdb",
+      "evidence": "src/services/vaultFactory.ts:7-22 baseMongoConfig() (only Mongo); grep for postgresql/timescaledb/influxdb in src returned no engine wiring (only TODO at src/index.ts:65 'PostgreSQL')",
+      "recommendation": "Either document Mongo as a reference engine choice or wire engine selection from vault.schema.json so the ingest spine is not coupled to Mongo."
+    },
+    {
+      "title": "TenantScoped client overwrites canonical analystId with auth tenantId",
+      "severity": "P2",
+      "theme": "publicSurface|proprietaryDetail / identity provenance",
+      "evidence": "afi-infra/src/tssd/TenantScopedTSSDVaultClient.ts:29-38 'async upsert(record) { const scoped = { ...record, identity: { ...record.identity, analystId: this.tenantId } }; return this.inner.upsert(scoped); }'",
+      "recommendation": "Separate gateway tenantId from canonical SignalIdentity.analystId (e.g. store tenantId in a gateway-scoped field) to preserve replay/training provenance and avoid silently rewriting submitted identity."
+    },
+    {
+      "title": "Gateway is an HTTP client to afi-reactor's Froggy pipeline (reactor-as-orchestrator coupling)",
+      "severity": "Info",
+      "theme": "pipeline|DAG|froggy|orchestrator",
+      "evidence": "src/afiClient.ts:117-138 runFroggyTrendPullback posts to '${baseUrl}/api/webhooks/tradingview'; src/afiClient.ts:104-109 comments 'Ingest -> USS normalization ... Analyst scoring (trend_pullback_v1) ... Vault persistence'; afiCli.ts:94 references '/api/ingest/cpj endpoint for CPJ signals'",
+      "recommendation": "Reference-only; the client correctly treats reactor as one backend over HTTP. Keep endpoints/strategy names (froggy_trend_pullback_v1) abstracted so non-reactor scoring backends can be substituted."
+    },
+    {
+      "title": "AFIScout signal-outbox is draft-only with no wired endpoint",
+      "severity": "Info",
+      "theme": "usignal|USS / ingest boundary",
+      "evidence": "src/afiscout/plugins/afi-signal-outbox.ts:46-51 'TODO: Send to AFI signal outbox endpoint when available'; afi-scout-signal.ts:3-4 'This is NOT the canonical AFI Signal schema; it is a lightweight, deterministic draft'",
+      "recommendation": "None — correctly scoped and self-labeled as non-canonical draft-only; good example of ingest dialect boundary discipline."
+    },
+    {
+      "title": "No on-chain / mint / emissions code in repo (only described in readiness report)",
+      "severity": "Info",
+      "theme": "AFIMintCoordinator|EmissionsMinted|beneficiary",
+      "evidence": "grep for AFIMintCoordinator|AFISignalReceipt|EmissionsMinted in src/ returned no hits; only TSSD_VAULT_READINESS_REPORT.md:270-286 discusses afi-token signalId/epochId breadcrumbs",
+      "recommendation": "None — commitment plane correctly absent from the gateway; matches five-plane separation."
+    },
+    {
+      "title": "Skills discovery exposes determinism_required and risk_level metadata",
+      "severity": "Info",
+      "theme": "replay|determinism / SDK-API",
+      "evidence": "src/services/skillsService.ts:11 'determinism_required?: boolean;' and risk_level/allowed_tools fields; loaded from ../afi-skills/manifest.json (skillsService.ts:39)",
+      "recommendation": "None — read-only passthrough of afi-skills manifest; canonical skill governance lives upstream in afi-skills."
+    },
+    {
+      "title": "Large cross-repo TSSD readiness report parked in client repo, partly stale",
+      "severity": "P3",
+      "theme": "normative|canonical|reference / stale docs",
+      "evidence": "TSSD_VAULT_READINESS_REPORT.md:1-37 dated 2025-11-29, asserts 'no production MongoDB implementation exists yet' (line 26) while afi-infra/src/tssd/MongoTSSDVaultClient.ts now exists; recommends Mongo-default standardization (line 500, 667)",
+      "recommendation": "Tag stale / relocate the cross-repo readiness report to afi-docs or afi-infra; refresh claims about Mongo implementation status and soften Mongo-default guidance toward the multi-engine portable direction."
+    }
+  ]
+}

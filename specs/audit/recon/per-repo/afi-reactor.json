@@ -1,0 +1,189 @@
+{
+  "repo": "afi-reactor",
+  "visibility": "PUBLIC",
+  "archived": false,
+  "classification": "REFERENCE_IMPL",
+  "classification_rationale": "afi-reactor is a concrete TypeScript implementation of ONE scoring/orchestration spine (the \"reference spine\" gateway->reactor DAG->vault per North Star). package.json declares `\"name\": \"afi-reactor\"` with mongodb, express, zod and `file:../afi-core`/`file:../afi-factory` deps (package.json:1-46). It ships a working flexible plugin DAG (src/dag/DAGBuilder.ts, DAGExecutor.ts, plugins/nodes), enrichment, USS/CPJ ingest mappers, and a Mongo persistence service. It is NOT itself a normative spec: its DAG/replay docs explicitly defer schema ownership to other repos (config/schema.codex.json `ownerRepo` fields point to afi-core/afi-infra; VALIDATOR_REPLAY_SPEC.v0.1.md:21 \"canonical vaulted-signal schema is owned by afi-infra\"). The one genuinely normative artifact it carries, VALIDATOR_REPLAY_SPEC.v0.1.md, is a spec doc bundled inside a reference impl. The repo's own framing (\"ONLY orchestrator\", \"canonical orchestrator\", \"The DAG is law\") presents the reference impl as protocol law, which is the P1 tension rather than a reason to reclassify.",
+  "primary_purpose": "afi-reactor is the reference TypeScript orchestrator that runs a flexible, plugin-based DAG pipeline to ingest (USS v1.1 / CPJ v0.1), enrich, deterministically score, and persist financial signals to a Mongo-backed scored-signal vault, exposing replay/simulation entrypoints.",
+  "replay_relevance": "critical",
+  "protocol_touchpoints": [
+    "USS/CPJ ingest",
+    "TSSD/vault",
+    "DAG/pipeline",
+    "schemas",
+    "replay/determinism",
+    "SDK/API"
+  ],
+  "normative_artifacts": [
+    "/home/user/AFI-Protocol/afi-reactor/docs/VALIDATOR_REPLAY_SPEC.v0.1.md",
+    "/home/user/AFI-Protocol/afi-reactor/config/schema.codex.json",
+    "/home/user/AFI-Protocol/afi-reactor/config/dag.codex.json",
+    "/home/user/AFI-Protocol/afi-reactor/src/types/ReactorScoredSignalV1.ts",
+    "/home/user/AFI-Protocol/afi-reactor/src/uss/ussValidator.ts",
+    "/home/user/AFI-Protocol/afi-reactor/src/cpj/cpjValidator.ts",
+    "/home/user/AFI-Protocol/afi-reactor/src/uss/cpjMapper.ts",
+    "/home/user/AFI-Protocol/afi-reactor/src/novelty/canonicalNovelty.ts",
+    "/home/user/AFI-Protocol/afi-reactor/docs/AFI_REACTOR_DAG_SPEC.md"
+  ],
+  "reference_only_assumptions": [
+    {
+      "path": "/home/user/AFI-Protocol/afi-reactor/README.md",
+      "quote": "**afi-reactor is the ONLY orchestrator in AFI Protocol.** All canonical pipelines, DAGs, and routing logic live here."
+    },
+    {
+      "path": "/home/user/AFI-Protocol/afi-reactor/docs/AFI_ORCHESTRATOR_DOCTRINE.md",
+      "quote": "### 3. The DAG is law\nEvery signal path (ingest → enrich → score → mint/review) must be expressible as a Reactor DAG; ad-hoc flows are anti-patterns."
+    },
+    {
+      "path": "/home/user/AFI-Protocol/afi-reactor/AGENTS.md",
+      "quote": "**afi-reactor** is the canonical DAG orchestrator for AFI Protocol... This is the **ONLY orchestrator** in the AFI ecosystem—agents are nodes, not orchestrators."
+    },
+    {
+      "path": "/home/user/AFI-Protocol/afi-reactor/src/services/tssdVaultService.ts",
+      "quote": "Provides MongoDB persistence for scored signals from AFI Reactor. ... AFI_MONGO_URI: MongoDB connection string (required)"
+    },
+    {
+      "path": "/home/user/AFI-Protocol/afi-reactor/config/dag.codex.json",
+      "quote": "\"description\": \"Stores approved signals in the MongoDB T.S.S.D. Vault.\""
+    },
+    {
+      "path": "/home/user/AFI-Protocol/afi-reactor/config/schema.codex.json",
+      "quote": "\"meta\": { \"bsonType\": \"object\", \"required\": [\"signalId\", \"timestamp\", \"score\"] ...} (vaulted-signal schema expressed only as MongoDB BSON)"
+    }
+  ],
+  "contradictions": [
+    {
+      "title": "Reactor self-declares as THE single orchestrator, contradicting portable-protocol (DAG is pluggable)",
+      "detail": "North Star treats the Scoring DAG plane as pluggable (afi-reactor / custom DAG / Mage blocks if outputs conform). The repo repeatedly asserts itself as the sole/canonical orchestrator and that the DAG is 'law', which would forbid an external validator from running a conformant DAG on a different stack.",
+      "evidence": "README.md:137 \"afi-reactor is the ONLY orchestrator in AFI Protocol.\"; docs/AFI_ORCHESTRATOR_DOCTRINE.md:38-40 \"The DAG is law... ad-hoc flows are anti-patterns\"; AGENTS.md:3 \"This is the ONLY orchestrator in the AFI ecosystem\"",
+      "severity": "P1"
+    },
+    {
+      "title": "Vault layer hard-bound to MongoDB; no multi-engine seam at the persistence contract",
+      "detail": "Portable protocol requires the evidence/vault plane to be pluggable across Mongo/PostgreSQL/TimescaleDB/InfluxDB per vault.schema.json. The reference persistence is Mongo-only and the canonical contract is expressed as Mongo BSON, and node descriptions name 'MongoDB T.S.S.D. Vault' directly. AFI_MONGO_URI is 'required' for the vault to function.",
+      "evidence": "src/services/tssdVaultService.ts:4-22 \"MongoDB persistence... AFI_MONGO_URI: MongoDB connection string (required)\"; config/dag.codex.json:20 \"Stores approved signals in the MongoDB T.S.S.D. Vault.\"; config/schema.codex.json:49-56 vaulted-signal uses bsonType",
+      "severity": "P1"
+    },
+    {
+      "title": "DAG executor uses non-deterministic ordering/IDs, risking replay determinism the spec mandates",
+      "detail": "VALIDATOR_REPLAY_SPEC.v0.1.md makes determinism normative (same codex+config+data => same outputs). But DAGExecutor relies on Set iteration order, Math.random execution IDs, and Promise.all parallel races for same-level nodes; with non-commutative node side effects on shared PipelineState this could yield order-dependent outputs. Node-level transforms (TA, CPJ hashing, novelty) are individually deterministic, but the orchestration layer offers no pinned topology hash or ordered merge guarantee.",
+      "evidence": "src/dag/DAGExecutor.ts:1002-1004 generateExecutionId uses Date.now()+Math.random; DAGExecutor.ts:716-743 executeLevelParallel runs Promise.all over a level; vs docs/VALIDATOR_REPLAY_SPEC.v0.1.md:37 \"Same codex version + same config + same data snapshot → same validator outputs.\"",
+      "severity": "P2"
+    },
+    {
+      "title": "DAG spec/codex describe an aspirational 15-node design not matched by implemented nodes; placeholder schema entry present",
+      "detail": "AFI_REACTOR_DAG_SPEC.md documents a 15-node 'target design' (market-data-streamer, onchain-feed-ingestor, exchange-execution-node, etc.) while src/dag implements a different smaller node set (Analyst/Execution/Observer + Scout/News/Sentiment/Pattern/SignalIngress/TechnicalIndicators/AiMl). schema.codex.json contains a filler entry to pad the count. This makes the canonical config a poor source of truth for an external implementer.",
+      "evidence": "config/schema.codex.json:289-291 \"additional-schema.schema.json\" ... \"Additional schema to reach count of 15.\"; docs/AFI_REACTOR_DAG_SPEC.md:28 \"5 primary categories with 15 total nodes in the current target design\"",
+      "severity": "P2"
+    },
+    {
+      "title": "Doctrine claims 'Configuration is externalized' from afi-config but pipeline/DAG topology is hardcoded in-repo",
+      "detail": "Commandment 7 says reactor reads pipeline configs from afi-config with 'no hard-coded magic', yet the canonical DAG topology, node configs (quorum, poiWeight/insightWeight, lineageDepth), and the Froggy pipeline live hardcoded in this repo's config/dag.codex.json and src/config/froggyPipeline.ts.",
+      "evidence": "docs/AFI_ORCHESTRATOR_DOCTRINE.md:95-104 \"Configuration is externalized... no hard-coded magic\"; config/dag.codex.json:146-170 hardcoded strategyId/poiWeight/insightWeight; AFI_REACTOR_DAG_SPEC.md:7 \"canonical DAG description for afi-reactor currently lives in config/dag.codex.json\"",
+      "severity": "P3"
+    }
+  ],
+  "dependencies": {
+    "upstream": [
+      "afi-core (file:../afi-core; AnalystScoreTemplate, validators, UWR/PoI logic, scoring formulas)",
+      "afi-config (USS v1.1 schemas loaded at runtime by ussValidator)",
+      "afi-factory (file:../afi-factory; AnalystConfig/EnrichmentNodeConfig, template_registry)",
+      "afi-math (declared in .afi-codex.json dependsOn)",
+      "afi-plugins (declared in .afi-codex.json dependsOn)"
+    ],
+    "downstream": [
+      "afi-infra (owns canonical vaulted-signal schema + real TSSD persistence; consumes reactor as service)",
+      "afi-ops (deployment, listed as consumer)",
+      "afi-gateway (ElizaOS actions call reactor Froggy pipeline via HTTP/WS)",
+      "afi-mint (receives validated/scored outcomes; minting/emissions explicitly moved out of reactor)",
+      "afi-token (subscribes to reactor events for emissions per doctrine)"
+    ]
+  },
+  "recommended_action": "clarify reference-vs-normative",
+  "notable_findings": [
+    {
+      "title": "README and doctrine present reference orchestrator as protocol law ('ONLY orchestrator', 'DAG is law')",
+      "severity": "P1",
+      "theme": "pipeline|DAG|orchestrator|doctrine",
+      "evidence": "README.md:137 \"afi-reactor is the ONLY orchestrator in AFI Protocol.\"; docs/AFI_ORCHESTRATOR_DOCTRINE.md:290 \"This doctrine is authoritative. All afi-reactor code must comply.\"",
+      "recommendation": "Reframe doctrine/README as 'reference orchestrator for the AFI reference spine'. The portable-protocol law is conformance to USS/CPJ/scored-signal/vaulted-signal contracts + replay invariants, NOT that this DAG engine is the only legal orchestrator. Extract the genuinely normative pieces (replay invariants, signal envelope) to spec repo."
+    },
+    {
+      "title": "Vault persistence is Mongo-only and canonical contract is BSON-typed; violates multi-engine evidence plane",
+      "severity": "P1",
+      "theme": "mongodb|MongoTSSD|vault|TSSD|VaultedSignalRecord",
+      "evidence": "src/services/tssdVaultService.ts:22 \"import { MongoClient, Db, Collection } from \\\"mongodb\\\";\"; config/schema.codex.json:49-53 vaulted-signal meta uses bsonType; config/dag.codex.json:196 \"persists execution result to MongoDB vault.\"",
+      "recommendation": "Define vaulted-signal as an engine-neutral JSON Schema (current vault.schema.json North Star), with Mongo BSON as one binding. Make the reactor write through a storage-agnostic interface so PostgreSQL/Timescale/Influx backends can satisfy the same contract."
+    },
+    {
+      "title": "Strong per-node determinism + canonical hashing/ID generation for replay (positive)",
+      "severity": "Info",
+      "theme": "replay|ReplaySession|determinism|codex",
+      "evidence": "src/uss/cpjMapper.ts:198-226 deterministic SHA256 ingest hash with key sorting + array canonicalization; src/novelty/canonicalNovelty.ts:9-12 \"CanonicalNovelty contains ONLY replay-stable fields (no timestamps)\"; enrichment/technicalIndicators.ts:2-5 deterministic",
+      "recommendation": "Preserve and promote: these canonicalization rules (CPJ ingest hash, replay-stable novelty, deterministic signalIds) are exactly the determinism artifacts a portable protocol needs. Consider extracting the canonicalization algorithm to a shared normative spec so other stacks reproduce identical hashes."
+    },
+    {
+      "title": "Orchestration layer lacks pinned topology + parallel-merge determinism guarantee",
+      "severity": "P2",
+      "theme": "replay|ReplaySession|determinism|codex",
+      "evidence": "src/dag/DAGExecutor.ts:1002-1004 generateExecutionId via Date.now()+Math.random(); DAGExecutor.ts:734-735 \"const promises = chunk.map... await Promise.all(promises)\"; spec requires determinism docs/VALIDATOR_REPLAY_SPEC.v0.1.md:37",
+      "recommendation": "Add a pinned topology hash (codexVersion + node/plugin/analyst/validator versions) and an order-independent state merge (or canonical post-merge sort) so same-level parallel nodes cannot perturb scored outputs. Record the pinned version set in each replay session."
+    },
+    {
+      "title": "VALIDATOR_REPLAY_SPEC.v0.1.md is normative-grade but lives inside a reference impl repo",
+      "severity": "P2",
+      "theme": "normative|canonical|reference implementation",
+      "evidence": "docs/VALIDATOR_REPLAY_SPEC.v0.1.md:67 \"v0.1 is **normative** for invariants (determinism, isolation, traceability)\"; :38 \"Replay must not mutate production state (no new mints, no writes to live TSSD collections).\"",
+      "recommendation": "Promote the replay invariants (determinism, isolation, traceability, ReplaySession fields) into the protocol spec set (afi-docs/specs) so external validators can implement replay without reading reactor internals."
+    },
+    {
+      "title": "USS v1.1 validation loads schemas from afi-config (correct interoperability seam)",
+      "severity": "Info",
+      "theme": "usignal|USS|cpj|CPJ",
+      "evidence": "src/uss/ussValidator.ts:79-88 reads node_modules/afi-config/schemas/usignal/v1_1/core.schema.json + index.schema.json via AJV; src/collectors/.../mtprotoToCpj.ts:73 \"schema: \\\"afi.cpj.v0.1\\\"\"",
+      "recommendation": "None / keep. This is the right pattern: the ingest dialect is validated against the canonical afi-config schemas rather than an in-repo copy. Confirm CPJ also validates against an afi-config CPJ schema rather than only an in-repo zod type."
+    },
+    {
+      "title": "No mint/emissions/beneficiary/epoch logic in reactor source — correctly delegated to afi-mint/afi-token",
+      "severity": "Info",
+      "theme": "mintForSignal|coordinateMint|beneficiary|epoch|AFIMintCoordinator",
+      "evidence": "grep for mintForSignal|coordinateMint|beneficiary|EmissionsMinted|AFIMintCoordinator across src/ found 0 hits (only 'epoch'=unix-time, 'base'=symbol base); src/services/froggyDemoService.ts:18 \"Minting/emissions (moved to afi-mint)\"",
+      "recommendation": "None. Consistent with doctrine commandment 8 and current on-chain reality (reactor emits scored/validated outcomes; commitment plane lives in afi-mint/afi-token). Reactor holds no on-chain anchoring logic."
+    },
+    {
+      "title": "DAG spec describes aspirational 15-node design + filler schema entry; codex not a clean source of truth",
+      "severity": "P2",
+      "theme": "pipeline|DAG|froggy|orchestrator|doctrine",
+      "evidence": "config/schema.codex.json:289-291 \"Additional schema to reach count of 15.\"; docs/AFI_REACTOR_DAG_SPEC.md:34-68 lists onchain-feed-ingestor/exchange-execution-node etc. not present in src/dag/",
+      "recommendation": "Tag the 15-node spec as roadmap/aspirational and align config/*.codex.json with actually-implemented nodes; remove the 'additional-schema' placeholder before treating dag/schema codex as an interoperability contract."
+    },
+    {
+      "title": "No public-vs-proprietary evidence surface distinction in reactor",
+      "severity": "Info",
+      "theme": "publicSurface|proprietaryDetail",
+      "evidence": "grep for publicSurface|proprietaryDetail|proprietary|dense evidence|challenge-ready across repo returned 0 hits",
+      "recommendation": "Observation: the public/proprietary vault surface split (North Star evidence plane) is not modeled here. If reactor is to remain the reference write path, document where the public surface is derived vs the proprietary detail it persists, or defer entirely to afi-infra vault.schema.json."
+    },
+    {
+      "title": "No analytics/market plane engines (BigQuery/Kafka/warehouse) and that is consistent with reactor scope",
+      "severity": "Info",
+      "theme": "BigQuery|kafka|warehouse|postgresql|timescaledb|influxdb",
+      "evidence": "grep found only ObserverNode.ts:250 comment \"Message queues (e.g., RabbitMQ, Kafka)\"; no BigQuery/warehouse/postgres/timescale/influx usage",
+      "recommendation": "None for reactor itself; flag at org level that the market/analytics plane (BigQuery, Kafka/PubSub) is absent from the reference spine and must be documented as a separate pluggable plane, not folded into the reactor vault."
+    },
+    {
+      "title": "Multi-repo schema ownership modeled via ownerRepo (healthy separation signal)",
+      "severity": "Info",
+      "theme": "normative|canonical|reference implementation",
+      "evidence": "config/schema.codex.json:7 \"ownerRepo\": \"afi-core\"; :44 \"ownerRepo\": \"afi-infra\" with note 'Canonical vault schema lives in afi-infra; afi-reactor uses this as a contract for DAG output only'; AFI_REACTOR_DAG_SPEC.md:9 explains ownerRepo",
+      "recommendation": "None / keep. The ownerRepo field plus 'contract not implementation' language is the correct portable-protocol posture and partially mitigates the 'ONLY orchestrator' framing. Reuse this pattern consistently across all codex entries."
+    },
+    {
+      "title": "VaultService (src/core/VaultService.ts) and DAG tssd-vault plugin are unimplemented stubs",
+      "severity": "P3",
+      "theme": "mongodb|MongoTSSD|vault|TSSD",
+      "evidence": "src/core/VaultService.ts:1-2 \"VaultService Stub - Scaffold Only / TODO: Implement real vault service logic\" (queryVault/saveSignal throw 'not implemented'); plugins/tssd-vault-service.ts:9 \"DEV STUB – no real DB; canonical TSSD vault lives in afi-infra.\"",
+      "recommendation": "Tag stale/scaffold. Two parallel vault paths exist (real Mongo tssdVaultService vs throwing core/VaultService vs dev-stub plugin); consolidate or clearly mark which is the reference write path to avoid an external implementer wiring the wrong one."
+    }
+  ]
+}
