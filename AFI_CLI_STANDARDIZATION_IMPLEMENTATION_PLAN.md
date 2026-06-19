@@ -1,5 +1,7 @@
 # AFI CLI Standardization Implementation Plan
 
+> **Status: RETIRED (2026-06-19)** — Aspirational only; not an active mandate. See [`specs/audit/AFI_CLI_FRAMEWORKS_DECISIONS.md`](./specs/audit/AFI_CLI_FRAMEWORKS_DECISIONS.md).
+
 ## Executive Summary
 
 Following the comprehensive CLI audit of the AFI repositories, this plan addresses the critical finding that the project relies on **6 disparate CLI frameworks** across **15 implementations** with no unified approach. This creates maintenance overhead, inconsistent user experience, and development friction.

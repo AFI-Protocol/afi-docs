@@ -1,5 +1,7 @@
 # AFI CLI Maintenance Schedule
 
+> **Status: RETIRED (2026-06-19)** — Aspirational only; not an active mandate. See [`specs/audit/AFI_CLI_FRAMEWORKS_DECISIONS.md`](./specs/audit/AFI_CLI_FRAMEWORKS_DECISIONS.md).
+
 ## Overview
 
 This document outlines the maintenance schedule, procedures, and monitoring framework for AFI CLI tools. It ensures ongoing quality, security, and compliance while supporting the 10-week timeline transition to maintenance mode.

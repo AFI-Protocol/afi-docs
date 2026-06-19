@@ -1,5 +1,7 @@
 # AFI CLI Standards and Governance
 
+> **Status: RETIRED (2026-06-19)** — Aspirational only; not an active mandate. See [`specs/audit/AFI_CLI_FRAMEWORKS_DECISIONS.md`](./specs/audit/AFI_CLI_FRAMEWORKS_DECISIONS.md).
+
 ## Introduction
 
 This document establishes comprehensive guidelines for developing, maintaining, and governing Command Line Interface (CLI) tools across all AFI project repositories. The goal is to ensure consistency, maintainability, and high quality across all CLI tools while leveraging shared frameworks and best practices.

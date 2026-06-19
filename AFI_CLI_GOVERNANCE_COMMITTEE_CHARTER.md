@@ -1,5 +1,7 @@
 # AFI CLI Governance Committee Charter
 
+> **Status: RETIRED (2026-06-19)** — Aspirational only; not an active mandate. See [`specs/audit/AFI_CLI_FRAMEWORKS_DECISIONS.md`](./specs/audit/AFI_CLI_FRAMEWORKS_DECISIONS.md).
+
 ## Purpose
 
 The AFI CLI Governance Committee is responsible for overseeing the standardization, maintenance, and evolution of Command Line Interface (CLI) tools across all AFI project repositories. The committee ensures consistency, quality, and alignment with AFI's technical and security standards while facilitating collaboration among CLI developers and stakeholders.

@@ -14,6 +14,7 @@ Persistent handoff for the portable-protocol surface investigation across the 31
 **afi-core build fix:** [`AFI_CORE_BUILD_FIX_PROMPT.md`](./AFI_CORE_BUILD_FIX_PROMPT.md) (P0 — unblock npm install)  
 **CLI frameworks investigation:** [`AFI_CLI_FRAMEWORKS_INVESTIGATION.md`](./AFI_CLI_FRAMEWORKS_INVESTIGATION.md) (relevance + consumer graph)  
 **CLI frameworks decisions:** [`AFI_CLI_FRAMEWORKS_DECISIONS.md`](./AFI_CLI_FRAMEWORKS_DECISIONS.md) (binding human verdict + execution charter)  
+**CLI frameworks consolidation:** [`AFI_CLI_FRAMEWORKS_CONSOLIDATION_RESULTS.md`](./AFI_CLI_FRAMEWORKS_CONSOLIDATION_RESULTS.md) (execution results — docs fix, bash-lib rehome, Python deprecation, gateway alignment)  
 **Analyst Shop MVP:** [`../AFI_ANALYST_SHOP_MVP.md`](../AFI_ANALYST_SHOP_MVP.md) (onboarding tiers, Ably as optional storefront)  
 **Final reports:** see [Final Deliverables](#final-deliverables-phase-4) below.
 

@@ -1,5 +1,7 @@
 # AFI CLI Review Process
 
+> **Status: RETIRED (2026-06-19)** — Aspirational only; not an active mandate. See [`specs/audit/AFI_CLI_FRAMEWORKS_DECISIONS.md`](./specs/audit/AFI_CLI_FRAMEWORKS_DECISIONS.md).
+
 ## Overview
 
 This document defines the review and approval processes for CLI proposals, changes, and maintenance activities. It ensures quality, security, and compliance while maintaining efficient development workflows.

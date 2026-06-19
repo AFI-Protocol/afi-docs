@@ -1,5 +1,7 @@
 # AFI CLI Communication Plan
 
+> **Status: RETIRED (2026-06-19)** — Aspirational only; not an active mandate. See [`specs/audit/AFI_CLI_FRAMEWORKS_DECISIONS.md`](./specs/audit/AFI_CLI_FRAMEWORKS_DECISIONS.md).
+
 ## Overview
 
 This communication plan ensures transparent, timely, and effective information sharing among CLI stakeholders, developers, and the broader AFI community. It supports the governance framework and facilitates successful adoption of CLI standards.

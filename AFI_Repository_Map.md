@@ -165,11 +165,11 @@
 ```
 afi-core
     ↓
-afi-gateway → afi-pipeline → afi-reactor
-    ↓              ↓
-afi-factory → afi-agents
+afi-gateway → afi-reactor
     ↓
-afi-cli-framework → afi-cli-shared
+afi-factory
+    ↓
+afi-cli-framework
     ↓
 afi-econ → afi-governance
     ↓
@@ -182,21 +182,21 @@ afi-config (all repos)
 
 ## Key Integration Points
 
-1. **Gateway to Pipeline**: afi-gateway sends signals to afi-pipeline for processing
-2. **Pipeline to Reactor**: afi-pipeline can trigger afi-reactor for real-time processing
-3. **Factory to Agents**: afi-factory creates and manages agents in afi-agents
-4. **CLI Framework to Shared**: afi-cli-framework uses utilities from afi-cli-shared
-5. **Econ to Governance**: afi-econ provides economic data to afi-governance
-6. **Benchkit to Tiny Brains**: afi-benchkit tests models from afi-tiny-brains
-7. **Config to All**: afi-config provides configuration to all repositories
+1. **Gateway to Reactor**: afi-gateway forwards USS v1.1 signals to afi-reactor for Froggy scoring (canonical spine — the legacy `afi-pipeline` hop no longer exists)
+2. **Factory**: afi-factory provides agent/factory tooling (the standalone `afi-agents` repo no longer exists)
+3. **Econ to Governance**: afi-econ provides economic data to afi-governance
+4. **Benchkit to Tiny Brains**: afi-benchkit tests models from afi-tiny-brains
+5. **Config to All**: afi-config provides configuration to all repositories
+
+> Note: the two CLI repos are **independent** — a prior diagram edge between them was a phantom (no real dependency). `afi-cli-shared` is deprecated (2026-06-19) and its bash lib was rehomed to `afi-ops/scripts/lib/afi-shared.sh`; the remaining TS CLI library (`afi-cli-framework`) is unaffected. See `specs/audit/AFI_CLI_FRAMEWORKS_DECISIONS.md`.
 
 ## Development Workflow
 
 1. **Core Development**: Start with afi-core for protocol changes
 2. **Gateway Integration**: Update afi-gateway for new endpoints
-3. **Pipeline Updates**: Modify afi-pipeline for new processing stages
-4. **Agent Development**: Use afi-factory to create agents in afi-agents
-5. **CLI Tools**: Build CLI tools using afi-cli-framework and afi-cli-shared
+3. **Reactor Updates**: Modify afi-reactor for new scoring/pipeline stages
+4. **Agent Development**: Use afi-factory for agent tooling
+5. **CLI Tools**: Build TS CLI tools on afi-cli-framework
 6. **Economic Modeling**: Update afi-econ and afi-governance for economic changes
 7. **Testing**: Use afi-benchkit and afi-tiny-brains for testing
 8. **Documentation**: Update afi-docs with changes
