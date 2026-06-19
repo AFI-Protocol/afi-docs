@@ -5,6 +5,14 @@ Persistent handoff for the portable-protocol surface investigation across the 31
 **Status: COMPLETE.** All four phases are done — Phase 1 recon, Phase 2 themes (A–J), Phase 3 adversarial verification (`themes/verified.json`, 33/33 P0/P1 confirmed), and Phase 4 synthesis (6 master reports written, validated, and promoted to `afi-docs/specs/`). The deterministic gate `scripts/validate_audit.py all` reports `RESULT: PASS`.
 
 **Start here:** [`AFI_AUDIT_CHECKPOINT.md`](./AFI_AUDIT_CHECKPOINT.md) (phase status + Definition-of-Done tracker)  
+**Human review:** [`AFI_HUMAN_REVIEW_WORKSHEET.md`](./AFI_HUMAN_REVIEW_WORKSHEET.md) (Q1–Q7 decisions with file links)  
+**Testnet E2E:** [`AFI_TESTNET_E2E_CHECKLIST.md`](./AFI_TESTNET_E2E_CHECKLIST.md) (MVP vs protocol-complete, Base Sepolia)  
+**Mage + GCP research:** [`AFI_MAGE_GCP_RESEARCH_PROMPT.md`](./AFI_MAGE_GCP_RESEARCH_PROMPT.md) (deep agent charter)  
+**Mage Pro plan pick:** [`AFI_MAGE_PRO_PLAN_DECISION.md`](./AFI_MAGE_PRO_PLAN_DECISION.md) (OSS default; Pro fallback)  
+**Froggy → Mage map:** [`AFI_FROGGY_MAGE_MIGRATION_MAP.md`](./AFI_FROGGY_MAGE_MIGRATION_MAP.md) (stage-by-stage reuse)  
+**Legacy purge prompt:** [`AFI_LEGACY_PIPELINE_PURGE_PROMPT.md`](./AFI_LEGACY_PIPELINE_PURGE_PROMPT.md) (remove alpha-scout / structurer / validator-decision / execution-sim)  
+**afi-core build fix:** [`AFI_CORE_BUILD_FIX_PROMPT.md`](./AFI_CORE_BUILD_FIX_PROMPT.md) (P0 — unblock npm install)  
+**Analyst Shop MVP:** [`../AFI_ANALYST_SHOP_MVP.md`](../AFI_ANALYST_SHOP_MVP.md) (onboarding tiers, Ably as optional storefront)  
 **Final reports:** see [Final Deliverables](#final-deliverables-phase-4) below.
 
 ---

@@ -1,5 +1,7 @@
 # AFI Agentic Legos Architecture Analysis
 
+> ⚠️ Historical snapshot. The legacy Froggy demo chain (Alpha Scout → Pixel Rick → Val Dook → Execution Sim) was removed; the reactor is scored-only. Canonical pipeline: afi-reactor/src/config/froggyPipeline.ts.
+
 ## Executive Summary
 
 The AFI Protocol implements an "agentic legos" architecture where modular components (skills, agents, droids) can be assembled into intelligent systems. This analysis clarifies the relationships between afi-skills, afi-math, afi-benchkit, afi-core, and afi-reactor, along with the broader agent universe, agent playbook, and current implementation status.

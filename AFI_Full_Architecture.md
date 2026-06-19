@@ -56,9 +56,9 @@
 │  │  afi-gateway │  │  afi-sdk-ts  │  │ afi-sdk-     │      │
 │  │   (External   │  │              │  │  python      │      │
 │  │   Integration)│  │ (TypeScript  │  │  (Python     │      │
-│  │  (Phoenix,    │  │   SDK)       │  │   SDK)       │      │
-│  │  Alpha, Froggy, │  │              │  │              │      │
-│  │  Val Dook)     │  │              │  │              │      │
+│  │  (Phoenix     │  │   SDK)       │  │   SDK)       │      │
+│  │   concierge; │  │              │  │              │      │
+│  │   scored-only)│  │              │  │              │      │
 │  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘      │
 │         │                  │                  │              │
 │         └──────────────────┼──────────────────┘              │
@@ -135,7 +135,7 @@ AFI Protocol is organized into **26 repositories**, each with specific responsib
 - `afi-starters` - Starter kits for developers
 
 **Integration Layer (2 repos):**
-- `afi-gateway` - ElizaOS integration (Phoenix, Alpha, Froggy, Val Dook)
+- `afi-gateway` - ElizaOS integration (active concierge: Phoenix; Alpha/Froggy as generic names; legacy validator persona deprecated/removed)
 - `afi-tiny-brains` - AI/ML microservice for enrichment
 
 **Documentation Layer (3 repos):**
@@ -650,12 +650,19 @@ npm run deploy:local
 
 ### Agent Architecture
 
-**Core Agents:**
-- **Phoenix** - AFI Protocol's frontline agent and primary voice (concierge)
-- **Alpha** - Scout agent (signal discovery)
-- **Val Dook** - Validator agent (signal validation)
-- **Froggy** - Strategy scorer (trend/pullback analysis)
-- **Pixel Rick** - Additional character (afi-gateway)
+**Active Agent:**
+- **Phoenix** - AFI Protocol's frontline agent and primary voice (active ElizaOS concierge persona)
+
+**Scoring Component (not a persona stage):**
+- **Froggy** - Reactor strategy scorer (trend_pullback_v1 analyst; produces the UWR score)
+
+**Deprecated / removed (legacy demo personas, no longer current):**
+- The former scout (signal-discovery) persona - removed.
+- The former validator persona - removed; certification is now an external concern, not the reactor's responsibility.
+- The former signal-structuring persona - removed.
+- The former execution simulation agent - removed; execution is now an external concern, not the reactor's responsibility.
+
+> The legacy Froggy demo chain (scout, structurer, validator, execution simulation) is gone. The reactor is scored-only; canonical pipeline: `afi-reactor/src/config/froggyPipeline.ts`.
 
 **Agent Lifecycle:**
 1. **Initialization:** Load character config from afi-gateway
@@ -897,7 +904,7 @@ const analyzers = filterPluginsByKind("analyzer");
 **HTTP Endpoints:**
 - `GET /` - ElizaOS Web UI (interactive chat)
 - `GET /health` - Health check with agent status
-- `GET /api/agents` - List all agents (Phoenix, Alpha, Froggy, Val Dook, Pixel Rick)
+- `GET /api/agents` - List active agents (Phoenix concierge; Alpha/Froggy as generic names). The legacy validator and signal-structuring personas are deprecated/removed.
 - `POST /api/agents/:id/message` - Send message to specific agent
 - `ws://localhost:8080/` - WebSocket for real-time chat
 

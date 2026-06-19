@@ -26,7 +26,7 @@ ElizaOS_Ext_Ref, Spartan_reference, _archived, afi-artifacts, afi-assets, afi-be
 - **afi-gateway/src/server.ts & src/server-full.ts**: `/healthz`, `/demo/ping`, `/`, `/api/afi/info`, `/api/agents`, `/api/agents/:id/message`.
 
 ## Pipelines / stages / plugins
-- **afi-reactor**: `FROGGY_TREND_PULLBACK_PIPELINE` stages — uss-telemetry-deriver; froggy-enrichment-tech-pattern; froggy-enrichment-sentiment-news; froggy-enrichment-adapter; froggy-analyst; validator-decision; execution-sim; tssd-vault-write (`src/config/froggyPipeline.ts`).
+- **afi-reactor** (scored-only, 6 stages): `FROGGY_TREND_PULLBACK_PIPELINE` stages — uss-telemetry-deriver; froggy-enrichment-tech-pattern; froggy-enrichment-sentiment-news; froggy-enrichment-adapter; froggy-analyst; tssd-vault-write (`src/config/froggyPipeline.ts`). Validator certification and execution are external concerns, not pipeline stages.
 
 ## NPM scripts (highlights)
 - **afi-reactor**: build, start:demo, demo:mock, simulate/replay, validate-all, verify:tssd:blofin, test suites.

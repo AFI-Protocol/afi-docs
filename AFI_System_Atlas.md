@@ -4,13 +4,13 @@ High-level map of AFI components across all repositories in `/Users/secretservic
 
 ## Pipeline / Ingestion / Normalization
 - **afi-reactor**: HTTP ingress (`src/server.ts`) for TradingView `/api/webhooks/tradingview` and CPJ `/api/ingest/cpj`; maps TradingView to USS v1.1 (`src/uss/tradingViewMapper.ts`); AJV validation against `afi-config` schemas (`src/uss/ussValidator.ts`).
-- **DAG execution**: `src/services/froggyDemoService.ts` + `src/config/froggyPipeline.ts` (uss-telemetry-deriver → enrichment branches → analyst → validator → execution → vault-write).
+- **DAG execution** (scored-only): `src/services/froggyDemoService.ts` + `src/config/froggyPipeline.ts` (uss-telemetry-deriver → parallel enrichment branches → enrichment-adapter → froggy-analyst → tssd-vault-write).
 - **Collectors**: Telegram collectors present under `src/collectors/` (not detailed here).
 - **Normalization**: USS facts/provenance from mappers; schemas from `afi-config`.
 
 ## Scoring / UWR / Validators / Replay
 - **afi-core**: Core scoring/validator logic (Node/TS library; needs module-level doc extraction).
-- **afi-reactor**: Validator decision plugin (`plugins/validator-decision-evaluator.plugin.ts`), replay endpoints `/replay/signal/:signalId`.
+- **afi-reactor**: Scores signals via the canonical Froggy DAG and emits `ReactorScoredSignalV1` (scored-only: `analystScore.uwrScore` + `uwrAxes{structure,execution,risk,insight}`); replay endpoints `/replay/signal/:signalId`. Validator certification is an external concern, not a reactor plugin.
 - **afi-math / afi-econ**: Math/econ primitives that feed scoring models (Node/TS and Python).
 - **afi-benchkit**: Benchmark/eval harnesses (Python) for validating scoring models.
 
@@ -26,7 +26,7 @@ High-level map of AFI components across all repositories in `/Users/secretservic
 - **afi-gateway**: AFI Reactor Actions plugin for ElizaOS (`plugins/afi-reactor-actions`), telemetry plugin (`plugins/afi-telemetry`).
 
 ## Agents / Droids / Factory Orchestration
-- **afi-gateway**: ElizaOS runtime with Phoenix/Alpha/Froggy/Pixel Rick/Val Dook characters (`src/*.character.ts`), full server in `src/server-full.ts`).
+- **afi-gateway**: ElizaOS runtime with the active Phoenix concierge persona (`src/*.character.ts`), full server in `src/server-full.ts`). Alpha/Froggy may remain as generic character names; the legacy validator and signal-structuring demo personas are deprecated/removed.
 - **afi-factory**: Factory orchestration (Node/TS).
 - **afi-ops**: Operational tooling for agent/service deployment.
 - **afi-protocol / afi-docs**: Meta/governance context for agents/droids.

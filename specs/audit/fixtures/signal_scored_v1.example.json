@@ -1,0 +1,56 @@
+{
+  "schema": "afi.signal_scored.v1",
+  "signalId": "sig_example_001",
+  "epochId": "epoch-208",
+  "qualify": true,
+  "scoredAt": "2026-06-03T12:00:00.000Z",
+  "analystScore": {
+    "analystId": "froggy",
+    "strategyId": "trend_pullback_v1",
+    "strategyVersion": "1.0.0",
+    "marketType": "spot",
+    "assetClass": "crypto",
+    "instrumentType": "spot",
+    "baseAsset": "BTC",
+    "quoteAsset": "USDT",
+    "signalTimeframe": "1h",
+    "holdingHorizon": "swing",
+    "direction": "long",
+    "riskBucket": "medium",
+    "conviction": 0.72,
+    "uwrAxes": {
+      "structure": 0.75,
+      "execution": 0.68,
+      "risk": 0.7,
+      "insight": 0.74
+    },
+    "uwrScore": 0.7175
+  },
+  "rawUss": {
+    "provenance": {
+      "signalId": "sig_example_001",
+      "providerId": "tradingview-default",
+      "source": "tradingview-webhook",
+      "providerType": "tradingview"
+    }
+  },
+  "decayParams": {
+    "halfLifeMinutes": 1440,
+    "greeksTemplateId": "default-v1"
+  },
+  "meta": {
+    "symbol": "BTC/USDT",
+    "timeframe": "1h",
+    "strategy": "trend_pullback_v1",
+    "direction": "long",
+    "source": "tradingview-webhook"
+  },
+  "metadata": {
+    "pipeline_uuid": "00000000-0000-0000-0000-000000000000",
+    "git_sha": "abcdef1",
+    "ruleset_version": "uwr-default-stub-v1",
+    "dag_id": "froggy-trend-pullback-v1"
+  },
+  "beneficiary": "0x0000000000000000000000000000000000000000",
+  "providerId": "tradingview-default"
+}
