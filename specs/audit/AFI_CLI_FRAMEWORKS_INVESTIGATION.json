@@ -1,0 +1,69 @@
+{
+  "investigated_at": "2026-06-19T02:53:53.437Z",
+  "repos": {
+    "afi-cli-framework": {
+      "classification": "KEEP",
+      "recommendation": "Generic, self-contained TS/Commander CLI library: build passes (exit 0), 53/53 tests pass, zero protocol coupling, one live consumer (afi-gateway). Keep as the single TS CLI framework; fix packaging (publish to a private registry or add a prepare script / commit dist) so the file:../ link is reliable, add CI, and drop the deprecated @types/commander stub. Not on the testnet critical path.",
+      "consumers": [
+        "afi-gateway/src/cli.ts:10 (import { CliApp }); afi-gateway/src/cli.ts:16 (class AfiGatewayCli extends CliApp); declared afi-gateway/package.json:42 \"@afi/cli-framework\": \"file:../afi-cli-framework\" (dormant: no bin field, no CI, off testnet path)"
+      ],
+      "build_passes": true,
+      "test_passes": true
+    },
+    "afi-cli-shared": {
+      "classification": "CONSOLIDATE",
+      "recommendation": "Single uninstallable Initial commit, unpublished (PyPI 404), Python package has ZERO in-tree consumers and a broken canonical install (pyproject.toml:35 packages=[\"afi_cli_shared\"] vs src/ layout makes pip install -e . fail). Tests pass (28) only via PYTHONPATH=src workaround. CONSOLIDATE: deprecate/remove the dead Python package (src/afi_cli_shared/*.py) and EXTRACT/RETAIN scripts/lib/afi-shared.sh (the only genuinely-used artifact) as a standalone bash utility; fix the in-tree-broken ../../ source paths in afi-benchkit lock/{compile,refresh}.sh. Not on the testnet critical path. Hygiene: egg-info/.coverage/.pyc are committed.",
+      "consumers": [
+        "afi-benchkit/scripts/capsule_run.sh:12 (source afi-shared.sh)",
+        "afi-benchkit/scripts/generate_benchmarks.sh:8 (source afi-shared.sh; invoked only by afi-benchkit/Makefile:56)",
+        "afi-benchkit/scripts/lock/refresh.sh:8 (source via ../../ path, BROKEN in-tree)",
+        "afi-benchkit/scripts/lock/compile.sh:8 (source via ../../ path, BROKEN in-tree; maintainers-only per compile.sh:3)"
+      ],
+      "build_passes": false,
+      "test_passes": true
+    }
+  },
+  "legacy_drift": [
+    {
+      "repo": "afi-gateway",
+      "path": "afi-gateway/src/cli.ts:43-49",
+      "issue": "eliza-demo top-level CLI command ('Run AFI Eliza Demo pipeline') still registered as a first-class discoverable verb for the purged demo chain (consumer of afi-cli-framework; library itself is clean)",
+      "severity": "P1"
+    },
+    {
+      "repo": "afi-gateway",
+      "path": "afi-gateway/src/afiCli.ts:44-45,81-98",
+      "issue": "eliza-demo dispatch -> runAfiElizaDemoFlow is neutralized (warns, returns 'endpoint has been removed') but its guidance (L92) steers operators to the legacy SUBMIT_SIGNAL_DRAFT draft-handoff verb instead of the USS->signal-raw spine",
+      "severity": "P1"
+    },
+    {
+      "repo": "afi-gateway",
+      "path": "afi-gateway/src/cli.ts:60-67",
+      "issue": "validator <subcommand> command ('Validator operations') resurfaces purged validator-decision-evaluator namespace as a primary CLI surface (distinct from afi-core/validators/ValidatorDecision.ts; not calling it)",
+      "severity": "P1"
+    },
+    {
+      "repo": "afi-gateway",
+      "path": "afi-gateway/src/afiCli.ts:53-57,120-126",
+      "issue": "validator explain-last -> getLastValidatorDecisionSummary is a stub returning 'Last Validator Decision: Not yet implemented'; exposes purged validator-decision response-shape vocabulary as a primary handoff concept",
+      "severity": "P1"
+    },
+    {
+      "repo": "afi-gateway",
+      "path": "afi-gateway/src/afiCli.ts:131-142",
+      "issue": "help text advertises 'eliza-demo' (L135) and 'validator explain-last' (L137) with no deprecation marker, marketing purged demo + validator-decision semantics to operators as if live",
+      "severity": "P1"
+    },
+    {
+      "repo": "afi-gateway",
+      "path": "afi-gateway/plugins/afi-reactor-actions/index.ts:37-113",
+      "issue": "SUBMIT_SIGNAL_DRAFT action (registered into CLI runtime via cli.ts:31-32) re-exposes legacy 'draft' handoff verb/shape (TradingViewLikeDraft); underlying call (afiClient.ts:117-155 -> /api/webhooks/tradingview -> Froggy ingest/USS/enrich/score/persist) is on-spine, so naming-only drift",
+      "severity": "P2"
+    }
+  ],
+  "testnet_critical_path": {
+    "afi-cli-framework": false,
+    "afi-cli-shared": false
+  },
+  "recommended_action": "CONSOLIDATE"
+}
