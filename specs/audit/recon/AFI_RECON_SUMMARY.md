@@ -49,9 +49,7 @@ Companion: [`AFI_RECON_CORPUS.json`](./AFI_RECON_CORPUS.json) | Checkpoint: [`..
 | `afi-assets` | SUPPORTING | none | Brand and visual-asset scaffold repository intended to store AFI Protocol logos,… |
 | `afi-benchkit` | SUPPORTING | partial | A standalone, container-packaged Python toolkit that runs deterministic, seeded … |
 | `afi-cli-framework` | SUPPORTING | none | A generic, framework-agnostic Node.js/TypeScript CLI scaffolding library (a Comm… |
-| `afi-cli-shared` | SUPPORTING | none | A reusable, domain-agnostic shared CLI framework for AFI Python projects built o… |
 | `afi-config` | NORMATIVE | critical | afi-config is the canonical configuration and JSON Schema library for AFI Protoc… |
-| `afi-construct` | STALE | none | A minimal archived scaffold for a "public simulation and blueprint layer" — a wh… |
 | `afi-core` | REFERENCE_IMPL | partial | afi-core is a pure-ESM TypeScript runtime library providing the deterministic sc… |
 | `afi-docs` | DOCS | none | Documentation hub for AFI Protocol: hosts the portable-protocol surface spec and… |
 | `afi-econ` | RESEARCH | none | A dual-stack (TypeScript + Python) deterministic, config-driven economic simulat… |
@@ -65,7 +63,6 @@ Companion: [`AFI_RECON_CORPUS.json`](./AFI_RECON_CORPUS.json) | Checkpoint: [`..
 | `afi-ops` | SUPPORTING | none | afi-ops is a Phase-1 scaffolding operations/devops toolkit providing local-deplo… |
 | `afi-plugins` | REFERENCE_IMPL | partial | Central plugin registry and template/stub pack that defines the extension surfac… |
 | `afi-protocol` | DOCS | none | A governance/onboarding meta-repo that orchestrates the AFI ("Agentic Financial … |
-| `AFI-Protocol/afi-agents` | STALE | none | A pre-archival scaffold providing agent/persona definitions plus a yargs CLI wra… |
 | `afi-reactor` | REFERENCE_IMPL | critical | afi-reactor is the reference TypeScript orchestrator that runs a flexible, plugi… |
 | `afi-research-site` | OUT_OF_SCOPE | none | Public-facing marketing/brochure website (Next.js App Router, Axleo template ski… |
 | `afi-sdk-python` | STALE | none | Intended official Python SDK for building on AFI Protocol (signal submission/val… |

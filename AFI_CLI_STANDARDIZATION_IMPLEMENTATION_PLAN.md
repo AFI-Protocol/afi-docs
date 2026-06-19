@@ -1,6 +1,6 @@
 # AFI CLI Standardization Implementation Plan
 
-> **Status: RETIRED (2026-06-19)** — Aspirational only; not an active mandate. See [`specs/audit/AFI_CLI_FRAMEWORKS_DECISIONS.md`](./specs/audit/AFI_CLI_FRAMEWORKS_DECISIONS.md).
+> **Status: RETIRED (2026-06-19)** — Aspirational only; not an active mandate.
 
 ## Executive Summary
 
@@ -23,7 +23,7 @@ Following the comprehensive CLI audit of the AFI repositories, this plan address
 
 **Deliverables:**
 - `@afi/cli-framework` npm package with TypeScript utilities
-- `afi-cli-shared` Python package for common CLI utilities
+- a shared Python package for common CLI utilities
 - Standardized error handling, logging, and help text patterns
 - Configuration management utilities
 

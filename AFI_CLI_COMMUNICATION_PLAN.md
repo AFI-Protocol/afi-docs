@@ -1,6 +1,6 @@
 # AFI CLI Communication Plan
 
-> **Status: RETIRED (2026-06-19)** — Aspirational only; not an active mandate. See [`specs/audit/AFI_CLI_FRAMEWORKS_DECISIONS.md`](./specs/audit/AFI_CLI_FRAMEWORKS_DECISIONS.md).
+> **Status: RETIRED (2026-06-19)** — Aspirational only; not an active mandate.
 
 ## Overview
 

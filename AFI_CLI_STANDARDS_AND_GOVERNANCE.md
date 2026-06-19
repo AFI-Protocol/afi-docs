@@ -1,6 +1,6 @@
 # AFI CLI Standards and Governance
 
-> **Status: RETIRED (2026-06-19)** — Aspirational only; not an active mandate. See [`specs/audit/AFI_CLI_FRAMEWORKS_DECISIONS.md`](./specs/audit/AFI_CLI_FRAMEWORKS_DECISIONS.md).
+> **Status: RETIRED (2026-06-19)** — Aspirational only; not an active mandate.
 
 ## Introduction
 
@@ -20,9 +20,9 @@ All new CLI tools must use the designated shared frameworks. Existing CLIs must 
 - **Example:** See [`CliApp.ts`](afi-cli-framework/src/base/CliApp.ts:17) for base implementation
 
 ### Python CLIs
-- **Framework:** `afi-cli-shared` (built on Click)
+- **Framework:** the shared Python CLI library (built on Click)
 - **Usage:** Extend `BaseCli` class for base functionality
-- **Example:** See [`base.py`](afi-cli-shared/src/afi_cli_shared/base.py:9) for base implementation
+- **Example:** See the `base.py` module for base implementation
 
 ### Prohibited Frameworks
 - No new CLIs using `argparse`, `yargs`, `custom` frameworks, or direct Commander.js/Click usage
@@ -170,7 +170,7 @@ cli/
 - **Documentation:** Rollback procedures in README
 
 **Examples:**
-- Migrate `afi-benchkit` from direct Click to `afi-cli-shared`
+- Migrate `afi-benchkit` from direct Click to the shared Python CLI library
 - Maintain `--suite` and `--dataset` options during transition
 
 **Responsibilities:**

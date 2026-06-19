@@ -1,6 +1,6 @@
 # AFI CLI Maintenance Schedule
 
-> **Status: RETIRED (2026-06-19)** — Aspirational only; not an active mandate. See [`specs/audit/AFI_CLI_FRAMEWORKS_DECISIONS.md`](./specs/audit/AFI_CLI_FRAMEWORKS_DECISIONS.md).
+> **Status: RETIRED (2026-06-19)** — Aspirational only; not an active mandate.
 
 ## Overview
 
@@ -50,7 +50,7 @@ This document outlines the maintenance schedule, procedures, and monitoring fram
 - **Process:**
   1. Monitor upstream dependencies weekly
   2. Test compatibility in staging environment
-  3. Update shared frameworks (afi-cli-framework, afi-cli-shared)
+  3. Update shared frameworks (afi-cli-framework)
   4. Run full test suite across all dependent CLIs
   5. Deploy updates with rollback capability
 - **Frequency:** Monthly for minor updates, quarterly for major

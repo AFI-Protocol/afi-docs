@@ -164,8 +164,6 @@ The engine-neutral seam (`ITSSDVaultClient`, `afi-infra/src/tssd/TSSDVaultClient
 
 | Repo | Why excluded from the live spine | Evidence |
 |------|----------------------------------|----------|
-| `afi-agents` | GitHub-archived scaffold; one of the stale names flagged in the North Star tension list | corpus record `afi-agents` (`archived:true`, pushed 2025-07-15) |
-| `afi-construct` | GitHub-archived white-room blueprint scaffold; divergent blueprint stub | corpus record `afi-construct` |
 | `afi-sdk-python` | Empty scaffold (no `afi_sdk` package); README advertises "API clients for afi-reactor" that cannot import | `afi-sdk-python/README.md:11` |
 | `afi-sdk-ts` | Empty scaffold (no `dist`/`src`); README advertises reactor clients | `afi-sdk-ts/README.md:11` |
 | `afi-xerc20` | Vendored defi-wonderland/xERC20 bridge fork; not an AFI mint/receipt artifact | corpus record `afi-xerc20` (homepage defi-wonderland/xERC20) |
@@ -185,7 +183,7 @@ Theme-B's stale-naming finding is **P3** (`themes/B-reference-impl.json` finding
 
 1. **Annotate the vault engine enum** (`afi-config/schemas/vault.schema.json:14-23`) to state only `mongodb` is implemented today, and reframe the prod guard (`afi-infra/src/tssd/TSSDVaultClient.ts:197-201`) as "a persistent `ITSSDVaultClient` is required in production" (engine-agnostic). [Mongo-only]
 2. **Reframe afi-reactor as the reference orchestrator** (not the only one): add a banner that any conforming, version-pinned DAG output is valid (`afi-reactor/README.md:137`). [reactor-only]
-3. **Tag stale/empty repos** (`afi-agents`, `afi-construct` archived; `afi-sdk-python`/`afi-sdk-ts` unimplemented scaffolds) so they are not mistaken for live spine segments. [stale-arch-docs]
+3. **Tag stale/empty repos** (`afi-sdk-python`/`afi-sdk-ts` unimplemented scaffolds) so they are not mistaken for live spine segments. [stale-arch-docs]
 4. **Label the commitment segment precisely**: `afi-mint` = off-chain coordination; `afi-token/src` = sole on-chain commitment; `afi-xerc20` = OUT_OF_SCOPE vendored fork.
 
 ---

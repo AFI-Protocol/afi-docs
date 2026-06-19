@@ -97,7 +97,7 @@ For each repo, classify as: `NORMATIVE` | `REFERENCE_IMPL` | `SUPPORTING` | `RES
 
 ### J. Documentation & Drift
 
-31. Inventory architecture docs; flag stale repo names (`afi-pipeline`, `afi-agents`, etc.).
+31. Inventory architecture docs; flag stale repo names (`afi-pipeline`, etc.).
 32. Build a **contradiction register**: doc A says X, code B does Y.
 33. List docs that should be **normative**, **reference**, or **archived**.
 

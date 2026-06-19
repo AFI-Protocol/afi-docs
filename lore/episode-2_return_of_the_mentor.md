@@ -12,7 +12,7 @@ CLASSIFIED – TESSERACT SUBROUTINE 7B
 Signal-Ref:   ETH-VOL-SKEW-4721-06-27-02:28
 Agent-ID:     Z-42  (“EchoLedger”)
 Mentor-Pair:  SYNTAX-8  (archetype: [macro, ethics])
-Registry-Path: afi-agents/registry/mentor_registry.ts
+Registry-Path: afi-factory/registry/mentor_registry.ts
 
 ░░ Transcript (redacted) ░░
 

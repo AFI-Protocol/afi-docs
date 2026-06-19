@@ -51,15 +51,6 @@
   - Agent lifecycle management
   - Agent configuration
 
-### afi-agents
-- **Purpose**: Collection of AFI agent implementations
-- **Language**: TypeScript
-- **Key Components**:
-  - Signal processing agents
-  - Analysis agents
-  - Validation agents
-  - Custom agent implementations
-
 ## CLI Repositories
 
 ### afi-cli-framework
@@ -70,15 +61,6 @@
   - Command registration
   - Configuration management
   - Extension points
-
-### afi-cli-shared
-- **Purpose**: Shared utilities for CLI tools
-- **Language**: Python
-- **Key Components**:
-  - Shared CLI utilities
-  - Configuration handling
-  - Error handling
-  - Validation helpers
 
 ## Economic System
 
@@ -183,12 +165,12 @@ afi-config (all repos)
 ## Key Integration Points
 
 1. **Gateway to Reactor**: afi-gateway forwards USS v1.1 signals to afi-reactor for Froggy scoring (canonical spine — the legacy `afi-pipeline` hop no longer exists)
-2. **Factory**: afi-factory provides agent/factory tooling (the standalone `afi-agents` repo no longer exists)
+2. **Factory**: afi-factory provides agent/factory tooling (the standalone agents repo no longer exists)
 3. **Econ to Governance**: afi-econ provides economic data to afi-governance
 4. **Benchkit to Tiny Brains**: afi-benchkit tests models from afi-tiny-brains
 5. **Config to All**: afi-config provides configuration to all repositories
 
-> Note: the two CLI repos are **independent** — a prior diagram edge between them was a phantom (no real dependency). `afi-cli-shared` is deprecated (2026-06-19) and its bash lib was rehomed to `afi-ops/scripts/lib/afi-shared.sh`; the remaining TS CLI library (`afi-cli-framework`) is unaffected. See `specs/audit/AFI_CLI_FRAMEWORKS_DECISIONS.md`.
+> Note: the deprecated Python CLI utilities repo was removed (2026-06-19) and its bash lib was rehomed to `afi-ops/scripts/lib/afi-shared.sh`; the remaining TS CLI library (`afi-cli-framework`) is unaffected.
 
 ## Development Workflow
 

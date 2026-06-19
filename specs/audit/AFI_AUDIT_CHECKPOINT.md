@@ -47,10 +47,10 @@ Re-extract with: `python3 scripts/extract_recon.py`
 |----------------|-------|-------|
 | NORMATIVE | 2 | `afi-config`, `afi-infra` |
 | REFERENCE_IMPL | 8 | `afi-gateway`, `afi-mint`, `afi-governance`, `afi-reactor`, `afi-core`, `afi-plugins`, `afi-token`, `afi-tiny-brains` |
-| SUPPORTING | 11 | `afi-math`, `afi-starters`, `afi-skills`, `afi-benchkit`, `afi-factory`, `afi-artifacts`, `afi-ops`, `afi-cli-shared`, `afi-cli-framework`, `afi-assets`, `.github` |
+| SUPPORTING | 10 | `afi-math`, `afi-starters`, `afi-skills`, `afi-benchkit`, `afi-factory`, `afi-artifacts`, `afi-ops`, `afi-cli-framework`, `afi-assets`, `.github` |
 | RESEARCH | 2 | `afi-econ`, `afi-labs` |
 | DOCS | 2 | `afi-protocol`, `afi-docs` |
-| STALE | 4 | `afi-sdk-python`, `afi-sdk-ts`, `afi-construct`, `afi-agents` |
+| STALE | 2 | `afi-sdk-python`, `afi-sdk-ts` |
 | OUT_OF_SCOPE | 2 | `afi-xerc20`, `afi-research-site` |
 
 **Replay-critical:** `afi-config`, `afi-infra`, `afi-reactor`  

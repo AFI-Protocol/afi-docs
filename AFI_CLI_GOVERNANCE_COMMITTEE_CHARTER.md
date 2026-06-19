@@ -1,6 +1,6 @@
 # AFI CLI Governance Committee Charter
 
-> **Status: RETIRED (2026-06-19)** — Aspirational only; not an active mandate. See [`specs/audit/AFI_CLI_FRAMEWORKS_DECISIONS.md`](./specs/audit/AFI_CLI_FRAMEWORKS_DECISIONS.md).
+> **Status: RETIRED (2026-06-19)** — Aspirational only; not an active mandate.
 
 ## Purpose
 
@@ -28,7 +28,7 @@ The committee consists of 5-7 members with diverse expertise:
 
 ### Initial Members
 - Chair: [To be appointed by AFI Tech Leadership]
-- Technical Lead: [Lead developer of afi-cli-framework or afi-cli-shared]
+- Technical Lead: [Lead developer of afi-cli-framework]
 - Security Representative: [AFI Security Team Lead]
 - Developer Representatives: [One from afi-benchkit, one from afi-econ, one from afi-governance]
 - Product Owner Representative: [AFI Product Management]

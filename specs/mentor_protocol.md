@@ -112,8 +112,6 @@ if (mentor) {
 }
 ```
 
-*See* `afi-agents/examples/handleSignal.ts` *for a complete runtime snippet.*
-
 ---
 
 ### End of Spec

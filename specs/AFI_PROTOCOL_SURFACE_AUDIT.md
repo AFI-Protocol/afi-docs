@@ -91,7 +91,7 @@ Low-effort, high-clarity fixes — mostly documentation, metadata, or one-line c
 | Q5 | Tag stale/empty repos and de-version the SDK scaffolds (currently `1.0.0` with imports that fail). | Metadata | `afi-sdk-python/pyproject.toml:3`; `afi-sdk-ts/package.json:6` | C-RO-3 (`theme:I-sdks-gateway#3`) |
 | Q6 | Add an enumerated `stage` field (`RAW…REPLAYED`) to `afi-config` vault schema instead of only a boolean index hint. | Small schema | `afi-config/schemas/vault.schema.json:95-98`; enum source `afi-infra/src/tssd/types.ts:8-15` | C-MO-3 (partial) |
 | Q7 | Correct `afi-token` stale metadata: coordinator is `AFIMintCoordinator.sol` (not `AFICoordinator.sol`); toolchain is Foundry/Base (not Hardhat/Sepolia). | Metadata | `afi-token/.droid.json:3-4`; `afi-token/.afi-codex.json:8` vs `afi-token/src/AFIMintCoordinator.sol:1` | C-SD-1 |
-| Q8 | Purge `afi-pipeline`/`afi-agents` from live topology docs and add a doc-hierarchy banner naming the portable spec as canonical. | Doc | `afi-docs/AFI_Repository_Map.md:24,54,168`; `afi-docs/ARCHITECTURE_STATUS.md:4` | C-SD-2, C-SD-3 |
+| Q8 | Purge `afi-pipeline` from live topology docs and add a doc-hierarchy banner naming the portable spec as canonical. | Doc | `afi-docs/AFI_Repository_Map.md:24,54,168`; `afi-docs/ARCHITECTURE_STATUS.md:4` | C-SD-2, C-SD-3 |
 | Q9 | Reconcile the `provenance.timestamp` mandate with USS v1.1 (which demotes it to legacy/optional). | Doc | `afi-config/docs/AFI_CONFIG_OVERVIEW.md:122` vs `afi-config/schemas/usignal/v1_1/index.schema.json:235-239` | U5 (Normative Register) |
 | Q10 | Resolve the placeholder receipt URI and document the log-only provenance assumption (or persist a minimal anchor mapping). | Metadata/doc | `afi-token/script/DeployAFITokenMainnet.s.sol:103`; `afi-token/src/AFIMintCoordinator.sol:85` | C-anchor-P2a/b |
 
@@ -299,7 +299,7 @@ All P0/P1 findings collapse to **23 register rows over 33 verified sources** (so
 ### 5.3 P2 / P3 / Info (representative — full catalogue in the contradiction register)
 
 - **P2 (reference-as-law, doc-fixable):** theme-B framing of Mongo-only and reactor-only as reference-as-law (`themes/B-reference-impl.json` #0–#2); honor-system reputation rule (`theme:H-governance#0`); `TSSDReplayRunner` v0.1 stub (`theme:D-evidence-vault#4`); doc-hierarchy authority conflict (C-SD-3); `signalId`/epoch log-only persistence (C-anchor-P2a).
-- **P3 (stale naming):** `afi-token` toolchain/entrypoint metadata (C-SD-1); `afi-pipeline`/`afi-agents` in live topology docs (C-SD-2); theme-B stale-naming finding (`#3`).
+- **P3 (stale naming):** `afi-token` toolchain/entrypoint metadata (C-SD-1); `afi-pipeline` in live topology docs (C-SD-2); theme-B stale-naming finding (`#3`).
 - **Info:** 86B cap is the one strong verifiable on-chain guarantee; merit/reputation blended into research allocation weights (`draft:36`).
 
 ---
