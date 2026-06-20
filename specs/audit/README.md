@@ -4,6 +4,8 @@ Persistent handoff for the portable-protocol surface investigation across the 31
 
 **Status: COMPLETE.** All four phases are done — Phase 1 recon, Phase 2 themes (A–J), Phase 3 adversarial verification (`themes/verified.json`, 33/33 P0/P1 confirmed), and Phase 4 synthesis (6 master reports written, validated, and promoted to `afi-docs/specs/`). The deterministic gate `scripts/validate_audit.py all` reports `RESULT: PASS`.
 
+**Org delta (2026-06-20):** Three repos were **permanently deleted** from GitHub: `afi-cli-shared`, `afi-agents`, `afi-construct`. The live org is **28 `afi-*` repos** (+ `.github`, `afi-xerc20`). Phase 4 classification reports below still reflect the **31-repo audit snapshot** (June 2026) — treat deleted repos as historical catalog entries, not operational dependencies. Operational docs (`AFI_Repository_Map.md`, governance READMEs) were scrubbed; forensic corpus (`recon/`, `themes/*.json`) was intentionally left intact.
+
 **Start here:** [`AFI_AUDIT_CHECKPOINT.md`](./AFI_AUDIT_CHECKPOINT.md) (phase status + Definition-of-Done tracker)  
 **Human review:** [`AFI_HUMAN_REVIEW_WORKSHEET.md`](./AFI_HUMAN_REVIEW_WORKSHEET.md) (Q1–Q7 decisions with file links)  
 **Testnet E2E:** [`AFI_TESTNET_E2E_CHECKLIST.md`](./AFI_TESTNET_E2E_CHECKLIST.md) (MVP vs protocol-complete, Base Sepolia)  

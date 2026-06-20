@@ -95,9 +95,9 @@
       "title": "Two divergent DAG definitions: the 'canonical' codex DAG lists nodes the runtime Froggy pipeline explicitly marks REMOVED",
       "original_severity": "P1",
       "confirmed": true,
-      "corrected_evidence": "afi-reactor/config/dag.codex.json:100 'alpha-scout-ingest', :113 'pixelrick-structurer', :156 'froggy-ensemble-scorer', :173 'execution-sim-node' (README.md:122 calls dag.codex.json the 'canonical orchestrator config') while runtime afi-reactor/src/config/froggyPipeline.ts:90-94 'REMOVED STAGES: - alpha-scout-ingest ... - signal-structurer ... - validator-decision ... - execution-sim'",
-      "revised_severity": "P1",
-      "note": "Confirmed. The codex DAG still declares four nodes the runtime pipeline explicitly lists as REMOVED. Original cited froggyPipeline.ts:90-95; the REMOVED block is :90-94 — corrected. An external implementer reading the 'canonical' codex would wire dead nodes. P1 stands."
+      "corrected_evidence": "afi-reactor/config/dag.codex.json:1-127 (8-node Scarlet chain; legacy alpha-scout/structurer/execution-sim purged 2026-06 per PR #29) vs afi-reactor/src/config/froggyPipeline.ts:96-151 (6-stage FROGGY_TREND_PULLBACK_PIPELINE); README.md:122 still calls dag.codex.json 'canonical orchestrator config'",
+      "revised_severity": "P2",
+      "note": "Partially resolved by 2026-06 legacy purge: dead nodes no longer appear in dag.codex.json. Remaining drift is two unrelated graphs (8-node codex vs 6-stage runtime Froggy). Downgraded P1→P2; citation ranges updated post-purge (file now 127 lines)."
     },
     {
       "source": "theme:E-scoring-dag#1",
