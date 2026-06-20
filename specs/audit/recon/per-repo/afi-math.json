@@ -79,7 +79,7 @@
       "title": "USS/CPJ/vault/TSSD/mint-contract/replay artifacts entirely absent (correctly)",
       "severity": "Info",
       "theme": "schemas",
-      "evidence": "grep for mongodb|TSSD|VaultedSignalRecord|cpj|AFIMintCoordinator|AFISignalReceipt|EmissionsMinted|publicSurface|proprietaryDetail|BigQuery|kafka|postgres|timescaledb returned NO hits in src/; USS appears only as a docs mapping example (docs/AFI_MATH_OVERVIEW.md:190-214).",
+      "evidence": "grep for mongodb|TSSD|VaultedSignalRecord|cpj|AFIMintCoordinator|AFISignalReceipt|EmissionsMinted|publicSurface|proprietaryDetail|kafka|postgres|timescaledb|snowflake|datalake returned NO hits in src/; USS appears only as a docs mapping example (docs/AFI_MATH_OVERVIEW.md:190-214).",
       "recommendation": "None. Confirms correct separation of concerns: this repo holds no canonical dialect, vault, ledger, or replay-manifest artifacts. No normative schema lives here."
     },
     {

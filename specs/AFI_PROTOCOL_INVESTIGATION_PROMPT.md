@@ -74,8 +74,8 @@ For each repo, classify as: `NORMATIVE` | `REFERENCE_IMPL` | `SUPPORTING` | `RES
 
 ### F. Market / Analytics Plane
 
-20. Any BigQuery, Kafka, warehouse, or stream integrations?
-21. Where would Mage-style pipelines fit without violating orchestration doctrine?
+20. Any warehouse, stream, or feature-plane integrations? *(Answer: none — the reference impl uses MongoDB TSSD only; the warehouse/streaming evidence plane was a doc-only detour, retracted 2026-06. See [`audit/AFI_EVIDENCE_STORE_DECISION.md`](./audit/AFI_EVIDENCE_STORE_DECISION.md).)*
+21. Where would non-reactor (custom) orchestrators fit without violating orchestration doctrine?
 22. Separate **per-signal operational stores** from **analytics/feature planes** in findings.
 
 ### G. Emissions, Mint, Settlement
@@ -129,7 +129,7 @@ Run targeted searches across all repos for:
 - `publicSurface`, `proprietaryDetail`
 - `AFIMintCoordinator`, `AFISignalReceipt`, `EmissionsMinted`
 - `pipeline`, `DAG`, `froggy`, `orchestrator`, `doctrine`
-- `BigQuery`, `kafka`, `warehouse`
+- `warehouse`, `kafka`, `stream` (analytics-plane terms — none used in AFI reference impl)
 - `normative`, `canonical`, `reference implementation`
 - `postgresql`, `timescaledb`, `influxdb` (vault engines)
 

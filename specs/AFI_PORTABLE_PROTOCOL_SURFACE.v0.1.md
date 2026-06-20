@@ -12,7 +12,7 @@
 
 ## 1. Executive Summary
 
-AFI was always intended to be a **portable protocol**: a thin, shared semantics layer that any validator, operator, or builder can implement on their own stack—so long as communication and commitment follow the rules. MongoDB, `afi-reactor`, Mage, BigQuery, and the current monorepo layout are **reference paths** built to learn the end-user journey. They are not the protocol itself.
+AFI was always intended to be a **portable protocol**: a thin, shared semantics layer that any validator, operator, or builder can implement on their own stack—so long as communication and commitment follow the rules. MongoDB, `afi-reactor`, and the current monorepo layout are **reference paths** built to learn the end-user journey. They are not the protocol itself.
 
 The correct mental model is closer to **HTTP** than to “everyone runs our Mongo cluster”:
 
@@ -52,11 +52,11 @@ AFI is best understood as **separated planes**, not one monolithic stack:
 |-------|------|------------------------------|-------------------------------------------|
 | **Commitment** | Immutable attestation of what the network accepted | BASE: mint events, receipts, emissions caps, epoch linkage, content anchors/hashes (present + future) | `afi-token`, `afi-mint` |
 | **Evidence** | Dense per-signal lifecycle for replay and challenge | Full RAW → ENRICHED → ANALYZED → SCORED → MINTED → REPLAYED record; public vs proprietary surface | Mongo, PostgreSQL, TimescaleDB, InfluxDB (per `vault.schema.json`) |
-| **Scoring DAG** | Deterministic transforms on declared inputs | Pinned topology, plugin/analyst/validator versions; conforming outputs | `afi-reactor`, custom DAG, Mage blocks (if outputs conform) |
-| **Market / analytics** | Continuous context at scale (not per-signal canon) | Published feature schemas, snapshot refs for replay | BigQuery, Kafka/Pub/Sub, data lakes |
+| **Scoring DAG** | Deterministic transforms on declared inputs | Pinned topology, plugin/analyst/validator versions; conforming outputs | `afi-reactor`, custom DAG, any conforming orchestrator (if outputs conform) |
+| **Market / analytics** | Continuous context at scale (not per-signal canon) | Published feature schemas, snapshot refs for replay | warehouses/streams chosen per operator — non-normative, never AFI's evidence store |
 | **Ingest boundary** | Valid entry dialect into the protocol | USS v1.1, CPJ v0.1, lens extensions | `afi-gateway`, webhooks, SDKs |
 
-**Key rule:** Do not collapse commitment, evidence, and analytics into one store. Mongo-only and BQ-only are both wrong if they are the *only* layer.
+**Key rule:** Do not collapse commitment, evidence, and analytics into one store. A single-store design (whatever the engine) is wrong if it is the *only* layer.
 
 ### 3.3 The HTTP Analogy (Formal)
 
@@ -67,8 +67,8 @@ AFI is best understood as **separated planes**, not one monolithic stack:
 | Headers (content-type, cache-control) | Schema IDs, pipeline/DAG version pins, content hashes |
 | Immutable audit (server logs, CDN edge) | BASE commitments (events, receipts) |
 | Message body | Off-chain evidence vault (operator’s choice) |
-| Client (curl, browser, fetch) | Reactor, Mage, custom Python, any conforming orchestrator |
-| CDN / analytics / log pipeline | BQ, streams, benchkit, research tooling |
+| Client (curl, browser, fetch) | Reactor, custom Python, any conforming orchestrator |
+| CDN / analytics / log pipeline | warehouses, streams, benchkit, research tooling |
 
 HTTP did not mandate Apache. AFI must not mandate Mongo or `afi-reactor`—only **conforming artifacts and behavior**.
 
@@ -137,7 +137,7 @@ These are **starting hypotheses** for the agent team to verify and expand:
 | BASE = full signal ledger | User vision vs receipt-only contracts | Spec what **must** be on-chain vs hash-anchored vs off-chain only |
 | Econ splits vs on-chain settlement | `afi-econ` gauge vs single `beneficiary` mint | Classify econ as research/simulation unless wired to production |
 | Stale architecture docs | `afi-docs/AFI_Full_Architecture.md`, `AFI_Repository_Map.md` | Mark stale sections; align to portable protocol surface |
-| BigQuery / Mage absent from normative layer | Blog-driven consideration | Classify as optional analytics plane; document integration boundaries |
+| Analytics/warehouse plane absent from normative layer | Considered, never built | Optional, non-normative; Mongo TSSD is the reference evidence store, warehouses pluggable per operator |
 
 ---
 

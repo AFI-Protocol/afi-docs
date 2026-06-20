@@ -2,7 +2,7 @@
   "repo": "afi-cli-framework",
   "classification": "SUPPORTING",
   "primary_purpose": "A generic, framework-agnostic Node.js/TypeScript CLI scaffolding library (a Commander.js wrapper providing base CLI app class, hierarchical config, logging, validation, error handling, and an extension/plugin system) intended to be reused by AFI command-line tools.",
-  "classification_rationale": "README.md:3 describes it as \"A modular CLI framework for AFI Node.js projects, built on Commander.js\" and package.json:3 as \"Modular CLI framework for AFI projects using Commander.js\". The only dependency is commander (package.json:16). Source (src/) contains CliApp, ConfigManager, Logger, validation helpers, error handling, and an ExtensionManager — pure developer tooling. Targeted searches for every protocol-surface term (signal/USS/CPJ/vault/TSSD/mint/receipt/DAG/replay/determinism/registry/schema/contract/Mongo/BigQuery/etc.) returned ZERO matches across src, README, and config. No normative artifacts, no protocol logic, no chain code. It is shared infrastructure for AFI repos, hence SUPPORTING (not NORMATIVE, REFERENCE_IMPL, or STALE).",
+  "classification_rationale": "README.md:3 describes it as \"A modular CLI framework for AFI Node.js projects, built on Commander.js\" and package.json:3 as \"Modular CLI framework for AFI projects using Commander.js\". The only dependency is commander (package.json:16). Source (src/) contains CliApp, ConfigManager, Logger, validation helpers, error handling, and an ExtensionManager — pure developer tooling. Targeted searches for every protocol-surface term (signal/USS/CPJ/vault/TSSD/mint/receipt/DAG/replay/determinism/registry/schema/contract/Mongo/etc.) returned ZERO matches across src, README, and config. No normative artifacts, no protocol logic, no chain code. It is shared infrastructure for AFI repos, hence SUPPORTING (not NORMATIVE, REFERENCE_IMPL, or STALE).",
   "replay_relevance": "none",
   "protocol_touchpoints": [],
   "normative_artifacts": [],
@@ -22,7 +22,7 @@
       "title": "No AFI protocol surface present anywhere in the repo",
       "severity": "Info",
       "theme": "scope/classification",
-      "evidence": "rg over src/, README.md, package.json for mongodb|TSSD|vault|usignal|CPJ|mintForSignal|beneficiary|epoch|replay|determinism|AFIMintCoordinator|pipeline|DAG|orchestrator|BigQuery|normative|canonical|postgresql|timescaledb|influxdb -> 'NO MATCHES for protocol patterns'; broader search for signal|schema|mint|emission|registr|reputation|onchain|solidity|web3|ethers|protocol|reactor|gateway -> 'NO MATCHES'.",
+      "evidence": "rg over src/, README.md, package.json for mongodb|TSSD|vault|usignal|CPJ|mintForSignal|beneficiary|epoch|replay|determinism|AFIMintCoordinator|pipeline|DAG|orchestrator|normative|canonical|postgresql|timescaledb|influxdb -> 'NO MATCHES for protocol patterns'; broader search for signal|schema|mint|emission|registr|reputation|onchain|solidity|web3|ethers|protocol|reactor|gateway -> 'NO MATCHES'.",
       "recommendation": "Treat as generic shared tooling. No protocol audit obligations. No spec extraction needed."
     },
     {

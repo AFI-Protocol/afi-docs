@@ -127,7 +127,7 @@ Theme-B's own framing of this as reference-as-law sits at **P2** (`themes/B-refe
 
 ### 4.2 afi-reactor presented as THE only orchestrator
 
-Authoritative docs assert reactor is *the* orchestrator and "the DAG is law": `afi-reactor/README.md:137` (*"afi-reactor is the ONLY orchestrator in AFI Protocol."*), `afi-reactor/AGENTS.md:3`, and downstream echoes `afi-core/docs/AFI_CORE_RUNTIME_OVERVIEW.md:39` and `afi-config/codex/governance/droids/AFI_DROID_CHARTER.v0.1.md:117`. The North Star instead permits "afi-reactor, custom DAG, Mage blocks (if outputs conform)" and "any conforming orchestrator" ([`AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md`](../../AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md) §3.4).
+Authoritative docs assert reactor is *the* orchestrator and "the DAG is law": `afi-reactor/README.md:137` (*"afi-reactor is the ONLY orchestrator in AFI Protocol."*), `afi-reactor/AGENTS.md:3`, and downstream echoes `afi-core/docs/AFI_CORE_RUNTIME_OVERVIEW.md:39` and `afi-config/codex/governance/droids/AFI_DROID_CHARTER.v0.1.md:117`. The North Star instead permits "afi-reactor, custom DAG, any conforming orchestrator (if outputs conform)" ([`AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md`](../../AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md) §3.4).
 
 **Verified status (P0/P1 from `verified.json`):**
 

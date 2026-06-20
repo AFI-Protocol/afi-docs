@@ -100,14 +100,14 @@
       "severity": "Info",
       "theme": "mongodb|vault|TSSD|VaultedSignalRecord",
       "evidence": "repro/schemas/vaulted_tssd.schema.json:3 \"title\":\"VaultedTSSDSignal\"; repro/schemas/vaulted_signal_schema.mjs:1 \"// Vaulted Signal Schema (strict) for T.S.S.D. records\"; repro/data/examples/vault-ready-record.jsonl validated OK",
-      "recommendation": "None — good: vault shape is documented schema-first with no storage-engine coupling (no Mongo/Postgres/Timescale/Influx references anywhere in repo)."
+      "recommendation": "None — good: vault shape is documented schema-first; the implemented evidence store is MongoDB TSSD, and this bundle ships only the schema snapshot with no storage-engine coupling."
     },
     {
-      "title": "No storage-engine or analytics coupling anywhere (no Mongo/Postgres/Timescale/Influx/BigQuery/Kafka/warehouse)",
+      "title": "No analytics/warehouse coupling anywhere; vault shape is schema-only (no engine binding in this bundle)",
       "severity": "Info",
-      "theme": "mongodb|postgresql|timescaledb|influxdb / BigQuery|kafka|warehouse",
-      "evidence": "grep across repo for mongodb|MongoTSSD|postgresql|timescaledb|influxdb|bigquery|kafka|warehouse returned zero hits",
-      "recommendation": "None — consistent with portable-protocol direction (vault treated as a schema, not a specific DB)."
+      "theme": "mongodb|postgresql|timescaledb|influxdb / kafka|warehouse|snowflake|datalake",
+      "evidence": "grep across repo for kafka|warehouse|snowflake|datalake returned zero hits. Analytics/warehouse integrations are absent; MongoDB TSSD is the implemented evidence store. No separate warehouse plane is planned for the reference implementation.",
+      "recommendation": "None — consistent with the reference direction (this bundle ships the vault as a schema snapshot; the implemented store is MongoDB TSSD)."
     },
     {
       "title": "USS ingestion vs vaulted TSSD separation is correctly modeled (lenient edge vs strict canon)",

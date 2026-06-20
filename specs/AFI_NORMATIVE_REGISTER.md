@@ -134,7 +134,7 @@ These are normative rules asserted in docs/specs with **no code backing**. Each 
 
 The portable spec defines five planes — Commitment, Evidence, Scoring DAG, Market/analytics, Ingest boundary (`AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md` §3.2). The canonical `afi-config` schema library covers **Evidence (S4/S11), Scoring DAG (S5/S6/S7), and Ingest (S1–S3)** but contains **no Commitment-plane schema** (no on-chain receipt/anchor schema) and **no Market/analytics-plane schema**:
 
-- Reproducible negative searches (from `/home/user/AFI-Protocol/`): `rg -nc "EmissionsMinted|mintForSignal|AFISignalReceipt|contentHash" afi-config/schemas` → 0 hits; `rg -nwi -c "bigquery|kafka|warehouse|snowflake|redshift" afi-config/schemas` → 0 hits. The only on-chain reference is a coordinator address/chainId field at `afi-config/schemas/validatorConfig.schema.json:82-87`, not a commitment-plane schema.
+- Reproducible negative searches (from `/home/user/AFI-Protocol/`): `rg -nc "EmissionsMinted|mintForSignal|AFISignalReceipt|contentHash" afi-config/schemas` → 0 hits; `rg -nwi -c "kafka|warehouse|snowflake|redshift|datalake" afi-config/schemas` → 0 hits. The only on-chain reference is a coordinator address/chainId field at `afi-config/schemas/validatorConfig.schema.json:82-87`, not a commitment-plane schema.
 - **Severity P1 — Verified: CONFIRMED.** `theme:A-normative-surface#4` = `draft:14`.
 
 Consequence: external validators cannot validate on-chain↔off-chain linkage (North Star rule 4) from the schema library alone. This is the structural reason the commitment-plane law in §4 lives in Solidity rather than in `afi-config`.

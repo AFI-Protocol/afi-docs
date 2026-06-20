@@ -82,7 +82,7 @@
       "severity": "P2",
       "theme": "pipeline|DAG|orchestrator|doctrine",
       "evidence": "architecture_overview.md:23 '| **Reactor** | DAG orchestration (source of truth) | `afi-reactor` |'; architecture_overview.md:6 '**Canonical orchestration status:** AFI Reactor uses a **custom deterministic TypeScript DAG**'",
-      "recommendation": "Reframe reactor as the reference orchestration spine; make explicit that the protocol's canonical surface is the schemas/lifecycle/determinism rules, and that conformant alternative DAGs (custom / Mage blocks) are permitted per AFI_PORTABLE_PROTOCOL_SURFACE."
+      "recommendation": "Reframe reactor as the reference orchestration spine; make explicit that the protocol's canonical surface is the schemas/lifecycle/determinism rules, and that any conforming orchestrator (if outputs conform) is permitted per AFI_PORTABLE_PROTOCOL_SURFACE."
     },
     {
       "title": "Stale repo references (afi-agents) and cross-repo relative doc paths",
@@ -99,7 +99,7 @@
       "recommendation": "None here; the normative REGISTRIES_AND_REPUTATION spec lives elsewhere. Consistent with the rule that reputation/registries influence selection/allocation, not deterministic scoring (no scoring code present in this repo)."
     },
     {
-      "title": "Pattern searches found no mongodb/TSSD/vault/USS/CPJ/mint/replay/BigQuery/kafka/postgres references",
+      "title": "Pattern searches found no mongodb/TSSD/vault/USS/CPJ/mint/replay/kafka/snowflake/postgres references",
       "severity": "Info",
       "theme": "schemas/contracts/vault/mint/replay",
       "evidence": "grep -rinE across *.md/*.json/*.ts/*.sol/*.yml for the full audit pattern set returned only incidental hits: 'Codex definitions' (architecture_overview.md:26), 'pipelines' (pathways.md:8, working-groups.md:5), 'LangGraph/DAG' (architecture_overview.md:6)",

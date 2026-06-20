@@ -104,7 +104,7 @@
       "title": "No commitment/evidence/analytics storage and no contracts present (correctly out of scope for this repo)",
       "severity": "Info",
       "theme": "plane separation",
-      "evidence": "grep for mongodb|TSSD|vault|mint|beneficiary|epoch|BigQuery|kafka|postgres|.sol returned only generic 'secure vaults' (AGENTS.md:57) and 'manifests are contracts' (AGENTS.md:58); no storage/contract code",
+      "evidence": "grep for mongodb|TSSD|vault|mint|beneficiary|epoch|kafka|postgres|snowflake|datalake|.sol returned only generic 'secure vaults' (AGENTS.md:57) and 'manifests are contracts' (AGENTS.md:58); no storage/contract code",
       "recommendation": "None; confirms repo does not collapse planes and holds no on-chain/vault canon."
     },
     {

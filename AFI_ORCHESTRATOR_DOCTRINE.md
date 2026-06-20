@@ -115,7 +115,7 @@ Emissions, rewards, and AFI token rules live in afi-token; Reactor just emits ev
 **Rationale:** Economic policy is separate from execution orchestration.
 
 **Examples:**
-- ✅ Reactor emits "signal-scored" event
+- ✅ Reactor persists a scored signal record to the Mongo TSSD vault
 - ✅ afi-token subscribes to events for minting
 - ❌ Reactor calculating token emissions
 - ❌ Reactor implementing reward logic

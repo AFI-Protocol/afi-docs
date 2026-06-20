@@ -75,7 +75,7 @@
       "title": "No mint/receipt/emissions/vault/TSSD/USS/CPJ touchpoints present",
       "severity": "Info",
       "theme": "protocol-surface coverage",
-      "evidence": "grep across .py/.md/.toml/.sh/.yml/.json for mongodb|vault|TSSD, usignal|USS|cpj|CPJ, mintForSignal|coordinateMint|beneficiary, AFIMintCoordinator|AFISignalReceipt|EmissionsMinted, BigQuery|kafka|postgresql|timescaledb|influxdb -> ZERO hits",
+      "evidence": "grep across .py/.md/.toml/.sh/.yml/.json for mongodb|vault|TSSD, usignal|USS|cpj|CPJ, mintForSignal|coordinateMint|beneficiary, AFIMintCoordinator|AFISignalReceipt|EmissionsMinted, kafka|postgresql|timescaledb|influxdb|snowflake -> ZERO hits",
       "recommendation": "Confirms this repo touches none of the commitment/evidence/ingest planes; it is orthogonal benchmark tooling. No portable-protocol normative obligations apply."
     },
     {

@@ -118,11 +118,11 @@
       "recommendation": "Document that protocol finality / determinism must be enforced off-chain by afi-mint before this role mints; an external validator cannot verify scoring legitimacy from on-chain data alone. Clarify trust assumption in VALIDATOR_REPLAY_SPEC."
     },
     {
-      "title": "No multi-engine vault / no analytics layer present (and none should be) but no USS/CPJ ingest validation either",
+      "title": "No vault / warehouse integration present (and none should be) but no USS/CPJ ingest validation either",
       "severity": "P2",
       "theme": "USS/CPJ ingest",
-      "evidence": "grep usignal|USS|cpj => 0 hits; grep BigQuery|kafka|postgresql|timescaledb|influxdb => 0 hits; models/SignalSchema.zod.ts:3 bespoke local schema",
-      "recommendation": "Correctly scoped to commitment plane (no vault/analytics here). However the local Zod SignalSchema and reward math should validate against canonical USS v1.1 from afi-config rather than a private schema, or be explicitly marked illustrative/non-canonical."
+      "evidence": "grep usignal|USS|cpj => 0 hits; grep kafka|postgresql|timescaledb|influxdb|snowflake => 0 hits; models/SignalSchema.zod.ts:3 bespoke local schema. Analytics/warehouse integrations absent; MongoDB TSSD (afi-reactor/afi-infra) is the implemented evidence store and no separate warehouse plane is planned for the reference implementation.",
+      "recommendation": "Correctly scoped to commitment plane (no vault/warehouse here). However the local Zod SignalSchema and reward math should validate against canonical USS v1.1 from afi-config rather than a private schema, or be explicitly marked illustrative/non-canonical."
     },
     {
       "title": "ERC-1155 receipt metadata (URI) is a TODO placeholder for mainnet",

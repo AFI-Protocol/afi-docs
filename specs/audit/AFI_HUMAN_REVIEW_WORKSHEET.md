@@ -39,7 +39,7 @@
 | I SDKs / gateway | [`./themes/I-sdks-gateway.json`](./themes/I-sdks-gateway.json) | B1, B6, Q1 |
 | H Governance | [`./themes/H-governance.json`](./themes/H-governance.json) | B9, Q4 |
 | J Doc drift | [`./themes/J-docs-drift.json`](./themes/J-docs-drift.json) | Stale arch docs |
-| F Analytics | [`./themes/F-analytics.json`](./themes/F-analytics.json) | BQ/Kafka plane (absent) |
+| F Analytics | [`./themes/F-analytics.json`](./themes/F-analytics.json) | Warehouse/analytics plane (absent); Mongo TSSD is the evidence store |
 | **Verification** | [`./themes/verified.json`](./themes/verified.json) | 33/33 P0/P1 re-confirmed |
 
 ### Recon corpus
@@ -210,7 +210,7 @@ _________________________________________________________
 
 **Read before answering:**
 - Canonical type (TSSD): [`afi-infra/src/tssd/types.ts`](../../../afi-infra/src/tssd/types.ts) — `VaultedSignalRecord`, `stages.scored`
-- Reactor parallel store: [`afi-reactor/src/services/tssdVaultService.ts`](../../../afi-reactor/src/services/tssdVaultService.ts), [`afi-reactor/src/types/ReactorScoredSignalV1.ts`](../../../afi-reactor/src/types/ReactorScoredSignalV1.ts)
+- Reactor scored store: [`afi-reactor/src/services/tssdVaultService.ts`](../../../afi-reactor/src/services/tssdVaultService.ts), [`afi-reactor/src/types/ReactorScoredSignalV1.ts`](../../../afi-reactor/src/types/ReactorScoredSignalV1.ts)
 - Replay matrix SCORED row: [`AFI_REPLAY_READINESS_MATRIX.md` §2–§3](../AFI_REPLAY_READINESS_MATRIX.md)
 - Theme: [`themes/D-evidence-vault.json`](./themes/D-evidence-vault.json) — B8
 - Blocker B8: [Master §1.3](../AFI_PROTOCOL_SURFACE_AUDIT.md)

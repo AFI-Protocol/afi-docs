@@ -26,8 +26,8 @@
     {
       "title": "No protocol patterns present anywhere in source",
       "severity": "Info",
-      "theme": "mongodb|TSSD|vault|usignal|CPJ|mint|epoch|replay|reactor|BigQuery|kafka|postgresql",
-      "evidence": "grep -rniE 'mongodb|MongoTSSD|TSSD|VaultedSignalRecord|usignal|USS v1|cpj|mintForSignal|coordinateMint|epoch|ReplaySession|determinism|publicSurface|AFIMintCoordinator|froggy|doctrine|BigQuery|kafka|timescaledb|influxdb' over *.js/jsx/ts/tsx/json/md/mjs/sol returned zero matches (excluding lockfile/node_modules).",
+      "theme": "mongodb|TSSD|vault|usignal|CPJ|mint|epoch|replay|reactor|kafka|postgresql",
+      "evidence": "grep -rniE 'mongodb|MongoTSSD|TSSD|VaultedSignalRecord|usignal|USS v1|cpj|mintForSignal|coordinateMint|epoch|ReplaySession|determinism|publicSurface|AFIMintCoordinator|froggy|doctrine|kafka|snowflake|timescaledb|influxdb|datalake' over *.js/jsx/ts/tsx/json/md/mjs/sol returned zero matches (excluding lockfile/node_modules).",
       "recommendation": "No action; confirms repo holds no schema, contract, vault, DAG, or replay surface."
     },
     {

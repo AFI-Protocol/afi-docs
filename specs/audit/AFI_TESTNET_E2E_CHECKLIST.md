@@ -4,13 +4,13 @@
 
 **Workspace root:** `/home/user/AFI-Protocol/`  
 **Chain:** Base Sepolia (chain ID `84532`)  
-**Purpose:** Track what is needed to run the full signal → score → allocate → mint → vault loop on testnet, with **immediate links** to evidence and source files.
+**Purpose:** Track what is needed to run the full signal → score → persist → mint loop on testnet, with **immediate links** to evidence and source files.
 
 **Owner:** _________________________  
 **Target date:** _________________________  
 **Scope chosen:** [ ] MVP E2E  [ ] Protocol-complete
 
-**Companion docs:** [`AFI_HUMAN_REVIEW_WORKSHEET.md`](./AFI_HUMAN_REVIEW_WORKSHEET.md) (Q1–Q7 decisions) · [`../AFI_ANALYST_SHOP_MVP.md`](../AFI_ANALYST_SHOP_MVP.md) (T1/T2 tiers, Ably storefront) · [`../AFI_ONCHAIN_ANCHOR_GAP_ANALYSIS.md`](../AFI_ONCHAIN_ANCHOR_GAP_ANALYSIS.md) (contract gap detail) · [`Mage And GCP Architecture Research.md`](../../../Mage%20And%20GCP%20Architecture%20Research.md) (winner architecture) · [`AFI_MAGE_PRO_PLAN_DECISION.md`](./AFI_MAGE_PRO_PLAN_DECISION.md) (OSS vs Pro) · [`AFI_FROGGY_MAGE_MIGRATION_MAP.md`](./AFI_FROGGY_MAGE_MIGRATION_MAP.md) (Froggy → Mage stage map)
+**Companion docs:** [`AFI_HUMAN_REVIEW_WORKSHEET.md`](./AFI_HUMAN_REVIEW_WORKSHEET.md) (Q1–Q7 decisions) · [`../AFI_ANALYST_SHOP_MVP.md`](../AFI_ANALYST_SHOP_MVP.md) (T1/T2 tiers, Ably storefront) · [`../AFI_ONCHAIN_ANCHOR_GAP_ANALYSIS.md`](../AFI_ONCHAIN_ANCHOR_GAP_ANALYSIS.md) (contract gap detail) · [`AFI_EVIDENCE_STORE_DECISION.md`](./AFI_EVIDENCE_STORE_DECISION.md) (Mongo TSSD is canonical) · [`AFI_MONGO_TSSD_INVENTORY.md`](./AFI_MONGO_TSSD_INVENTORY.md) (code-level Mongo spine)
 
 ---
 
@@ -24,7 +24,7 @@
 | Replay / lifecycle | [`../AFI_REPLAY_READINESS_MATRIX.md`](../AFI_REPLAY_READINESS_MATRIX.md) | RAW→MINTED vault stages |
 | Emissions / mint | [`./themes/G-emissions-mint.json`](./themes/G-emissions-mint.json) | Allocation formula, single payee |
 | On-chain theme | [`./themes/C-onchain-anchor.json`](./themes/C-onchain-anchor.json) | Breadcrumb vs intended anchor |
-| Vault theme | [`./themes/D-evidence-vault.json`](./themes/D-evidence-vault.json) | Mongo, parallel scored store |
+| Vault theme | [`./themes/D-evidence-vault.json`](./themes/D-evidence-vault.json) | Mongo TSSD evidence store |
 | Master blockers | [`../AFI_PROTOCOL_SURFACE_AUDIT.md`](../AFI_PROTOCOL_SURFACE_AUDIT.md) | §1.3, §6 roadmap |
 
 ### Testnet contracts (deployed)
@@ -39,31 +39,25 @@
 **Deploy runbook:** [`afi-token/docs/deployment-testnet.md`](../../../afi-token/docs/deployment-testnet.md)  
 **Redeploy script:** [`afi-token/script/DeployAFITestnet.s.sol`](../../../afi-token/script/DeployAFITestnet.s.sol)
 
-### Reference spine (GCP + Mage — active path)
+### Reference spine (afi-reactor + Mongo TSSD — the working path)
+
+This is the **only** implemented ingest → score → persist path. MongoDB TSSD is AFI's canonical reference evidence store — see [`AFI_EVIDENCE_STORE_DECISION.md`](./AFI_EVIDENCE_STORE_DECISION.md).
 
 | Stage | Component | Key refs |
 |-------|-----------|----------|
-| **Ingest** | `afi-gateway` or Cloud Run webhook | [`afi-gateway/src/http/app.ts`](../../../afi-gateway/src/http/app.ts) → publish to Pub/Sub |
-| **Workflow bus** | **GCP Pub/Sub** (not Ably) | Topics: `signal-raw`, `signal-scored`, `signal-minted` — [exactly-once](https://docs.cloud.google.com/pubsub/docs/exactly-once-delivery) |
-| **Scoring DAG** | Mage.ai streaming pipeline | [Pub/Sub loader](https://docs.mage.ai/guides/streaming/tutorials/streaming-pipeline) · UWR sidecar or Python block |
-| **Evidence** | BigQuery append-only | `afi_evidence.signals_lifecycle` — see research DDL |
-| **Analytics** *(defer)* | BQ `afi_analytics.*` | Separate plane; not evidence topics |
-| **Mint** | `afi-mint` on Cloud Run | Pub/Sub **push** subscription → [`MintExecutor.ts`](../../../afi-mint/src/orchestrator/MintExecutor.ts) |
+| **Ingest** | `afi-reactor` webhook (or `afi-gateway` minimal) | [`afi-reactor/src/server.ts:159`](../../../afi-reactor/src/server.ts) `POST /api/webhooks/tradingview` (twin: `/api/ingest/cpj`) |
+| **Scoring DAG** | `afi-reactor` Froggy pipeline → `afi-core` UWR | [`froggyDemoService.ts:196`](../../../afi-reactor/src/services/froggyDemoService.ts) `runPipelineDag` → [`UniversalWeightingRule.ts`](../../../afi-core/validators/UniversalWeightingRule.ts) |
+| **Evidence** | **MongoDB TSSD** (canonical) | [`tssdVaultService.ts:112`](../../../afi-reactor/src/services/tssdVaultService.ts) `insertOne` → `afi_reactor.reactor_scored_signals_v1`; gateway path: [`MongoTSSDVaultClient.ts`](../../../afi-infra/src/tssd/MongoTSSDVaultClient.ts) → `afi_tssd.tssd_signals` |
+| **Mint** | `afi-mint` reads scored signal from Mongo | [`MintExecutor.ts`](../../../afi-mint/src/orchestrator/MintExecutor.ts) → `mintForSignal` (T2 wire-up gap — see §1.4) |
 | **Commitment** | `afi-token` Base Sepolia | [`AFIMintCoordinator.sol`](../../../afi-token/src/AFIMintCoordinator.sol) |
-| **Proof feed** *(Phase B)* | Ably optional | [`AFI_ANALYST_SHOP_MVP.md`](../AFI_ANALYST_SHOP_MVP.md) T2 — downstream of `signal-minted` only |
-
-### Legacy spine (Mongo + reactor — deprecated for new work)
-
-| Stage | Repo | Note |
-|-------|------|------|
-| Vault client | [`MongoTSSDVaultClient.ts`](../../../afi-infra/src/tssd/MongoTSSDVaultClient.ts) | Do not extend for testnet E2E |
-| Scored store | [`tssdVaultService.ts`](../../../afi-reactor/src/services/tssdVaultService.ts) | Parallel store; use Mage + BQ instead |
+| **Proof feed** *(Phase B)* | Ably optional | [`AFI_ANALYST_SHOP_MVP.md`](../AFI_ANALYST_SHOP_MVP.md) T2 — downstream of mint only |
 
 ### Shared protocol repos
 
 | Stage | Repo | Key files |
 |-------|------|-----------|
 | Evidence types | `afi-infra` | [`src/tssd/types.ts`](../../../afi-infra/src/tssd/types.ts), [`docs/TSSD_VAULT_SPEC.md`](../../../afi-infra/docs/TSSD_VAULT_SPEC.md) |
+| Scored record | `afi-reactor` | [`src/types/ReactorScoredSignalV1.ts`](../../../afi-reactor/src/types/ReactorScoredSignalV1.ts) |
 | UWR math | `afi-core` | [`validators/UniversalWeightingRule.ts`](../../../afi-core/validators/UniversalWeightingRule.ts) |
 | Mint coord | `afi-mint` | [`ValidatorDaemon.ts`](../../../afi-mint/src/orchestrator/ValidatorDaemon.ts), [`EmissionsMintDataProvider.ts`](../../../afi-mint/src/adapters/EmissionsMintDataProvider.ts) |
 | Emissions math | `afi-math` | [`src/emissions/emissionsSchedule.ts`](../../../afi-math/src/emissions/emissionsSchedule.ts) |
@@ -76,19 +70,19 @@
 | Tier | Question | Status today | Scope |
 |------|----------|--------------|-------|
 | **T1** | Can we mint manually on testnet? | **Yes** — contracts deployed; `mintForSignal` works with `EMISSIONS_ROLE` | Manual `cast` / script only |
-| **T2** | Can we mint from a real scored signal? | **No** — pipeline not wired | **MVP E2E (Phase A)** |
+| **T2** | Can we mint from a real scored signal? | **Partial** — reactor scores → Mongo works; `afi-mint` Mongo reader + on-chain client not yet wired | **MVP E2E (Phase A)** |
 | **T2b** | Can a pilot analyst show live proof to subscribers? | **No** | **Phase B** (Ably storefront, after T2) |
 | **T3** | Can we test multi-role reward allocations? | **No** — gauge is research-only | Protocol-complete (or deferred) |
 | **T4** | Can a third party verify mint from chain + rules? | **No** — no anchors, formula drift | Protocol-complete |
 
 **This checklist is organized around reaching T2 (Phase A MVP E2E), then optional Phase B (Ably proof fan-out).**
 
-### Messaging layer (do not conflate)
+### Source of truth (do not conflate)
 
-| Bus | Role | Use for pipeline? |
-|-----|------|-------------------|
-| **GCP Pub/Sub** | Internal workflow (`raw` → `scored` → `minted`) | **Yes — required** |
-| **BigQuery** | Canonical append-only evidence | **Yes — required** |
+| Layer | Role | Use for pipeline? |
+|-------|------|-------------------|
+| **MongoDB TSSD** | Canonical per-signal evidence store (`reactor_scored_signals_v1`) | **Yes — required** |
+| **Base Sepolia** | On-chain commitment (mint events, receipts) | **Yes — required** |
 | **Ably** | External live proof + dashboard (T2 tier) | **No for pipeline** — Phase B only |
 
 ---
@@ -99,11 +93,11 @@
 
 | In scope | Out of scope (defer) |
 |----------|----------------------|
-| **GCP Pub/Sub** evidence-plane topics | Kafka / self-managed message bus |
-| **Mage** streaming scoring DAG | Full `afi-reactor` as mandatory orchestrator |
-| **BigQuery** append-only `afi_evidence.signals_lifecycle` | Mongo TSSD vault path |
+| `afi-reactor` webhook ingest → Froggy score | Standalone message bus / external orchestrator |
+| `afi-reactor` Froggy scoring DAG (afi-core UWR) | Multi-engine vault (PG/Timescale/Influx) |
+| **MongoDB TSSD** `reactor_scored_signals_v1` evidence | Separate analytics/warehouse plane |
 | Single beneficiary per signal | Multi-role gauge splits ([`gauge_v0.yaml`](../../../afi-econ/params/gauge_v0.yaml)) |
-| Pub/Sub push → `afi-mint` → Base Sepolia | Ably in critical mint path |
+| `afi-mint` reads scored signal from Mongo → Base Sepolia | Ably in critical mint path |
 | Proportional epoch-budget allocation (as implemented) | Goldpaper `clamp(B(t)…)` formula |
 | Scored signal → mint via `afi-mint` | Full Snapshot challenge appeals (bypass OK) |
 | `MintCoordinated` event as provenance | On-chain `contentHash` (nice-to-have) |
@@ -172,86 +166,79 @@ Proves T1 before wiring the pipeline. Open [`MintCoordinatorIntegration.t.sol`](
 
 ---
 
-## Section 1 — Phase A: MVP E2E build checklist (GCP + Mage)
+## Section 1 — Phase A: MVP E2E build checklist (afi-reactor + Mongo)
 
 Work in this order. **Phase B (Ably) starts only after §1.7 passes.**
 
-### 1.0 Mage platform & deployment (decide before §1.1)
+### 1.0 Provision MongoDB (decide before §1.1)
 
-Full rationale: [`AFI_MAGE_PRO_PLAN_DECISION.md`](./AFI_MAGE_PRO_PLAN_DECISION.md)
+MongoDB TSSD is the canonical reference evidence store. No warehouse/stream plane is required at any tier.
 
-**Default for T2 testnet:** **Mage OSS self-hosted on GCP** (Terraform + Docker). AFI has **no Mage infra yet** — reuse patterns from your other ETL/ELT projects (commission sales tracking, etc.), not an existing AFI deploy. **Pro is fallback** only if you cannot own streaming uptime during testnet.
+**Default for T2 testnet:** a single MongoDB reachable by `afi-reactor` and `afi-mint`. The repo already ships a one-command local Mongo.
 
 | Done? | Decision | Choice | Notes |
 |-------|----------|--------|-------|
-| [ ] | Platform | [ ] **OSS self-host**  [ ] Mage Pro Team  [ ] Plus | OSS = default when you have transferable Terraform/Docker/GCP skills |
-| [ ] | AFI Mage status | [ ] **Net-new deploy**  [ ] Already running | Expected: net-new |
-| [ ] | Mage UI | Cloud Run (Terraform) | Same pattern as other projects |
-| [ ] | Streaming worker | [ ] **GCE**  [ ] GKE  [ ] Cloud Run only | **Reject Cloud Run only** for always-on Pub/Sub consumer |
-| [ ] | GCP project | e.g. `afi-testnet` / `us-central1` | Pub/Sub + BQ + Mage in one region |
-| [ ] | Pro fallback evaluated | [ ] N/A (OSS)  [ ] Quoted | Only if OSS ops blocked |
+| [ ] | Mongo deployment | [ ] **Local docker-compose** (`mongo:7`)  [ ] Atlas free tier  [ ] Self-host | Local compose ships in [`afi-starters/self-hosted-pipeline/docker-compose.yml`](../../../afi-starters/self-hosted-pipeline/docker-compose.yml) |
+| [ ] | Connection string | `AFI_MONGO_URI=mongodb://localhost:27017` | Used by `afi-reactor` (and `afi-mint` reader) |
+| [ ] | Database / collection | `afi_reactor` / `reactor_scored_signals_v1` (defaults) | [`tssdVaultService.ts:58-59`](../../../afi-reactor/src/services/tssdVaultService.ts) |
 
-**Still outside Mage (OSS or Pro):** ingest webhook, Pub/Sub topics, BQ DDL, `afi-mint` Cloud Run, emissions key, Base Sepolia, AFI-specific pipeline blocks.
+**Outside Mongo:** ingest webhook (reactor), `afi-mint` mint client, emissions key, Base Sepolia.
 
 ---
 
-### 1.1 Shared testnet + GCP config
+### 1.1 Shared testnet config
 
 | Done? | Task | Create / edit | Acceptance |
 |-------|------|---------------|------------|
-| [ ] | GCP project + region (single-region MVP) | e.g. `afi-testnet` / `us-central1` | All services same region for Pub/Sub exactly-once |
-| [ ] | Centralize contract addresses + chain ID | Env template for `afi-mint`, ingest, Mage | `COORDINATOR_ADDRESS`, `CHAIN_ID=84532` |
-| [ ] | Create Pub/Sub topics | `signal-raw`, `signal-scored`, `signal-minted` | Topics exist; IAM bound to service accounts |
-| [ ] | Create BQ dataset + evidence table | `afi_evidence.signals_lifecycle` | Append-only DDL per research report (use `event_id`, not PK on `signal_id+stage` alone) |
-| [ ] | Document emissions-agent key | Secret Manager + `afi-mint` | Key never committed |
-| [ ] | Deploy Mage OSS (Terraform + Docker) | Per §1.0 — adapt from other-project playbook; [GCP setup](https://docs.mage.ai/production/deploying-to-cloud/gcp/setup) | UI reachable; streaming worker on GCE/GKE consumes `signal-raw` |
+| [ ] | Provision MongoDB (per §1.0) | docker-compose / Atlas | `mongosh $AFI_MONGO_URI` connects |
+| [ ] | Centralize contract addresses + chain ID | Env template for `afi-mint`, reactor | `COORDINATOR_ADDRESS`, `CHAIN_ID=84532` |
+| [ ] | Set reactor vault env | `AFI_MONGO_URI`, `AFI_MONGO_DB_NAME`, `AFI_MONGO_COLLECTION_SCORED` | Reactor logs `✅ Reactor vault connected` on first write |
+| [ ] | Document emissions-agent key | Secret store + `afi-mint` | Key never committed |
+| [ ] | Build + run `afi-reactor` | `cd afi-reactor && npm install && npm run build && npm run start:demo` | Listens on `:8080`; webhook reachable |
 
 **Gap ID:** B8 (no shared config)
 
 ---
 
-### 1.2 Ingest → Pub/Sub `signal-raw` + BQ RAW row
+### 1.2 Ingest → reactor score → Mongo SCORED row
 
 | Done? | Task | Files / services | Acceptance |
 |-------|------|------------------|------------|
-| [ ] | USS/CPJ validate on ingest | [`afi-gateway`](../../../afi-gateway/src/http/app.ts) **or** new Cloud Run webhook | Invalid payloads rejected before Pub/Sub |
-| [ ] | Publish to `signal-raw` | Gateway post-hook or Cloud Run publisher | Message visible in Pub/Sub |
-| [ ] | Append BQ row `stage=RAW` | Mage loader side-effect or ingest publisher | Row in `afi_evidence.signals_lifecycle` |
+| [ ] | USS/CPJ validate on ingest | [`afi-reactor/src/server.ts:211`](../../../afi-reactor/src/server.ts) `validateUsignalV11` | Invalid payloads rejected (AJV) |
+| [ ] | POST a test signal | `curl POST /api/webhooks/tradingview` (or `/api/ingest/cpj`) | HTTP 200 with `analystScore` |
+| [ ] | Reactor persists scored signal | [`froggyDemoService.ts:315`](../../../afi-reactor/src/services/froggyDemoService.ts) → [`tssdVaultService.ts:112`](../../../afi-reactor/src/services/tssdVaultService.ts) | Row in `afi_reactor.reactor_scored_signals_v1` |
 | [ ] | *(Optional)* TradingView / Telegram template | See [`AFI_ANALYST_SHOP_MVP.md`](../AFI_ANALYST_SHOP_MVP.md) | Pilot analyst can ingest without custom code |
 
-**Do not** use Mongo for new testnet path.
+> No API keys required for the demo path: the demo price feed (`AFI_PRICE_FEED_SOURCE=demo`) generates synthetic OHLCV; sentiment/news/aiMl enrichment is fail-soft.
 
-**Gap IDs:** D1, B6 (USS validation still required)
+**Gap IDs:** D1 (USS validation present in reactor), B6
 
 ---
 
-### 1.3 Mage scoring (Pub/Sub consumer → SCORED)
-
-**Stage map:** [`AFI_FROGGY_MAGE_MIGRATION_MAP.md`](./AFI_FROGGY_MAGE_MIGRATION_MAP.md) · **Fixture:** [`fixtures/signal_scored_v1.example.json`](./fixtures/signal_scored_v1.example.json)
+### 1.3 Scored signal record (shape + determinism)
 
 | Done? | Task | Files / services | Acceptance |
 |-------|------|------------------|------------|
-| [ ] | Mage streaming pipeline from `signal-raw` | Mage Pub/Sub loader | Pipeline runs on test message |
-| [ ] | UWR scoring block | Port [`UniversalWeightingRule.ts`](../../../afi-core/validators/UniversalWeightingRule.ts) **or** HTTP sidecar to `afi-reactor` | Deterministic score for pinned config |
-| [ ] | Pin `pipeline_uuid`, `git_sha`, ruleset version in `metadata` JSON | Mage exporter boilerplate | Reproducibility fields on every SCORED row |
-| [ ] | Append BQ `stage=SCORED` + publish `signal-scored` | Dual exporter blocks | Mint path reads from Pub/Sub push payload (not BQ poll) |
+| [ ] | Confirm scored record shape | [`ReactorScoredSignalV1.ts`](../../../afi-reactor/src/types/ReactorScoredSignalV1.ts) | `signalId`, `analystScore`, `scoredAt`, `_priceFeedMetadata` present |
+| [ ] | Provenance guardrail satisfied | [`froggyDemoService.ts:272-278`](../../../afi-reactor/src/services/froggyDemoService.ts) | `priceSource` + `venueType` set (always set on demo path) |
+| [ ] | *(Protocol-complete)* pin `dagTopologyHash` / ruleset version on record | [`types.ts:331`](../../../afi-infra/src/tssd/types.ts) | Determinism fields on every SCORED record |
 
-**Gap IDs:** D3, B8
+**Gap IDs:** D3, D7 (record-level determinism pins are protocol-complete work)
 
 ---
 
-### 1.4 Mint orchestration (`afi-mint` on Cloud Run)
+### 1.4 Mint orchestration (`afi-mint` reads scored signal from Mongo)
 
 | Done? | Task | Files | Acceptance |
 |-------|------|-------|------------|
-| [ ] | **Pub/Sub push subscription** → `afi-mint` HTTP handler | **New:** Cloud Run service | Push from `signal-scored` delivers full payload |
+| [ ] | **Implement a Mongo reader** for `ISignalMetadataFetcher` | **New:** `afi-mint/src/adapters/MongoSignalMetadataFetcher.ts` | `afi-mint` fetches the scored signal from `reactor_scored_signals_v1` by `signalId` (currently an in-memory stub seam) |
 | [ ] | **Implement `ethers`/`viem` coordinator client** | **New:** `afi-mint/src/adapters/OnChainMintCoordinator.ts` | `mintForSignal` returns real `txHash` |
-| [ ] | **Idempotent mint** | Check coordinator / on-chain before re-minting same `signalId` | Duplicate push does not double-mint |
-| [ ] | Build `MintRequest` from push payload | [`MintExecutor.ts`](../../../afi-mint/src/orchestrator/MintExecutor.ts) | beneficiary, amount, epoch, receiptId populated |
-| [ ] | On success: publish `signal-minted` | Publisher in mint post-hook | Downstream BQ + optional Ably fan-out |
+| [ ] | **Idempotent mint** | Check coordinator / on-chain before re-minting same `signalId` | Re-running does not double-mint |
+| [ ] | Build `MintRequest` from the scored record | [`MintExecutor.ts`](../../../afi-mint/src/orchestrator/MintExecutor.ts) | beneficiary, amount, epoch, receiptId populated |
+| [ ] | On success: write `MINTED` back to Mongo | Mint post-hook | `txHash` recorded on the signal's Mongo record |
 | [ ] | MVP: skip Snapshot challenges | [`SignalStateManager.ts`](../../../afi-mint/src/orchestrator/SignalStateManager.ts) | Fast-path qualify → mint |
 
-**Rejected for mint path:** BQ poll, Mage HTTP callback, Ably as workflow bus.
+**Rejected for mint path:** external message bus, Ably as workflow bus.
 
 **Gap IDs:** B1, B2, B6
 
@@ -263,19 +250,19 @@ Full rationale: [`AFI_MAGE_PRO_PLAN_DECISION.md`](./AFI_MAGE_PRO_PLAN_DECISION.m
 |-------|------|-------|------------|
 | [ ] | Confirm proportional epoch formula | [`EmissionsMintDataProvider.ts:255-287`](../../../afi-mint/src/adapters/EmissionsMintDataProvider.ts) | Test vectors match on-chain wei |
 | [ ] | Set `epochPulseFactor = 1.0` | `DEFAULT_CONFIG` | No governance multiplier |
-| [ ] | Set `reputationWeight = 1.0` in metadata | Scoring block output | No reputation scaling |
+| [ ] | Set `reputationWeight = 1.0` in metadata | Scored record / reader output | No reputation scaling |
 
 **Gap IDs:** C1–C7 (partially deferred)
 
 ---
 
-### 1.6 Mint → BQ evidence write-back
+### 1.6 Mint → Mongo evidence write-back
 
 | Done? | Task | Files | Acceptance |
 |-------|------|-------|------------|
-| [ ] | Consumer on `signal-minted` appends BQ row | Mage micro-batch or Cloud Run | `stage=MINTED`, `metadata.txHash`, `chainId=84532` |
-| [ ] | Use Storage Write API for exactly-once | Not pandas `toPandas()` insert | No duplicate rows on retry |
-| [ ] | Align with evidence model | [`MintSnapshot`](../../../afi-infra/src/tssd/types.ts), [`TSSD_VAULT_SPEC.md`](../../../afi-infra/docs/TSSD_VAULT_SPEC.md) | BQ row matches protocol shape |
+| [ ] | After mint, update the signal's Mongo record | reactor vault collection or an `afi_reactor.mints` collection | `stage=MINTED`, `txHash`, `chainId=84532` recorded |
+| [ ] | Idempotent write (no duplicate mint rows on retry) | upsert by `signalId` | Re-run leaves a single MINTED record |
+| [ ] | Align with evidence model | [`MintSnapshot`](../../../afi-infra/src/tssd/types.ts), [`TSSD_VAULT_SPEC.md`](../../../afi-infra/docs/TSSD_VAULT_SPEC.md) | Mongo record matches protocol shape |
 
 **Gap IDs:** B7, D4
 
@@ -290,18 +277,18 @@ Run once with a single test signal.
 | `signalId` | _________________________ |
 | `providerId` | _________________________ |
 | Ingest time | _________________________ |
-| BQ SCORED `event_id` | _________________________ |
+| Mongo SCORED `_id` | _________________________ |
 | Mint `txHash` | _________________________ |
 | Beneficiary | _________________________ |
-| BQ MINTED `event_id` | _________________________ |
+| Mongo MINTED record | _________________________ |
 
 | Done? | Step | Verify |
 |-------|------|--------|
-| [ ] | 1. Ingest → `signal-raw` | Pub/Sub message + BQ RAW row |
-| [ ] | 2. Mage scores | BQ SCORED row + `signal-scored` message |
-| [ ] | 3. `afi-mint` push mint | `MintCoordinated` on [BaseScan](https://sepolia.basescan.org) |
+| [ ] | 1. Ingest → reactor | HTTP 200 with `analystScore` |
+| [ ] | 2. Reactor persists | SCORED row in `reactor_scored_signals_v1` (`mongosh`) |
+| [ ] | 3. `afi-mint` reads + mints | `MintCoordinated` on [BaseScan](https://sepolia.basescan.org) |
 | [ ] | 4. Token balance | `cast call` `balanceOf(beneficiary)` |
-| [ ] | 5. BQ MINTED row | Append row with `txHash` |
+| [ ] | 5. Mongo MINTED record | Record updated with `txHash` |
 | [ ] | 6. Receipt (if enabled) | `balanceOf(beneficiary, receiptId)` |
 
 **Phase A complete = all six checked.** Proceed to Phase B only after this.
@@ -313,13 +300,13 @@ Run once with a single test signal.
 **Prerequisite:** §1.7 Phase A passed.  
 **Product tier:** [T2 in Analyst Shop MVP](../AFI_ANALYST_SHOP_MVP.md) — *not* required for protocol testnet.
 
-**Purpose:** Live proof channel for pilot analysts and Codex UI. Ably is a **read model**; BQ + chain remain source of truth.
+**Purpose:** Live proof channel for pilot analysts and Codex UI. Ably is a **read model**; Mongo + chain remain source of truth.
 
 ```mermaid
 flowchart LR
-  PS[Pub/Sub signal-minted] --> FAN[Cloud Run fan-out]
+  MINT[afi-mint MINTED] --> FAN[fan-out service]
   FAN --> ABLY[Ably REST publish]
-  FAN --> BQ[(BQ — already written in Phase A)]
+  FAN --> MONGO[(Mongo — MINTED record, Phase A)]
   ABLY --> PROOF[afi:proof:providerId]
   ABLY --> OPS[afi:ops:providerId]
   PROOF --> UI[Vercel proof page]
@@ -329,7 +316,7 @@ flowchart LR
 
 | In scope | Out of scope |
 |----------|--------------|
-| Fan-out service on `signal-minted` | Ably between Mage and `afi-mint` |
+| Fan-out service on mint completion | Ably between scoring and `afi-mint` |
 | `afi:proof:{providerId}` public surface only | `proprietaryDetail` on Ably |
 | Read-only proof page (Vercel) | Full analyst onboarding wizard (T1) |
 | Optional `afi:ops:{providerId}` for operator | Telegram mirror bot (stretch) |
@@ -343,8 +330,8 @@ flowchart LR
 
 | Done? | Task | Acceptance |
 |-------|------|------------|
-| [ ] | Ably app + API key in Secret Manager | Key not in repo |
-| [ ] | **Cloud Run `afi-fanout`** subscribes to `signal-minted` (pull or push) | Service receives mint events |
+| [ ] | Ably app + API key in secret store | Key not in repo |
+| [ ] | **Fan-out service** triggers on mint completion (Mongo change stream or mint post-hook) | Service receives mint events |
 | [ ] | Map payload → Ably message (`publicSurface` only) | No proprietary fields |
 | [ ] | Channel naming: `afi:proof:{providerId}` | Scoped per analyst |
 | [ ] | Token auth: read-only capability tokens for subscribers | Clients cannot publish |
@@ -360,7 +347,7 @@ flowchart LR
 | [ ] | Complete Phase A mint for pilot `providerId` | §1.7 still passes |
 | [ ] | Ably channel receives `stage=MINTED` event | Message includes `signalId`, `txHash`, `publicSurface` |
 | [ ] | Proof page updates without refresh | Browser shows mint within seconds |
-| [ ] | BQ still authoritative | Ably outage does not block mint; BQ row exists |
+| [ ] | Mongo still authoritative | Ably outage does not block mint; Mongo MINTED record exists |
 
 **Phase B complete = all four checked.**
 
@@ -370,12 +357,9 @@ flowchart LR
 
 ```bash
 # --- Ably (Phase B only) ---
-ABLY_API_KEY=...                    # Secret Manager
+ABLY_API_KEY=...                    # secret store
 ABLY_CHANNEL_PREFIX=afi:proof
 ABLY_OPS_CHANNEL_PREFIX=afi:ops
-
-# Fan-out service
-PUBSUB_SUBSCRIPTION_MINTED=signal-minted-fanout-sub
 ```
 
 ---
@@ -401,13 +385,13 @@ Use when deciding whether MVP needs a contract change before first E2E.
 
 **Read:** [`AFI_REPLAY_READINESS_MATRIX.md` §2](../AFI_REPLAY_READINESS_MATRIX.md)
 
-| Stage | Written today? | Phase A (GCP) | Protocol-complete |
-|-------|----------------|---------------|-------------------|
-| RAW | Partial (gateway only) | Pub/Sub + BQ append | + USS validation, `payloadHash` |
-| ENRICHED | No | Mage block (optional passthrough) | Pinned enrichment snapshot in BQ |
-| ANALYZED | No | Defer | BQ append |
-| SCORED | Reactor parallel store (legacy) | **Mage → BQ append + `signal-scored`** | + determinism pins |
-| MINTED | On-chain logs only | **BQ append via `signal-minted`** | + on-chain anchor |
+| Stage | Written today? | Phase A (Mongo) | Protocol-complete |
+|-------|----------------|-----------------|-------------------|
+| RAW | Partial (gateway only) | reactor receives + validates USS | + `payloadHash` |
+| ENRICHED | In-pipeline (not persisted) | optional persist of enrichment snapshot | Pinned enrichment snapshot in Mongo |
+| ANALYZED | In-pipeline | Defer | Mongo append |
+| SCORED | **Yes — `reactor_scored_signals_v1`** | **reactor `insertOne` (working)** | + determinism pins; canonical `stages.scored` |
+| MINTED | On-chain logs only | **Mongo write-back via §1.6** | + on-chain anchor |
 | REPLAYED | No | Defer | Replay runner |
 
 ---
@@ -437,7 +421,7 @@ Track after T2 passes. Ordered roughly by audit roadmap Phase 2–4.
 | [ ] | Persist minimal `signalId → anchor` mapping | `afi-token` | §8.2 |
 | [ ] | Import `afi-math` schedule; pin version in receipt | `afi-mint`, `afi-math` | theme G#0 |
 | [ ] | Reconcile mint formula docs vs code | `afi-mint` | theme G#1 |
-| [ ] | Write SCORED to canonical vault | `afi-reactor`, `afi-infra` | theme D#1 |
+| [ ] | Write canonical `stages.scored` to the TSSD vault | `afi-reactor`, `afi-infra` | theme D#1 |
 | [ ] | Record-level determinism pinning | `afi-infra`, `afi-config` | theme A#3, D#0 |
 | [ ] | Gateway USS validation | `afi-gateway` | theme A#1 |
 | [ ] | Normative commitment + lifecycle schemas | `afi-config` | Master B3, B5 |
@@ -461,20 +445,16 @@ AFI_RECEIPTS_ADDRESS=0xD1aDC1Ca4A98B141D8f3a4fE2cb9638003E70e23
 AFI_COORDINATOR_ADDRESS=0xDd825a05EFe22668Ffbd627C586f19D08d62eA5e
 
 # --- Mint caller (EMISSIONS_ROLE on coordinator) ---
-EMISSIONS_AGENT_PRIVATE_KEY=...   # Secret Manager — NEVER COMMIT
+EMISSIONS_AGENT_PRIVATE_KEY=...   # secret store — NEVER COMMIT
 
-# --- GCP (Phase A) ---
-GCP_PROJECT_ID=afi-testnet
-GCP_REGION=us-central1
-PUBSUB_TOPIC_RAW=signal-raw
-PUBSUB_TOPIC_SCORED=signal-scored
-PUBSUB_TOPIC_MINTED=signal-minted
-BQ_DATASET_EVIDENCE=afi_evidence
-BQ_TABLE_LIFECYCLE=signals_lifecycle
+# --- MongoDB TSSD (evidence store) ---
+AFI_MONGO_URI=mongodb://localhost:27017
+AFI_MONGO_DB_NAME=afi_reactor
+AFI_MONGO_COLLECTION_SCORED=reactor_scored_signals_v1
 
-# --- Mage ---
-MAGE_REPO_URL=...
-MAGE_PIPELINE_UUID=...
+# --- Reactor ---
+AFI_PRICE_FEED_SOURCE=demo        # network-free synthetic OHLCV
+# WEBHOOK_SHARED_SECRET=...        # optional ingest auth
 
 # --- MVP tuning ---
 EPOCH_PULSE_FACTOR=1.0
@@ -493,11 +473,11 @@ SKIP_CHALLENGE_WINDOW=true
 |-------|-----------|
 | [ ] | T1 manual mint smoke test (§0.1) |
 | [ ] | MVP scope accepted (§ Scope decision) |
-| [ ] | GCP topics + BQ table (§1.1) |
-| [ ] | **Phase A:** ingest → score → mint → BQ (§1.7) |
+| [ ] | MongoDB provisioned + reactor wired (§1.1) |
+| [ ] | **Phase A:** ingest → score → Mongo → mint (§1.7) |
 | [ ] | **Phase B** *(optional)*: Ably proof fan-out (§1B.3) |
 | [ ] | Pilot analyst T2 demo ([`AFI_ANALYST_SHOP_MVP.md`](../AFI_ANALYST_SHOP_MVP.md)) |
-| [ ] | Worksheet Q5 (vault engine = BQ/GCP) answered |
+| [ ] | Worksheet Q5 (vault engine = Mongo TSSD) answered |
 
 | Role | Name | Date |
 |------|------|------|
@@ -518,8 +498,8 @@ _________________________________________________________
 | A1–A3 | On-chain anchor / policy | Defer |
 | A4 | Single payee | OK for MVP |
 | A5–A8 | URI, stubs, bridge | Defer |
-| B1–B6 | Mint orchestration wiring | **Required** |
-| B7–B8 | Vault write-back, config | **Required** |
+| B1–B6 | Mint orchestration wiring (Mongo reader + on-chain client) | **Required** |
+| B7–B8 | Mongo write-back, config | **Required** |
 | C1–C7 | Allocation model | Partial (single payee + proportional) |
 | D1–D7 | Vault lifecycle | D3, D4 critical for E2E |
 | E1–E3 | Governance challenges | Bypass for MVP |

@@ -20,7 +20,7 @@ Work ONLY in afi-token unless a read-only check in afi-docs is needed for addres
 2. NEVER run mainnet commands or change foundry.toml chain defaults to mainnet.
 3. If a human-only step blocks progress, STOP and output a clear HANDOFF block — do not guess.
 4. Every checklist row must end PASS, FAIL, or HUMAN_REQUIRED with evidence (command output or tx hash).
-5. Do not proceed to Section 1 (GCP/Mage). This mission ends at T1 gate only.
+5. Do not proceed to Section 1. This mission ends at T1 gate only.
 6. If sanity script passes but coordinator/emissions-agent roles fail, run the supplemental cast checks below — the stock sanity script is incomplete.
 
 ## Human prerequisites (assume user completed BEFORE you start)
@@ -128,7 +128,7 @@ All Section 0 rows PASS OR explicitly HUMAN_REQUIRED with remediation steps.
 User can tick T1 in the checklist.
 
 ## Out of scope
-- GCP, Pub/Sub, Mage, BigQuery (Section 1)
+- Anything beyond the T1 gate (Section 1 and later)
 - Contract code changes
 - Mainnet
 - Committing .env or keys

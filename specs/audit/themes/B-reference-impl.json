@@ -53,7 +53,7 @@
       "severity": "P2",
       "theme": "B-reference-impl",
       "evidence": "afi-reactor/README.md:137 'afi-reactor is the ONLY orchestrator in AFI Protocol.'; afi-reactor/AGENTS.md:3 'This is the ONLY orchestrator in the AFI ecosystem'; afi-core/docs/AFI_CORE_RUNTIME_OVERVIEW.md:39 'AFI-Reactor ... is the canonical orchestrator for AFI Protocol.'",
-      "recommendation": "Reframe reactor as the reference orchestrator: protocol law is conforming DAG outputs + pinned transform versions (per AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md 3.4); add a banner that any conforming orchestrator (Mage blocks, custom DAG) is permitted. Cross-link Theme E (reactor-as-only-orchestrator quotes)."
+      "recommendation": "Reframe reactor as the reference orchestrator: protocol law is conforming DAG outputs + pinned transform versions (per AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md 3.4); add a banner that any conforming orchestrator (custom DAG, etc.) is permitted. Cross-link Theme E (reactor-as-only-orchestrator quotes)."
     },
     {
       "title": "Stale/archived repos still advertised as spine participants (afi-agents/afi-construct GitHub-archived)",

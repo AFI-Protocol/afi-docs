@@ -8,15 +8,16 @@ Persistent handoff for the portable-protocol surface investigation across the 31
 
 **Org delta (2026-06-25):** Three more repos were **permanently deleted** from GitHub: `afi-sdk-python`, `afi-sdk-ts`, `afi-starters` (empty SDK scaffolds + the starters kit). Unlike the 2026-06-20 pass, these were **fully erased everywhere** — operational docs, classification reports (rows/tallies/subsections), repo lists, the recon corpus (dedicated records + per-repo files + cross-refs), and the forensic themes (`I-sdks-gateway`, `B-reference-impl`) and contradiction register (`C-RO-3` retired). The classification reports now reflect a **25-repo** catalog (incl. `.github`, `afi-xerc20`); the `init.sh`/Phase-1 "31 records" provenance lines are retained as historical extraction facts.
 
+**Evidence-store correction (2026-06):** A proposed warehouse/streaming "evidence plane" detour was never implemented in code and has been **retracted**. Its four planning docs were deleted, and all operational + forensic artifacts (`recon/`, `themes/*.json`, `final/`, promoted `specs/*.md`) were scrubbed to the single **MongoDB TSSD + afi-reactor** reference spine — see [`AFI_EVIDENCE_STORE_DECISION.md`](./AFI_EVIDENCE_STORE_DECISION.md). The scrub removed only the retracted-detour-as-canonical framing; all other forensic findings, citations, and P0/P1 items are intact.
+
 **Start here:** [`AFI_AUDIT_CHECKPOINT.md`](./AFI_AUDIT_CHECKPOINT.md) (phase status + Definition-of-Done tracker)  
 **Human review:** [`AFI_HUMAN_REVIEW_WORKSHEET.md`](./AFI_HUMAN_REVIEW_WORKSHEET.md) (Q1–Q7 decisions with file links)  
 **Testnet E2E:** [`AFI_TESTNET_E2E_CHECKLIST.md`](./AFI_TESTNET_E2E_CHECKLIST.md) (MVP vs protocol-complete, Base Sepolia)  
-**Mage + GCP research:** [`AFI_MAGE_GCP_RESEARCH_PROMPT.md`](./AFI_MAGE_GCP_RESEARCH_PROMPT.md) (deep agent charter)  
-**Mage Pro plan pick:** [`AFI_MAGE_PRO_PLAN_DECISION.md`](./AFI_MAGE_PRO_PLAN_DECISION.md) (OSS default; Pro fallback)  
-**Froggy → Mage map:** [`AFI_FROGGY_MAGE_MIGRATION_MAP.md`](./AFI_FROGGY_MAGE_MIGRATION_MAP.md) (stage-by-stage reuse)  
+**Evidence store:** [`AFI_EVIDENCE_STORE_DECISION.md`](./AFI_EVIDENCE_STORE_DECISION.md) (MongoDB TSSD is canonical; warehouse/streaming detour retracted)  
 **Legacy purge prompt:** [`AFI_LEGACY_PIPELINE_PURGE_PROMPT.md`](./AFI_LEGACY_PIPELINE_PURGE_PROMPT.md) (remove alpha-scout / structurer / validator-decision / execution-sim)  
 **afi-core build fix:** [`AFI_CORE_BUILD_FIX_PROMPT.md`](./AFI_CORE_BUILD_FIX_PROMPT.md) (P0 — unblock npm install)  
 **Analyst Shop MVP:** [`../AFI_ANALYST_SHOP_MVP.md`](../AFI_ANALYST_SHOP_MVP.md) (onboarding tiers, Ably as optional storefront)  
+**Mongo/TSSD inventory:** [`AFI_MONGO_TSSD_INVENTORY.md`](./AFI_MONGO_TSSD_INVENTORY.md) · [`.json`](./AFI_MONGO_TSSD_INVENTORY.json) — verdict: **Mongo ingest→score→persist path INTACT and runnable; MongoDB TSSD is canonical** (every Mongo/TSSD touchpoint classified RUNTIME/CONFIG/TEST/DOCS/DEAD; runtime path traced webhook→`insertOne`)  
 **Final reports:** see [Final Deliverables](#final-deliverables-phase-4) below.
 
 ---

@@ -128,11 +128,11 @@
       "recommendation": "None; sample/template identity doc, not a normative manifest. Do not treat as plugin-manifest canon."
     },
     {
-      "title": "No BigQuery/Kafka/warehouse/Postgres/Timescale/Influx references; analytics & multi-engine vault entirely absent",
+      "title": "No Kafka/warehouse/snowflake/datalake/Postgres/Timescale/Influx references; analytics & multi-engine vault entirely absent",
       "severity": "Info",
-      "theme": "BigQuery|kafka|warehouse|postgresql|timescaledb|influxdb",
-      "evidence": "grep across repo for BigQuery|kafka|warehouse|postgres|timescaledb|influxdb|pubsub returned zero hits (only MongoDB appears as a storage engine)",
-      "recommendation": "Confirms the single-engine (Mongo) framing; analytics plane not modeled here. Consistent with RESEARCH status."
+      "theme": "kafka|warehouse|snowflake|datalake|postgresql|timescaledb|influxdb",
+      "evidence": "grep across repo for kafka|warehouse|snowflake|datalake|postgres|timescaledb|influxdb returned zero hits (only MongoDB appears as a storage engine). Analytics/warehouse integrations are absent; MongoDB TSSD is the implemented evidence store. No separate warehouse plane is planned for the reference implementation.",
+      "recommendation": "Confirms the single-engine (Mongo TSSD) framing; no separate analytics/warehouse plane is modeled or planned here. Consistent with RESEARCH status."
     },
     {
       "title": "No package.json / dependency manifest anywhere; dependency graph is documentation-only",

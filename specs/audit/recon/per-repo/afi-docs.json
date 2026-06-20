@@ -16,7 +16,7 @@
     "replay/determinism (described, points to afi-reactor)",
     "registries/reputation (pointer)",
     "SDK/API (referenced)",
-    "analytics (ABSENT)"
+    "analytics/warehouse (ABSENT; MongoDB TSSD is the evidence store)"
   ],
   "normative_artifacts": [
     "specs/AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md (direction-setting normative-vs-reference charter; the audit north star itself)",
@@ -60,10 +60,10 @@
       "severity": "P2"
     },
     {
-      "title": "Pipeline audit presents MongoDB TSSD vault as the canonical/working evidence store",
-      "detail": "AFI_PIPELINE_AUDIT_REPORT.md repeatedly equates the TSSD vault with MongoDB ('MongoDB TSSD vault persistence (Phase 1 complete)', 'afi-infra — TSSD vault (MongoDB)', 'Storage: MongoDB time-series collection', AFI_MONGO_URI). This is Mongo tunnel-vision: the portable spec's vault.schema.json explicitly allows PostgreSQL/TimescaleDB/InfluxDB and warns Mongo-only is wrong if it is the only layer. The doc never frames Mongo as a default reference engine.",
-      "evidence": "AFI_PIPELINE_AUDIT_REPORT.md:16,41,118 '✅ MongoDB TSSD vault persistence'; 'afi-infra — TSSD vault (MongoDB)'; 'Storage: MongoDB time-series collection' vs specs/AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md:52,57 'Mongo, PostgreSQL, TimescaleDB, InfluxDB ... Mongo-only and BQ-only are both wrong'",
-      "severity": "P2"
+      "title": "Pipeline audit correctly presents MongoDB TSSD vault as the canonical/working evidence store",
+      "detail": "AFI_PIPELINE_AUDIT_REPORT.md consistently equates the TSSD vault with MongoDB ('MongoDB TSSD vault persistence (Phase 1 complete)', 'afi-infra — TSSD vault (MongoDB)', 'Storage: MongoDB time-series collection', AFI_MONGO_URI). This matches the implemented reference store: MongoDB TSSD is the only working evidence store in the runtime repos. The portable spec's vault.schema.json keeps the engine pluggable (PostgreSQL/TimescaleDB/InfluxDB are permitted), but Mongo TSSD is the default reference engine and the docs should label it as such rather than as merely 'one of' several stores.",
+      "evidence": "AFI_PIPELINE_AUDIT_REPORT.md:16,41,118 '✅ MongoDB TSSD vault persistence'; 'afi-infra — TSSD vault (MongoDB)'; 'Storage: MongoDB time-series collection' vs specs/AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md:52,57 'Mongo, PostgreSQL, TimescaleDB, InfluxDB ... engine is pluggable; Mongo TSSD is the reference vault'",
+      "severity": "P3"
     },
     {
       "title": "AFI_Repository_Map.md uses stale/nonexistent repo names (afi-pipeline, afi-agents)",
@@ -78,9 +78,9 @@
       "severity": "P3"
     },
     {
-      "title": "Market/analytics plane (BigQuery/Kafka/warehouses/Mage) entirely absent from docs hub",
-      "detail": "Grep for bigquery|kafka|warehouse|data lake|mage|pub/sub across all docs returns zero hits outside the portable spec and investigation prompt. The portable spec names a Market/analytics plane (BigQuery, Kafka/PubSub, data lakes) as one of the five separated planes and Mage as a conforming DAG option. The architecture/status/pipeline docs describe a Mongo+reactor+BASE spine with no analytics plane, reinforcing collapse toward a single store/stack.",
-      "evidence": "grep bigquery|kafka|warehouse|mage across *.md = 0 hits outside specs/; AFI_Full_Architecture.md & AFI_PIPELINE_AUDIT_REPORT.md describe only Mongo vault + reactor DAG + BASE vs specs/AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md:54 'Market / analytics ... BigQuery, Kafka/Pub/Sub, data lakes'",
+      "title": "Analytics/warehouse integrations absent from docs hub; MongoDB TSSD is the implemented evidence store",
+      "detail": "Grep for kafka|warehouse|snowflake|datalake|data lake across all docs returns zero hits. The architecture/status/pipeline docs describe a Mongo+reactor+BASE spine: MongoDB TSSD is the implemented evidence store and afi-reactor is the reference orchestrator. No separate warehouse/analytics plane is planned for the reference implementation; the docs are internally consistent on this point.",
+      "evidence": "rg 'kafka|warehouse|snowflake|datalake' across *.md = 0 hits; AFI_Full_Architecture.md & AFI_PIPELINE_AUDIT_REPORT.md describe a Mongo TSSD vault + reactor DAG + BASE spine, consistent with the reference implementation",
       "severity": "P3"
     },
     {
@@ -102,7 +102,7 @@
     ],
     "downstream": []
   },
-  "recommended_action": "tag stale + clarify reference-vs-normative: (1) Add a banner to AFI_ORCHESTRATOR_DOCTRINE.md, ARCHITECTURE_STATUS.md, AFI_PIPELINE_AUDIT_REPORT.md, AFI_System_Atlas.md marking them as REFERENCE-implementation descriptions, not protocol law; reframe 'reactor is THE orchestrator' / 'DAG is law' / 'MongoDB TSSD vault' per the portable spec. (2) Archive or correct AFI_Repository_Map.md (stale afi-pipeline/afi-agents names). (3) Establish explicit doc hierarchy declaring specs/AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md as the top normative reference. (4) Add a Market/analytics plane note. (5) Repair the broken SUMMARY.md sitemap (references many nonexistent files).",
+  "recommended_action": "tag stale + clarify reference-vs-normative: (1) Add a banner to AFI_ORCHESTRATOR_DOCTRINE.md, ARCHITECTURE_STATUS.md, AFI_PIPELINE_AUDIT_REPORT.md, AFI_System_Atlas.md marking them as REFERENCE-implementation descriptions, not protocol law; reframe 'reactor is THE orchestrator' / 'DAG is law' per the portable spec, while keeping MongoDB TSSD documented as the reference evidence store. (2) Archive or correct AFI_Repository_Map.md (stale afi-pipeline/afi-agents names). (3) Establish explicit doc hierarchy declaring specs/AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md as the top normative reference. (4) Repair the broken SUMMARY.md sitemap (references many nonexistent files).",
   "notable_findings": [
     {
       "title": "afi-docs is the canonical home of the portable-protocol north star and the investigation charter",
@@ -114,16 +114,16 @@
     {
       "title": "AFI_ORCHESTRATOR_DOCTRINE.md (reactor-only, 'Authoritative') duplicated into docs hub",
       "severity": "P2",
-      "theme": "pipeline|DAG|froggy|orchestrator|doctrine",
+      "theme": "pipeline|DAG|orchestrator|doctrine",
       "evidence": "AFI_ORCHESTRATOR_DOCTRINE.md:3-5,11,38-40,290 'Repository: afi-reactor ... Status: Authoritative'; 'afi-reactor is the orchestrator of AFI'; 'The DAG is law'; 'This doctrine is authoritative. All afi-reactor code must comply.'",
       "recommendation": "Reframe as reference orchestration per portable spec; protocol law is conforming DAG outputs + pinned versions, not the reactor codebase."
     },
     {
-      "title": "MongoDB equated with TSSD vault across pipeline/atlas docs (Mongo tunnel vision)",
-      "severity": "P2",
+      "title": "MongoDB TSSD vault is the reference evidence store across pipeline/atlas docs",
+      "severity": "P3",
       "theme": "mongodb|MongoTSSD|vault|TSSD|VaultedSignalRecord",
       "evidence": "AFI_PIPELINE_AUDIT_REPORT.md:16,41,118,643-666,931 'MongoDB TSSD vault'; 'afi-infra/src/tssd/MongoTSSDVaultClient.ts'; AFI_System_Atlas.md:65 'Multiple Mongo/vault implementations ... needs harmonization'",
-      "recommendation": "Label Mongo as default reference vault engine; cite vault.schema.json multi-engine support (PG/Timescale/Influx)."
+      "recommendation": "Label Mongo TSSD as the default reference vault engine (afi-reactor src/services/tssdVaultService.ts -> reactor_scored_signals_v1; afi-infra src/tssd/MongoTSSDVaultClient.ts); harmonize the duplicate Mongo/vault implementations noted in AFI_System_Atlas.md."
     },
     {
       "title": "Stale repo names afi-pipeline and afi-agents documented as core repos",
@@ -133,11 +133,11 @@
       "recommendation": "Tag stale; reconcile with AFI_REPO_CENSUS.md (which lists neither) and the portable spec repo inventory."
     },
     {
-      "title": "Analytics plane (BigQuery/Kafka/Mage/warehouse) absent from all hub architecture docs",
-      "severity": "P3",
-      "theme": "BigQuery|kafka|warehouse",
-      "evidence": "grep 'bigquery|kafka|warehouse|data lake|mage|pub/sub' over *.md returns 0 hits outside specs/AFI_PROTOCOL_INVESTIGATION_PROMPT.md and AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md",
-      "recommendation": "Document the optional Market/analytics plane and its integration boundaries (one of the five separated planes)."
+      "title": "Analytics/warehouse integrations absent from all hub architecture docs; Mongo TSSD is the evidence store",
+      "severity": "Info",
+      "theme": "kafka|warehouse|snowflake",
+      "evidence": "rg 'kafka|warehouse|snowflake|datalake|data lake' over *.md returns 0 hits; hub architecture docs describe only the Mongo TSSD vault + reactor DAG + BASE spine",
+      "recommendation": "No action required: MongoDB TSSD is the implemented evidence store and no separate warehouse plane is planned for the reference implementation."
     },
     {
       "title": "On-chain layer correctly described as lightweight receipt/event (not full ledger) in AFI_Full_Architecture.md",

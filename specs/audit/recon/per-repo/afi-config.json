@@ -77,9 +77,9 @@
       "severity": "P1"
     },
     {
-      "title": "No analytics/market plane and no on-chain commitment schema in the canonical library",
-      "detail": "Vault enumerates Mongo/Postgres/Timescale/Influx (evidence plane) but the library has zero schemas for the Market/analytics plane (BigQuery/Kafka/PubSub/data lakes) and zero for the Commitment plane (mint receipts/emissions caps/epoch linkage/content hashes). grep for BigQuery|kafka|warehouse|mintForSignal|EmissionsMinted|AFISignalReceipt returns no schema hits. The five separated planes are not all represented in the source of truth, risking collapse of the layer model.",
-      "evidence": "grep BigQuery|kafka|warehouse across repo: 0 hits; grep mintForSignal|coordinateMint|EmissionsMinted: only validatorConfig coordinatorAddress + droid-index doc mentions, no schema",
+      "title": "No on-chain commitment schema in the canonical library",
+      "detail": "Vault enumerates Mongo/Postgres/Timescale/Influx as the evidence plane (MongoDB TSSD is the implemented evidence store) but the library has zero schemas for the Commitment plane (mint receipts/emissions caps/epoch linkage/content hashes). grep for kafka|warehouse|snowflake|mintForSignal|EmissionsMinted|AFISignalReceipt returns no schema hits; no separate analytics/warehouse plane is planned for the reference implementation. The commitment plane is not represented in the source of truth, risking collapse of the layer model.",
+      "evidence": "grep kafka|warehouse|snowflake across repo: 0 hits; grep mintForSignal|coordinateMint|EmissionsMinted: only validatorConfig coordinatorAddress + droid-index doc mentions, no schema",
       "severity": "P1"
     },
     {

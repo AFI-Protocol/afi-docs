@@ -93,7 +93,7 @@ Classification legend: **DELETE** (removed) · **REWRITE** (edited to scored-onl
 | `afi-reactor` canonical Froggy plugins (`froggy-enrichment-{tech-pattern,sentiment-news,adapter}.plugin.ts`, `froggy.trend_pullback_v1.plugin.ts`) | Active scoring path (comments-only cleanup above). |
 | `afi-reactor/src/config/froggyPipeline.ts` | Already canonical; REMOVED STAGES comment verified accurate; no imports of purged plugins. |
 | `afi-reactor/src/services/froggyDemoService.ts` | Already canonical; no dead imports. |
-| `afi-docs/specs/audit/**` (recon, themes, transcripts, `AFI_FROGGY_MAGE_MIGRATION_MAP.md` DROP rows, `AFI_LEGACY_PIPELINE_PURGE_PROMPT.md`) | Forensic audit corpus — left intact by design. |
+| `afi-docs/specs/audit/**` (recon, themes, transcripts, `AFI_LEGACY_PIPELINE_PURGE_PROMPT.md`) | Forensic audit corpus — left intact by design. |
 
 ## OUT OF SCOPE (observed, not changed)
 

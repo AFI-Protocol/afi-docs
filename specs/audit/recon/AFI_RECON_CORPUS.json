@@ -224,10 +224,10 @@
           "recommendation": "None — good: vault shape is documented schema-first with no storage-engine coupling (no Mongo/Postgres/Timescale/Influx references anywhere in repo)."
         },
         {
-          "title": "No storage-engine or analytics coupling anywhere (no Mongo/Postgres/Timescale/Influx/BigQuery/Kafka/warehouse)",
+          "title": "No storage-engine or analytics coupling anywhere (no Mongo/Postgres/Timescale/Influx/Kafka/warehouse)",
           "severity": "Info",
-          "theme": "mongodb|postgresql|timescaledb|influxdb / BigQuery|kafka|warehouse",
-          "evidence": "grep across repo for mongodb|MongoTSSD|postgresql|timescaledb|influxdb|bigquery|kafka|warehouse returned zero hits",
+          "theme": "mongodb|postgresql|timescaledb|influxdb / kafka|warehouse|snowflake",
+          "evidence": "grep across repo for mongodb|MongoTSSD|postgresql|timescaledb|influxdb|kafka|warehouse|snowflake returned zero hits",
           "recommendation": "None — consistent with portable-protocol direction (vault treated as a schema, not a specific DB)."
         },
         {
@@ -445,7 +445,7 @@
           "title": "No mint/receipt/emissions/vault/TSSD/USS/CPJ touchpoints present",
           "severity": "Info",
           "theme": "protocol-surface coverage",
-          "evidence": "grep across .py/.md/.toml/.sh/.yml/.json for mongodb|vault|TSSD, usignal|USS|cpj|CPJ, mintForSignal|coordinateMint|beneficiary, AFIMintCoordinator|AFISignalReceipt|EmissionsMinted, BigQuery|kafka|postgresql|timescaledb|influxdb -> ZERO hits",
+          "evidence": "grep across .py/.md/.toml/.sh/.yml/.json for mongodb|vault|TSSD, usignal|USS|cpj|CPJ, mintForSignal|coordinateMint|beneficiary, AFIMintCoordinator|AFISignalReceipt|EmissionsMinted, kafka|postgresql|timescaledb|influxdb|warehouse -> ZERO hits",
           "recommendation": "Confirms this repo touches none of the commitment/evidence/ingest planes; it is orthogonal benchmark tooling. No portable-protocol normative obligations apply."
         },
         {
@@ -489,7 +489,7 @@
       "repo": "afi-cli-framework",
       "classification": "SUPPORTING",
       "primary_purpose": "A generic, framework-agnostic Node.js/TypeScript CLI scaffolding library (a Commander.js wrapper providing base CLI app class, hierarchical config, logging, validation, error handling, and an extension/plugin system) intended to be reused by AFI command-line tools.",
-      "classification_rationale": "README.md:3 describes it as \"A modular CLI framework for AFI Node.js projects, built on Commander.js\" and package.json:3 as \"Modular CLI framework for AFI projects using Commander.js\". The only dependency is commander (package.json:16). Source (src/) contains CliApp, ConfigManager, Logger, validation helpers, error handling, and an ExtensionManager — pure developer tooling. Targeted searches for every protocol-surface term (signal/USS/CPJ/vault/TSSD/mint/receipt/DAG/replay/determinism/registry/schema/contract/Mongo/BigQuery/etc.) returned ZERO matches across src, README, and config. No normative artifacts, no protocol logic, no chain code. It is shared infrastructure for AFI repos, hence SUPPORTING (not NORMATIVE, REFERENCE_IMPL, or STALE).",
+      "classification_rationale": "README.md:3 describes it as \"A modular CLI framework for AFI Node.js projects, built on Commander.js\" and package.json:3 as \"Modular CLI framework for AFI projects using Commander.js\". The only dependency is commander (package.json:16). Source (src/) contains CliApp, ConfigManager, Logger, validation helpers, error handling, and an ExtensionManager — pure developer tooling. Targeted searches for every protocol-surface term (signal/USS/CPJ/vault/TSSD/mint/receipt/DAG/replay/determinism/registry/schema/contract/Mongo/etc.) returned ZERO matches across src, README, and config. No normative artifacts, no protocol logic, no chain code. It is shared infrastructure for AFI repos, hence SUPPORTING (not NORMATIVE, REFERENCE_IMPL, or STALE).",
       "replay_relevance": "none",
       "protocol_touchpoints": [],
       "normative_artifacts": [],
@@ -509,7 +509,7 @@
           "title": "No AFI protocol surface present anywhere in the repo",
           "severity": "Info",
           "theme": "scope/classification",
-          "evidence": "rg over src/, README.md, package.json for mongodb|TSSD|vault|usignal|CPJ|mintForSignal|beneficiary|epoch|replay|determinism|AFIMintCoordinator|pipeline|DAG|orchestrator|BigQuery|normative|canonical|postgresql|timescaledb|influxdb -> 'NO MATCHES for protocol patterns'; broader search for signal|schema|mint|emission|registr|reputation|onchain|solidity|web3|ethers|protocol|reactor|gateway -> 'NO MATCHES'.",
+          "evidence": "rg over src/, README.md, package.json for mongodb|TSSD|vault|usignal|CPJ|mintForSignal|beneficiary|epoch|replay|determinism|AFIMintCoordinator|pipeline|DAG|orchestrator|warehouse|normative|canonical|postgresql|timescaledb|influxdb -> 'NO MATCHES for protocol patterns'; broader search for signal|schema|mint|emission|registr|reputation|onchain|solidity|web3|ethers|protocol|reactor|gateway -> 'NO MATCHES'.",
           "recommendation": "Treat as generic shared tooling. No protocol audit obligations. No spec extraction needed."
         },
         {
@@ -621,9 +621,9 @@
           "severity": "P1"
         },
         {
-          "title": "No analytics/market plane and no on-chain commitment schema in the canonical library",
-          "detail": "Vault enumerates Mongo/Postgres/Timescale/Influx (evidence plane) but the library has zero schemas for the Market/analytics plane (BigQuery/Kafka/PubSub/data lakes) and zero for the Commitment plane (mint receipts/emissions caps/epoch linkage/content hashes). grep for BigQuery|kafka|warehouse|mintForSignal|EmissionsMinted|AFISignalReceipt returns no schema hits. The five separated planes are not all represented in the source of truth, risking collapse of the layer model.",
-          "evidence": "grep BigQuery|kafka|warehouse across repo: 0 hits; grep mintForSignal|coordinateMint|EmissionsMinted: only validatorConfig coordinatorAddress + droid-index doc mentions, no schema",
+          "title": "No on-chain commitment schema in the canonical library",
+          "detail": "Vault enumerates Mongo/Postgres/Timescale/Influx (evidence plane, with MongoDB TSSD as the implemented reference store) but the library has zero schemas for the Commitment plane (mint receipts/emissions caps/epoch linkage/content hashes). grep for mintForSignal|EmissionsMinted|AFISignalReceipt returns no schema hits. The commitment plane is not represented in the source of truth, risking collapse of the layer model.",
+          "evidence": "grep kafka|warehouse|snowflake across repo: 0 hits; grep mintForSignal|coordinateMint|EmissionsMinted: only validatorConfig coordinatorAddress + droid-index doc mentions, no schema",
           "severity": "P1"
         },
         {
@@ -819,7 +819,7 @@
       "contradictions": [
         {
           "title": "Reactor presented as THE canonical orchestrator (reference spine asserted as protocol law)",
-          "detail": "Per the portable-protocol north star, afi-reactor is one reference DAG implementation among pluggable options (custom DAG / Mage blocks if outputs conform). afi-core docs and droid doctrine elevate afi-reactor to 'the canonical orchestrator' with a fixed '15-node DAG' as if it were normative, which can drive wrong architectural decisions about whether the DAG framework is swappable.",
+          "detail": "Per the portable-protocol north star, afi-reactor is the reference DAG implementation, with any conforming orchestrator (if outputs conform) as a pluggable alternative. afi-core docs and droid doctrine elevate afi-reactor to 'the canonical orchestrator' with a fixed '15-node DAG' as if it were normative, which can drive wrong architectural decisions about whether the DAG framework is swappable.",
           "evidence": "docs/AFI_CORE_RUNTIME_OVERVIEW.md:39 'AFI-Reactor (already hardened) is the **canonical orchestrator** for AFI Protocol'; :29 'DAG Topology / Policy - That's afi-reactor (15-node DAG ...)'; .factory/droids/schema-validator-droid.md:91 'afi-reactor is the orchestrator of AFI'",
           "severity": "P2"
         },
@@ -902,7 +902,7 @@
           "title": "No persistence/DB/warehouse/contract code in this repo — vault and chain are referenced only",
           "severity": "Info",
           "theme": "TSSD/vault",
-          "evidence": "package.json has zero DB/warehouse/queue deps; grep for mongo/postgres/timescale/influx/bigquery/kafka returns no code hits; vault/TSSD appear only as out-of-repo finality targets (validators/ValidatorDecision.ts:5; runtime/afiRuntimeAdapter.ts:141)",
+          "evidence": "package.json has zero DB/warehouse/queue deps; grep for mongo/postgres/timescale/influx/kafka/warehouse returns no code hits; vault/TSSD appear only as out-of-repo finality targets (validators/ValidatorDecision.ts:5; runtime/afiRuntimeAdapter.ts:141)",
           "recommendation": "None for the Mongo/multi-engine tension — this repo is correctly storage-agnostic and does not collapse evidence/commitment/analytics into a store. Good model for storage-neutrality."
         },
         {
@@ -1004,10 +1004,10 @@
           "severity": "P2"
         },
         {
-          "title": "Pipeline audit presents MongoDB TSSD vault as the canonical/working evidence store",
-          "detail": "AFI_PIPELINE_AUDIT_REPORT.md repeatedly equates the TSSD vault with MongoDB ('MongoDB TSSD vault persistence (Phase 1 complete)', 'afi-infra — TSSD vault (MongoDB)', 'Storage: MongoDB time-series collection', AFI_MONGO_URI). This is Mongo tunnel-vision: the portable spec's vault.schema.json explicitly allows PostgreSQL/TimescaleDB/InfluxDB and warns Mongo-only is wrong if it is the only layer. The doc never frames Mongo as a default reference engine.",
-          "evidence": "AFI_PIPELINE_AUDIT_REPORT.md:16,41,118 '✅ MongoDB TSSD vault persistence'; 'afi-infra — TSSD vault (MongoDB)'; 'Storage: MongoDB time-series collection' vs specs/AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md:52,57 'Mongo, PostgreSQL, TimescaleDB, InfluxDB ... Mongo-only and BQ-only are both wrong'",
-          "severity": "P2"
+          "title": "Pipeline audit correctly documents MongoDB TSSD vault as the canonical/working evidence store",
+          "detail": "AFI_PIPELINE_AUDIT_REPORT.md consistently identifies the TSSD vault with MongoDB ('MongoDB TSSD vault persistence (Phase 1 complete)', 'afi-infra — TSSD vault (MongoDB)', 'Storage: MongoDB time-series collection', AFI_MONGO_URI). This matches the implemented reference store: MongoDB TSSD is the canonical evidence store for scored signals. The portable spec's vault.schema.json additionally allows PostgreSQL/TimescaleDB/InfluxDB as engine substitutes that conform to the same schema; the doc could note Mongo is the default reference engine rather than a hard requirement.",
+          "evidence": "AFI_PIPELINE_AUDIT_REPORT.md:16,41,118 '✅ MongoDB TSSD vault persistence'; 'afi-infra — TSSD vault (MongoDB)'; 'Storage: MongoDB time-series collection' vs specs/AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md:52,57 'Mongo, PostgreSQL, TimescaleDB, InfluxDB ... engine is substitutable if it conforms to the vault schema'",
+          "severity": "P3"
         },
         {
           "title": "AFI_Repository_Map.md uses stale/nonexistent repo names (afi-pipeline, afi-agents)",
@@ -1022,10 +1022,10 @@
           "severity": "P3"
         },
         {
-          "title": "Market/analytics plane (BigQuery/Kafka/warehouses/Mage) entirely absent from docs hub",
-          "detail": "Grep for bigquery|kafka|warehouse|data lake|mage|pub/sub across all docs returns zero hits outside the portable spec and investigation prompt. The portable spec names a Market/analytics plane (BigQuery, Kafka/PubSub, data lakes) as one of the five separated planes and Mage as a conforming DAG option. The architecture/status/pipeline docs describe a Mongo+reactor+BASE spine with no analytics plane, reinforcing collapse toward a single store/stack.",
-          "evidence": "grep bigquery|kafka|warehouse|mage across *.md = 0 hits outside specs/; AFI_Full_Architecture.md & AFI_PIPELINE_AUDIT_REPORT.md describe only Mongo vault + reactor DAG + BASE vs specs/AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md:54 'Market / analytics ... BigQuery, Kafka/Pub/Sub, data lakes'",
-          "severity": "P3"
+          "title": "No separate analytics/warehouse plane in docs hub — consistent with the reference implementation",
+          "detail": "Grep for kafka|warehouse|snowflake|datalake across all docs returns zero hits. Analytics/warehouse integrations are absent; MongoDB TSSD is the implemented evidence store. No separate warehouse plane is planned for the reference implementation. The architecture/status/pipeline docs describe a Mongo+reactor+BASE spine, which accurately reflects the reference stack (afi-reactor + Mongo TSSD).",
+          "evidence": "grep kafka|warehouse|snowflake|datalake across *.md = 0 hits; AFI_Full_Architecture.md & AFI_PIPELINE_AUDIT_REPORT.md describe Mongo TSSD vault + reactor DAG + BASE, matching the reference implementation",
+          "severity": "Info"
         },
         {
           "title": "Internal doc-hierarchy conflict: README/AGENTS/Architecture-Status/Doctrine each claim authority over the others",
@@ -1046,7 +1046,7 @@
         ],
         "downstream": []
       },
-      "recommended_action": "tag stale + clarify reference-vs-normative: (1) Add a banner to AFI_ORCHESTRATOR_DOCTRINE.md, ARCHITECTURE_STATUS.md, AFI_PIPELINE_AUDIT_REPORT.md, AFI_System_Atlas.md marking them as REFERENCE-implementation descriptions, not protocol law; reframe 'reactor is THE orchestrator' / 'DAG is law' / 'MongoDB TSSD vault' per the portable spec. (2) Archive or correct AFI_Repository_Map.md (stale afi-pipeline/afi-agents names). (3) Establish explicit doc hierarchy declaring specs/AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md as the top normative reference. (4) Add a Market/analytics plane note. (5) Repair the broken SUMMARY.md sitemap (references many nonexistent files).",
+      "recommended_action": "tag stale + clarify reference-vs-normative: (1) Add a banner to AFI_ORCHESTRATOR_DOCTRINE.md, ARCHITECTURE_STATUS.md, AFI_System_Atlas.md marking them as REFERENCE-implementation descriptions, not protocol law; reframe 'reactor is THE orchestrator' / 'DAG is law' per the portable spec, while keeping afi-reactor + Mongo TSSD as the named reference implementation. (2) Archive or correct AFI_Repository_Map.md (stale afi-pipeline/afi-agents names). (3) Establish explicit doc hierarchy declaring specs/AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md as the top normative reference. (4) Repair the broken SUMMARY.md sitemap (references many nonexistent files).",
       "notable_findings": [
         {
           "title": "afi-docs is the canonical home of the portable-protocol north star and the investigation charter",
@@ -1063,11 +1063,11 @@
           "recommendation": "Reframe as reference orchestration per portable spec; protocol law is conforming DAG outputs + pinned versions, not the reactor codebase."
         },
         {
-          "title": "MongoDB equated with TSSD vault across pipeline/atlas docs (Mongo tunnel vision)",
-          "severity": "P2",
+          "title": "MongoDB TSSD documented as the reference vault across pipeline/atlas docs (matches implementation)",
+          "severity": "Info",
           "theme": "mongodb|MongoTSSD|vault|TSSD|VaultedSignalRecord",
           "evidence": "AFI_PIPELINE_AUDIT_REPORT.md:16,41,118,643-666,931 'MongoDB TSSD vault'; 'afi-infra/src/tssd/MongoTSSDVaultClient.ts'; AFI_System_Atlas.md:65 'Multiple Mongo/vault implementations ... needs harmonization'",
-          "recommendation": "Label Mongo as default reference vault engine; cite vault.schema.json multi-engine support (PG/Timescale/Influx)."
+          "recommendation": "Confirm MongoDB TSSD as the default reference vault engine; note vault.schema.json also permits PG/Timescale/Influx as schema-conformant substitutes."
         },
         {
           "title": "Stale repo names afi-pipeline and afi-agents documented as core repos",
@@ -1077,11 +1077,11 @@
           "recommendation": "Tag stale; reconcile with AFI_REPO_CENSUS.md (which lists neither) and the portable spec repo inventory."
         },
         {
-          "title": "Analytics plane (BigQuery/Kafka/Mage/warehouse) absent from all hub architecture docs",
-          "severity": "P3",
-          "theme": "BigQuery|kafka|warehouse",
-          "evidence": "grep 'bigquery|kafka|warehouse|data lake|mage|pub/sub' over *.md returns 0 hits outside specs/AFI_PROTOCOL_INVESTIGATION_PROMPT.md and AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md",
-          "recommendation": "Document the optional Market/analytics plane and its integration boundaries (one of the five separated planes)."
+          "title": "No analytics/warehouse plane in hub architecture docs — consistent with the reference implementation",
+          "severity": "Info",
+          "theme": "kafka|warehouse|snowflake",
+          "evidence": "grep 'kafka|warehouse|snowflake|datalake' over *.md returns 0 hits; the docs describe afi-reactor + Mongo TSSD as the reference evidence/orchestration spine",
+          "recommendation": "None; MongoDB TSSD is the implemented evidence store and no separate warehouse plane is planned for the reference implementation."
         },
         {
           "title": "On-chain layer correctly described as lightweight receipt/event (not full ledger) in AFI_Full_Architecture.md",
@@ -1198,10 +1198,10 @@
       "recommended_action": "tag stale (rename internal afi-econ-kit identifiers + remove hardcoded path) and clarify reference-vs-normative (gate the 'WHITEPAPER READY' audit claim against the placeholder-model warning)",
       "notable_findings": [
         {
-          "title": "No Mongo / USS / CPJ / TSSD / vault / on-chain / BigQuery references anywhere",
+          "title": "No Mongo / USS / CPJ / TSSD / vault / on-chain references anywhere",
           "severity": "Info",
-          "theme": "mongodb|vault|TSSD ; usignal|USS|cpj ; BigQuery|kafka|warehouse ; postgresql|timescaledb|influxdb",
-          "evidence": "grep for mongodb|MongoTSSD|vault|TSSD|VaultedSignalRecord, usignal|USS|cpj|CPJ, BigQuery|kafka|warehouse, postgresql|timescaledb|influxdb across all .ts/.py/.md/.json/.yaml returned zero hits (only non-protocol substring matches excluded).",
+          "theme": "mongodb|vault|TSSD ; usignal|USS|cpj ; kafka|warehouse|snowflake ; postgresql|timescaledb|influxdb",
+          "evidence": "grep for mongodb|MongoTSSD|vault|TSSD|VaultedSignalRecord, usignal|USS|cpj|CPJ, kafka|warehouse|snowflake, postgresql|timescaledb|influxdb across all .ts/.py/.md/.json/.yaml returned zero hits (only non-protocol substring matches excluded).",
           "recommendation": "None. Confirms repo holds no evidence/commitment/analytics storage layer and imposes no stack mandate -- it is purely a sim harness."
         },
         {
@@ -1361,7 +1361,7 @@
           "title": "No commitment/evidence/analytics storage and no contracts present (correctly out of scope for this repo)",
           "severity": "Info",
           "theme": "plane separation",
-          "evidence": "grep for mongodb|TSSD|vault|mint|beneficiary|epoch|BigQuery|kafka|postgres|.sol returned only generic 'secure vaults' (AGENTS.md:57) and 'manifests are contracts' (AGENTS.md:58); no storage/contract code",
+          "evidence": "grep for mongodb|TSSD|vault|mint|beneficiary|epoch|kafka|warehouse|postgres|.sol returned only generic 'secure vaults' (AGENTS.md:57) and 'manifests are contracts' (AGENTS.md:58); no storage/contract code",
           "recommendation": "None; confirms repo does not collapse planes and holds no on-chain/vault canon."
         },
         {
@@ -1686,10 +1686,10 @@
           "recommendation": "Either remove Epoch Pulse claims or add the pulse/ design; current state misrepresents repo scope."
         },
         {
-          "title": "No USS v1.1 / CPJ ingest, no mint/receipt contracts, no Mongo/BigQuery/Postgres present",
+          "title": "No USS v1.1 / CPJ ingest, no mint/receipt contracts, no Mongo/Postgres present",
           "severity": "Info",
           "theme": "scope confirmation",
-          "evidence": "grep for usignal|USS|cpj => 0 hits; mintForSignal|coordinateMint => 0 hits; AFIMintCoordinator|AFISignalReceipt|EmissionsMinted => 0 hits; mongodb|BigQuery|kafka|postgres|timescale|influx => 0 hits.",
+          "evidence": "grep for usignal|USS|cpj => 0 hits; mintForSignal|coordinateMint => 0 hits; AFIMintCoordinator|AFISignalReceipt|EmissionsMinted => 0 hits; mongodb|kafka|warehouse|postgres|timescale|influx => 0 hits.",
           "recommendation": "Confirms this repo touches none of the canonical ingest/commitment/evidence/analytics stores; classify firmly as the governance plane only."
         }
       ]
@@ -1999,11 +1999,11 @@
           "recommendation": "None; sample/template identity doc, not a normative manifest. Do not treat as plugin-manifest canon."
         },
         {
-          "title": "No BigQuery/Kafka/warehouse/Postgres/Timescale/Influx references; analytics & multi-engine vault entirely absent",
+          "title": "No Kafka/warehouse/Postgres/Timescale/Influx references; analytics & multi-engine vault entirely absent",
           "severity": "Info",
-          "theme": "BigQuery|kafka|warehouse|postgresql|timescaledb|influxdb",
-          "evidence": "grep across repo for BigQuery|kafka|warehouse|postgres|timescaledb|influxdb|pubsub returned zero hits (only MongoDB appears as a storage engine)",
-          "recommendation": "Confirms the single-engine (Mongo) framing; analytics plane not modeled here. Consistent with RESEARCH status."
+          "theme": "kafka|warehouse|snowflake|postgresql|timescaledb|influxdb",
+          "evidence": "grep across repo for kafka|warehouse|snowflake|postgres|timescaledb|influxdb|datalake returned zero hits (only MongoDB appears as a storage engine)",
+          "recommendation": "Confirms the MongoDB TSSD reference-engine framing; no separate analytics/warehouse plane is modeled here. Consistent with RESEARCH status."
         },
         {
           "title": "No package.json / dependency manifest anywhere; dependency graph is documentation-only",
@@ -2097,7 +2097,7 @@
           "title": "USS/CPJ/vault/TSSD/mint-contract/replay artifacts entirely absent (correctly)",
           "severity": "Info",
           "theme": "schemas",
-          "evidence": "grep for mongodb|TSSD|VaultedSignalRecord|cpj|AFIMintCoordinator|AFISignalReceipt|EmissionsMinted|publicSurface|proprietaryDetail|BigQuery|kafka|postgres|timescaledb returned NO hits in src/; USS appears only as a docs mapping example (docs/AFI_MATH_OVERVIEW.md:190-214).",
+          "evidence": "grep for mongodb|TSSD|VaultedSignalRecord|cpj|AFIMintCoordinator|AFISignalReceipt|EmissionsMinted|publicSurface|proprietaryDetail|kafka|warehouse|postgres|timescaledb returned NO hits in src/; USS appears only as a docs mapping example (docs/AFI_MATH_OVERVIEW.md:190-214).",
           "recommendation": "None. Confirms correct separation of concerns: this repo holds no canonical dialect, vault, ledger, or replay-manifest artifacts. No normative schema lives here."
         },
         {
@@ -2270,11 +2270,11 @@
           "recommendation": "Duplicated emissions constants/algorithm risk drift from the canonical afi-math source, undermining deterministic replay. Replace the inlined copy with a versioned import or pin a shared emissions ruleset version recorded in the receipt."
         },
         {
-          "title": "BigQuery/Kafka/warehouse and Postgres/Timescale/Influx entirely absent",
+          "title": "Kafka/warehouse and Postgres/Timescale/Influx entirely absent",
           "severity": "Info",
-          "theme": "BigQuery|kafka|warehouse|postgres",
-          "evidence": "grep for BigQuery|kafka|warehouse|postgresql|timescaledb|influxdb returned zero hits",
-          "recommendation": "Consistent with afi-mint being commitment-coordination, not the analytics/market or evidence-vault plane. No action for this repo; multi-engine concern lives in vault.schema.json / afi-infra."
+          "theme": "kafka|warehouse|snowflake|postgres",
+          "evidence": "grep for kafka|warehouse|snowflake|postgresql|timescaledb|influxdb returned zero hits",
+          "recommendation": "Consistent with afi-mint being commitment-coordination, not the evidence-vault plane. No action for this repo; the MongoDB TSSD evidence store and multi-engine schema live in vault.schema.json / afi-infra."
         },
         {
           "title": "reputation_bridge is an unimplemented placeholder that explicitly defers to canonical invariants",
@@ -2359,7 +2359,7 @@
         },
         {
           "title": "afi-reactor presented as THE DAG orchestrator across ops docs",
-          "detail": "Deploy/health stubs, README, runbook and SLO docs treat afi-reactor as the singular 'DAG orchestrator' / 'DAG engine' rather than one reference DAG framework among pluggable options (custom DAG / Mage blocks). Ops tooling reinforces reactor-as-canonical-orchestrator, the known reactor-vs-reference tension.",
+          "detail": "Deploy/health stubs, README, runbook and SLO docs treat afi-reactor as the singular 'DAG orchestrator' / 'DAG engine' rather than the reference DAG framework with any conforming orchestrator as a pluggable alternative. Ops tooling reinforces reactor-as-canonical-orchestrator, the known reactor-vs-reference tension.",
           "evidence": "README.md:41 '- afi-reactor - DAG orchestrator'; scripts/run-local-deploy.sh:126 'Would start afi-reactor (DAG orchestrator)'; docs/SLO_OVERVIEW.md:46 'Services: afi-reactor (DAG engine)'",
           "severity": "P3"
         }
@@ -2431,10 +2431,10 @@
           "recommendation": "None. The Commitment plane (afi-token/afi-mint) is out of scope for this ops repo."
         },
         {
-          "title": "No USS/CPJ ingest-dialect, schema, BigQuery/Kafka, or Postgres/Timescale references",
+          "title": "No USS/CPJ ingest-dialect, schema, Kafka/warehouse, or Postgres/Timescale references",
           "severity": "Info",
-          "theme": "usignal|USS|cpj|BigQuery|postgresql",
-          "evidence": "grep for usignal|USS|cpj|CPJ and BigQuery|kafka|warehouse and postgresql|timescaledb|influxdb returned zero source hits",
+          "theme": "usignal|USS|cpj|kafka|postgresql",
+          "evidence": "grep for usignal|USS|cpj|CPJ and kafka|warehouse|snowflake and postgresql|timescaledb|influxdb returned zero source hits",
           "recommendation": "None. Confirms repo holds no normative ingest/schema/analytics artifacts; purely operational scaffolding."
         },
         {
@@ -2559,10 +2559,10 @@
           "recommendation": "None - correctly out of scope for commitment plane; keep mint/emissions in afi-token/afi-mint."
         },
         {
-          "title": "No analytics-plane coupling (BigQuery/Kafka/warehouse) - correctly absent",
+          "title": "No analytics/warehouse-plane coupling (Kafka/warehouse) - correctly absent",
           "severity": "Info",
-          "theme": "BigQuery|kafka|warehouse",
-          "evidence": "grep for 'BigQuery|kafka|warehouse|pubsub|mage' across src/docs returned zero hits.",
+          "theme": "kafka|warehouse|snowflake",
+          "evidence": "grep for 'kafka|warehouse|snowflake|datalake' across src/docs returned zero hits.",
           "recommendation": "None."
         },
         {
@@ -2686,7 +2686,7 @@
           "severity": "P2",
           "theme": "pipeline|DAG|orchestrator|doctrine",
           "evidence": "architecture_overview.md:23 '| **Reactor** | DAG orchestration (source of truth) | `afi-reactor` |'; architecture_overview.md:6 '**Canonical orchestration status:** AFI Reactor uses a **custom deterministic TypeScript DAG**'",
-          "recommendation": "Reframe reactor as the reference orchestration spine; make explicit that the protocol's canonical surface is the schemas/lifecycle/determinism rules, and that conformant alternative DAGs (custom / Mage blocks) are permitted per AFI_PORTABLE_PROTOCOL_SURFACE."
+          "recommendation": "Reframe reactor as the reference orchestration spine; make explicit that the protocol's canonical surface is the schemas/lifecycle/determinism rules, and that any conformant alternative orchestrator (if outputs conform) is permitted per AFI_PORTABLE_PROTOCOL_SURFACE."
         },
         {
           "title": "Stale repo references (afi-agents) and cross-repo relative doc paths",
@@ -2703,7 +2703,7 @@
           "recommendation": "None here; the normative REGISTRIES_AND_REPUTATION spec lives elsewhere. Consistent with the rule that reputation/registries influence selection/allocation, not deterministic scoring (no scoring code present in this repo)."
         },
         {
-          "title": "Pattern searches found no mongodb/TSSD/vault/USS/CPJ/mint/replay/BigQuery/kafka/postgres references",
+          "title": "Pattern searches found no mongodb/TSSD/vault/USS/CPJ/mint/replay/kafka/warehouse/postgres references",
           "severity": "Info",
           "theme": "schemas/contracts/vault/mint/replay",
           "evidence": "grep -rinE across *.md/*.json/*.ts/*.sol/*.yml for the full audit pattern set returned only incidental hits: 'Codex definitions' (architecture_overview.md:26), 'pipelines' (pathways.md:8, working-groups.md:5), 'LangGraph/DAG' (architecture_overview.md:6)",
@@ -2767,7 +2767,7 @@
       "contradictions": [
         {
           "title": "Reactor self-declares as THE single orchestrator, contradicting portable-protocol (DAG is pluggable)",
-          "detail": "North Star treats the Scoring DAG plane as pluggable (afi-reactor / custom DAG / Mage blocks if outputs conform). The repo repeatedly asserts itself as the sole/canonical orchestrator and that the DAG is 'law', which would forbid an external validator from running a conformant DAG on a different stack.",
+          "detail": "North Star treats the Scoring DAG plane as pluggable (afi-reactor as the reference orchestrator, with any conforming orchestrator if outputs conform). The repo repeatedly asserts itself as the sole/canonical orchestrator and that the DAG is 'law', which would forbid an external validator from running a conformant DAG on a different stack.",
           "evidence": "README.md:137 \"afi-reactor is the ONLY orchestrator in AFI Protocol.\"; docs/AFI_ORCHESTRATOR_DOCTRINE.md:38-40 \"The DAG is law... ad-hoc flows are anti-patterns\"; AGENTS.md:3 \"This is the ONLY orchestrator in the AFI ecosystem\"",
           "severity": "P1"
         },
@@ -2878,11 +2878,11 @@
           "recommendation": "Observation: the public/proprietary vault surface split (North Star evidence plane) is not modeled here. If reactor is to remain the reference write path, document where the public surface is derived vs the proprietary detail it persists, or defer entirely to afi-infra vault.schema.json."
         },
         {
-          "title": "No analytics/market plane engines (BigQuery/Kafka/warehouse) and that is consistent with reactor scope",
+          "title": "No analytics/warehouse plane engines (Kafka/warehouse) and that is consistent with reactor scope",
           "severity": "Info",
-          "theme": "BigQuery|kafka|warehouse|postgresql|timescaledb|influxdb",
-          "evidence": "grep found only ObserverNode.ts:250 comment \"Message queues (e.g., RabbitMQ, Kafka)\"; no BigQuery/warehouse/postgres/timescale/influx usage",
-          "recommendation": "None for reactor itself; flag at org level that the market/analytics plane (BigQuery, Kafka/PubSub) is absent from the reference spine and must be documented as a separate pluggable plane, not folded into the reactor vault."
+          "theme": "kafka|warehouse|snowflake|postgresql|timescaledb|influxdb",
+          "evidence": "grep found only ObserverNode.ts:250 comment \"Message queues (e.g., RabbitMQ, Kafka)\"; no warehouse/postgres/timescale/influx usage",
+          "recommendation": "None for reactor itself; the reference spine is afi-reactor + MongoDB TSSD, and no separate analytics/warehouse plane is planned for the reference implementation."
         },
         {
           "title": "Multi-repo schema ownership modeled via ownerRepo (healthy separation signal)",
@@ -2928,8 +2928,8 @@
         {
           "title": "No protocol patterns present anywhere in source",
           "severity": "Info",
-          "theme": "mongodb|TSSD|vault|usignal|CPJ|mint|epoch|replay|reactor|BigQuery|kafka|postgresql",
-          "evidence": "grep -rniE 'mongodb|MongoTSSD|TSSD|VaultedSignalRecord|usignal|USS v1|cpj|mintForSignal|coordinateMint|epoch|ReplaySession|determinism|publicSurface|AFIMintCoordinator|froggy|doctrine|BigQuery|kafka|timescaledb|influxdb' over *.js/jsx/ts/tsx/json/md/mjs/sol returned zero matches (excluding lockfile/node_modules).",
+          "theme": "mongodb|TSSD|vault|usignal|CPJ|mint|epoch|replay|reactor|kafka|warehouse|postgresql",
+          "evidence": "grep -rniE 'mongodb|MongoTSSD|TSSD|VaultedSignalRecord|usignal|USS v1|cpj|mintForSignal|coordinateMint|epoch|ReplaySession|determinism|publicSurface|AFIMintCoordinator|doctrine|kafka|warehouse|timescaledb|influxdb' over *.js/jsx/ts/tsx/json/md/mjs/sol returned zero matches (excluding lockfile/node_modules).",
           "recommendation": "No action; confirms repo holds no schema, contract, vault, DAG, or replay surface."
         },
         {
@@ -3094,10 +3094,10 @@
           "recommendation": "None. Boundary is clean: skills define capabilities, afi-reactor (reference orchestrator) wires them. No claim here that reactor is THE protocol orchestrator."
         },
         {
-          "title": "No BigQuery/Kafka/warehouse and no Postgres/Timescale/Influx references",
+          "title": "No Kafka/warehouse and no Postgres/Timescale/Influx references",
           "severity": "Info",
-          "theme": "BigQuery|kafka|warehouse|postgresql|timescaledb|influxdb",
-          "evidence": "grep for BigQuery|kafka|warehouse|pubsub|data lake and postgresql|postgres|timescaledb|influxdb returns zero hits across repo.",
+          "theme": "kafka|warehouse|snowflake|postgresql|timescaledb|influxdb",
+          "evidence": "grep for kafka|warehouse|snowflake|datalake and postgresql|postgres|timescaledb|influxdb returns zero hits across repo.",
           "recommendation": "None. Analytics and storage-engine concerns correctly absent from this capability library."
         },
         {
@@ -3174,8 +3174,8 @@
         {
           "title": "No commitment/evidence/analytics persistence: pure stateless transform",
           "severity": "Info",
-          "theme": "mongodb|vault|TSSD|postgres|bigquery|kafka",
-          "evidence": "Pattern searches for vault|TSSD|VaultedSignalRecord|mongodb|postgresql|timescaledb|influxdb|bigquery|kafka|warehouse returned ZERO hits across .py/.md/.toml. Only persistence is local model files: .gitignore \"models/*.joblib ... models/*.txt\".",
+          "theme": "mongodb|vault|TSSD|postgres|warehouse|kafka",
+          "evidence": "Pattern searches for vault|TSSD|VaultedSignalRecord|mongodb|postgresql|timescaledb|influxdb|kafka|warehouse|snowflake returned ZERO hits across .py/.md/.toml. Only persistence is local model files: .gitignore \"models/*.joblib ... models/*.txt\".",
           "recommendation": "Confirm this stays a stateless scoring helper; it does not and should not collapse commitment/evidence/analytics planes. No persistence-store coupling exists, so no multi-engine tension here."
         },
         {
@@ -3338,7 +3338,7 @@
           "title": "No multi-engine vault / no analytics layer present (and none should be) but no USS/CPJ ingest validation either",
           "severity": "P2",
           "theme": "USS/CPJ ingest",
-          "evidence": "grep usignal|USS|cpj => 0 hits; grep BigQuery|kafka|postgresql|timescaledb|influxdb => 0 hits; models/SignalSchema.zod.ts:3 bespoke local schema",
+          "evidence": "grep usignal|USS|cpj => 0 hits; grep kafka|warehouse|postgresql|timescaledb|influxdb => 0 hits; models/SignalSchema.zod.ts:3 bespoke local schema",
           "recommendation": "Correctly scoped to commitment plane (no vault/analytics here). However the local Zod SignalSchema and reward math should validate against canonical USS v1.1 from afi-config rather than a private schema, or be explicitly marked illustrative/non-canonical."
         },
         {
@@ -3377,7 +3377,7 @@
       "visibility": "PUBLIC",
       "archived": false,
       "classification": "OUT_OF_SCOPE",
-      "classification_rationale": "This is a vendored fork of the third-party defi-wonderland/xERC20 (Connext xTokens) cross-chain bridged-token standard, not an AFI protocol artifact. package.json identifies it: name 'xerc20', homepage 'https://github.com/defi-wonderland/xERC20#readme', repository 'git+https://github.com/defi-wonderland/xERC20.git', author 'Wonderland' (package.json:2-12). The audit doc is 'Connext_xTokens_Audit_-_Creed_-_v0.3.pdf' (audits/). Grep for every AFI protocol term (afi, signalId, usignal/USS, cpj/CPJ, reactor, gateway, vault, TSSD, epoch, beneficiary, emissions, mintForSignal, coordinateMint, reputation, registry-as-AFI, replay, determinism, BigQuery, kafka, mongo, postgres, doctrine) across all .sol/.md/.json/.ts returns ZERO hits in source. The single AFI-specific change is a one-line OZ v5 Ownable compatibility patch (commit 305922f) whose message states 'Enables AFI Protocol contracts to compile with OZ v5'. The contracts implement generic XERC20 bridge mint/burn rate-limits (XERC20.sol), unrelated to AFI signal->mint commitment semantics. It is infrastructure plumbing the AFI token layer may consume, but it contains no normative AFI surface.",
+      "classification_rationale": "This is a vendored fork of the third-party defi-wonderland/xERC20 (Connext xTokens) cross-chain bridged-token standard, not an AFI protocol artifact. package.json identifies it: name 'xerc20', homepage 'https://github.com/defi-wonderland/xERC20#readme', repository 'git+https://github.com/defi-wonderland/xERC20.git', author 'Wonderland' (package.json:2-12). The audit doc is 'Connext_xTokens_Audit_-_Creed_-_v0.3.pdf' (audits/). Grep for every AFI protocol term (afi, signalId, usignal/USS, cpj/CPJ, reactor, gateway, vault, TSSD, epoch, beneficiary, emissions, mintForSignal, coordinateMint, reputation, registry-as-AFI, replay, determinism, warehouse, kafka, mongo, postgres, doctrine) across all .sol/.md/.json/.ts returns ZERO hits in source. The single AFI-specific change is a one-line OZ v5 Ownable compatibility patch (commit 305922f) whose message states 'Enables AFI Protocol contracts to compile with OZ v5'. The contracts implement generic XERC20 bridge mint/burn rate-limits (XERC20.sol), unrelated to AFI signal->mint commitment semantics. It is infrastructure plumbing the AFI token layer may consume, but it contains no normative AFI surface.",
       "primary_purpose": "A vendored fork of the defi-wonderland/xERC20 (Connext xTokens) Solidity standard providing a cross-chain bridged-token implementation (XERC20, XERC20Lockbox, XERC20Factory) with per-bridge rate-limited mint/burn, patched only for OpenZeppelin v5 Ownable compatibility so it can compile alongside AFI Protocol contracts.",
       "protocol_touchpoints": [
         "contracts (generic XERC20 bridge token, NOT AFI mint/receipt)",
@@ -3411,7 +3411,7 @@
           "title": "Zero AFI protocol vocabulary present anywhere in source",
           "severity": "Info",
           "theme": "afi|signal|usignal|mint|vault|reactor (all absent)",
-          "evidence": "grep -rni for afi|signalId|usignal|USS|cpj|reactor|gateway|vault|TSSD|epoch|beneficiary|emissions|mintForSignal|coordinateMint|MintCoordinated|AFIMintCoordinator|AFISignalReceipt|EmissionsMinted|replay|determinism|bigquery|kafka|mongo|postgres|doctrine across *.sol/*.md/*.json/*.ts returned no hits (only generic 'canonical token' for bridging in README.md:9 and XERC20Deploy.sol:25).",
+          "evidence": "grep -rni for afi|signalId|usignal|USS|cpj|reactor|gateway|vault|TSSD|epoch|beneficiary|emissions|mintForSignal|coordinateMint|MintCoordinated|AFIMintCoordinator|AFISignalReceipt|EmissionsMinted|replay|determinism|warehouse|kafka|mongo|postgres|doctrine across *.sol/*.md/*.json/*.ts returned no hits (only generic 'canonical token' for bridging in README.md:9 and XERC20Deploy.sol:25).",
           "recommendation": "Confirms classification: this holds no USS/CPJ ingest, TSSD/vault, AFI mint-receipt, DAG, replay, or registry surface. No normative AFI artifacts to extract."
         },
         {

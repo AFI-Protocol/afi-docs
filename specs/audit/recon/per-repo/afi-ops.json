@@ -58,7 +58,7 @@
     },
     {
       "title": "afi-reactor presented as THE DAG orchestrator across ops docs",
-      "detail": "Deploy/health stubs, README, runbook and SLO docs treat afi-reactor as the singular 'DAG orchestrator' / 'DAG engine' rather than one reference DAG framework among pluggable options (custom DAG / Mage blocks). Ops tooling reinforces reactor-as-canonical-orchestrator, the known reactor-vs-reference tension.",
+      "detail": "Deploy/health stubs, README, runbook and SLO docs treat afi-reactor as the singular 'DAG orchestrator' / 'DAG engine' rather than one reference DAG framework among pluggable options (custom DAG / any conforming orchestrator). afi-reactor is the reference orchestrator, but ops tooling should note that any conforming orchestrator is acceptable.",
       "evidence": "README.md:41 '- afi-reactor - DAG orchestrator'; scripts/run-local-deploy.sh:126 'Would start afi-reactor (DAG orchestrator)'; docs/SLO_OVERVIEW.md:46 'Services: afi-reactor (DAG engine)'",
       "severity": "P3"
     }
@@ -130,10 +130,10 @@
       "recommendation": "None. The Commitment plane (afi-token/afi-mint) is out of scope for this ops repo."
     },
     {
-      "title": "No USS/CPJ ingest-dialect, schema, BigQuery/Kafka, or Postgres/Timescale references",
+      "title": "No USS/CPJ ingest-dialect, schema, analytics/warehouse, or Postgres/Timescale references",
       "severity": "Info",
-      "theme": "usignal|USS|cpj|BigQuery|postgresql",
-      "evidence": "grep for usignal|USS|cpj|CPJ and BigQuery|kafka|warehouse and postgresql|timescaledb|influxdb returned zero source hits",
+      "theme": "usignal|USS|cpj|warehouse|postgresql",
+      "evidence": "grep for usignal|USS|cpj|CPJ and kafka|warehouse|snowflake|datalake and postgresql|timescaledb|influxdb returned zero source hits. Analytics/warehouse integrations are absent; MongoDB TSSD is the implemented evidence store. No separate warehouse plane is planned for the reference implementation.",
       "recommendation": "None. Confirms repo holds no normative ingest/schema/analytics artifacts; purely operational scaffolding."
     },
     {

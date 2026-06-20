@@ -111,10 +111,10 @@
       "recommendation": "None - correctly out of scope for commitment plane; keep mint/emissions in afi-token/afi-mint."
     },
     {
-      "title": "No analytics-plane coupling (BigQuery/Kafka/warehouse) - correctly absent",
+      "title": "No analytics-plane coupling (Kafka/warehouse/snowflake) - correctly absent",
       "severity": "Info",
-      "theme": "BigQuery|kafka|warehouse",
-      "evidence": "grep for 'BigQuery|kafka|warehouse|pubsub|mage' across src/docs returned zero hits.",
+      "theme": "kafka|warehouse|snowflake|datalake",
+      "evidence": "grep for 'kafka|warehouse|snowflake|datalake' across src/docs returned zero hits. MongoDB TSSD is the implemented evidence store for the reference spine.",
       "recommendation": "None."
     },
     {
