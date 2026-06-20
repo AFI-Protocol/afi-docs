@@ -43,9 +43,7 @@ normative surface: afi-config + afi-infra (TSSD types/spec)
 | `afi-assets` | PRIVATE | SUPPORTING | none | tag stale |
 | `afi-benchkit` | PUBLIC | SUPPORTING | partial | clarify reference-vs-normative |
 | `afi-cli-framework` | PRIVATE | SUPPORTING | none | none |
-| `afi-cli-shared` | PRIVATE | SUPPORTING | none | none |
 | `afi-config` | PUBLIC | NORMATIVE | critical | clarify reference-vs-normative |
-| `afi-construct` | PRIVATE | STALE | none | tag stale |
 | `afi-core` | PUBLIC | REFERENCE_IMPL | partial | clarify reference-vs-normative |
 | `afi-docs` | PRIVATE | DOCS | none | tag stale + clarify reference-vs-normative: (1) Add a banner |
 | `afi-econ` | PRIVATE | RESEARCH | none | tag stale (rename internal afi-econ-kit identifiers + remove |
@@ -59,7 +57,6 @@ normative surface: afi-config + afi-infra (TSSD types/spec)
 | `afi-ops` | PRIVATE | SUPPORTING | none | clarify reference-vs-normative |
 | `afi-plugins` | PUBLIC | REFERENCE_IMPL | partial | clarify reference-vs-normative |
 | `afi-protocol` | PRIVATE | DOCS | none | clarify reference-vs-normative |
-| `AFI-Protocol/afi-agents` | PRIVATE | STALE | none | tag stale |
 | `afi-reactor` | PUBLIC | REFERENCE_IMPL | critical | clarify reference-vs-normative |
 | `afi-research-site` | PRIVATE | OUT_OF_SCOPE | none | none |
 | `afi-sdk-python` | PRIVATE | STALE | none | clarify reference-vs-normative |
@@ -111,7 +108,7 @@ normative surface: afi-config + afi-infra (TSSD types/spec)
 - **Classification:** SUPPORTING
 - **Rationale:** A standalone Python package (pyproject.toml:6 name="afi-benchkit", entrypoint afi-bench=afi_benchkit.cli:main) for deterministic validator benchmarking. README.md:22-26 explicitly bounds it: "This is a benchmark and verification toolkit only... Does NOT contain DAG/engine/scoring runtime logic... Do…
 - **Touchpoints:** replay/determinism (hash-locked reproducible benchmark outputs, golden-image verification), registries/reputation (computes benchmark-derived validator reputation scores influencing selection/allocation), scoring/metrics (PoI/PoInsight benchmark metrics: IC, hit-rate, Sharpe, coverage, vitality, latency), SDK/CLI (afi-bench CLI)
-- **Dependencies:** upstream=['afi-cli-shared (scripts/generate_benchmarks.sh:8, scripts/capsule_run.sh:12, scripts/lock/{compile,refresh}.sh source afi-cli-shared/scripts/lib/afi-shared.sh)', 'ghcr.io/AFI-Protocol/afi-benchkit container registry (README.md:177, ci.yml:80)']; downstream=[]
+- **Dependencies:** upstream=['ghcr.io/AFI-Protocol/afi-benchkit container registry (README.md:177, ci.yml:80)']; downstream=[]
 
 ### `afi-cli-framework`
 
@@ -119,13 +116,6 @@ normative surface: afi-config + afi-infra (TSSD types/spec)
 - **Classification:** SUPPORTING
 - **Rationale:** README.md:3 describes it as "A modular CLI framework for AFI Node.js projects, built on Commander.js" and package.json:3 as "Modular CLI framework for AFI projects using Commander.js". The only dependency is commander (package.json:16). Source (src/) contains CliApp, ConfigManager, Logger, validatio…
 - **Dependencies:** upstream=['commander (npm, ^14.0.2)']; downstream=[]
-
-### `afi-cli-shared`
-
-- **Purpose:** A reusable, domain-agnostic shared CLI framework for AFI Python projects built on Click — providing BaseCli (a click.Group subclass), a hierarchical ConfigManager (defaults -> .afi-cli.json -> AFI_CLI_* env vars), validation/error-handling helpers, an Extension/ExtensionManager plugin system, plus a Bash utility library (scripts/lib/afi-shared.sh) for logging, docker/podman, and file operations.
-- **Classification:** SUPPORTING
-- **Rationale:** Generic Click-based CLI framework with zero AFI protocol surface. README.md:3 "A shared CLI framework for AFI Python projects, built on Click." pyproject.toml:13 description "Shared CLI framework for AFI Python projects using Click". Source (src/afi_cli_shared/*.py) contains only BaseCli, ConfigMana…
-- **Dependencies:** upstream=['click (PyPI runtime dependency)', 'pytest (optional, test extra)', 'sphinx (optional, docs extra)']; downstream=['AFI Python CLI repos that pip install afi-cli-shared and extend BaseCli, or source scripts/lib/afi-shared.sh (consumers not enumerable from within this repo)']
 
 ### `afi-config`
 
@@ -144,14 +134,6 @@ normative surface: afi-config + afi-infra (TSSD types/spec)
   - `/home/user/AFI-Protocol/afi-config/schemas/usignal/v1/lenses/onchain.lens.schema.json`
   - … (+13 more)
 - **Dependencies:** upstream=[]; downstream=['afi-core', 'afi-reactor', 'afi-infra', 'afi-plugins', 'afi-ops', 'afi-token', 'afi-skills', 'afi-factory']
-
-### `afi-construct`
-
-- **Purpose:** A minimal archived scaffold for a "public simulation and blueprint layer" — a white-room/dojo environment intended for rehearsing DAG pipelines and modular agent interactions before hardening them in production logic (per README.md @ e7cfd87).
-- **Classification:** STALE
-- **Rationale:** Repo is GitHub-archived (archived:true, pushed_at 2025-07-15) and consists of only 8 files / 5 commits on a single `main` branch: README, two JSON stubs, an aider config, an init script, a no-op CI workflow, .gitignore, and an empty construct_templates/.gitkeep. README.md self-describes it as "the p…
-- **Touchpoints:** DAG/pipeline (blueprint.schema.json id/nodes/edges; pipeline_manifest.json), schemas (a divergent blueprint schema stub), validator/PoI simulation only (mock-validator-flow, mock data agents)
-- **Dependencies:** upstream=['afi-labs (named as upstream private-experiments source in README lineage)']; downstream=["afi-core (named as production-logic target where blueprints are 'hardened'; afi-core is a stale/renamed name)"]
 
 ### `afi-core`
 
@@ -246,7 +228,7 @@ normative surface: afi-config + afi-infra (TSSD types/spec)
 - **Classification:** RESEARCH
 - **Rationale:** Self-described as experimental: README.md:4-5 "AFI Labs is the experimental playground... Anything that isn't production-ready - prototypes, PoCs, research notebooks, speculative integrations - lives here first." .afi-codex.json:3-4 sets role "Experimental playground for prototypes and PoCs" and sta…
 - **Touchpoints:** USS/CPJ ingest (name-only, no schema), TSSD/vault (Mongo-only MVP scaffold, prose), mint/receipt (placeholder/mock only), DAG/pipeline (toy pipeline-runner), schemas (agent registry pydantic + agent_spec template; no canonical AFI schemas), replay/determinism (empty placeholder engine + codex replay_endpoint string), registries/reputation (agent registry servers, ghost/omnichain registry configs), SDK/API (FastAPI registry, Next.js frontend stubs)
-- **Dependencies:** upstream=['ElizaOS (proposed signal-processing base, roadmap only)', 'MongoDB Atlas (proposed TSSD store)', 'Vercel/Next.js (proposed frontend)', 'Factory.ai droids / augmentcode (codegen tooling)', 'LayerZero/OFT (proposed bridge, mock only)']; downstream=['afi-core (graduation target per README)', 'afi-agents (graduation target per README)']
+- **Dependencies:** upstream=['ElizaOS (proposed signal-processing base, roadmap only)', 'MongoDB Atlas (proposed TSSD store)', 'Vercel/Next.js (proposed frontend)', 'Factory.ai droids / augmentcode (codegen tooling)', 'LayerZero/OFT (proposed bridge, mock only)']; downstream=['afi-core (graduation target per README)']
 
 ### `afi-math`
 
@@ -293,15 +275,7 @@ normative surface: afi-config + afi-infra (TSSD types/spec)
 - **Classification:** DOCS
 - **Rationale:** This is a thin meta-repo containing ONLY documentation, governance, and agent-orchestration manifests — zero code, schemas, contracts, or canonical type definitions. package.json self-describes it: "description": "AFI Protocol documentation and specifications" with stub scripts ("build": "echo 'Buil…
 - **Touchpoints:** DAG/pipeline (described only, in architecture_overview.md — reactor as 'source of truth'), validators/scoring (described only, afi-core), registries/reputation (mentioned in faq/announcement: reputation, DAO votes, mentor registry), schemas (referenced only as 'persona schemas'/'Codex definitions' pointing at afi-config; none present)
-- **Dependencies:** upstream=[]; downstream=['afi-reactor (referenced as DAG source of truth)', 'afi-core (validators/mentors/scoring; agent_manifest entries)', 'afi-infra (signal templates/simulators; agent_manifest entry)', 'afi-config (codex/persona schemas)', 'afi-ops (deployment/health)', 'afi-docs (documentation; ARCHITECTURE_STATUS.md, droid_contributor_guide.md, archive/langgraph-migration-2025)', 'afi-gateway (optional Eliza client)', 'afi-agents (stale, onboarding only)', 'afi-labs (private, onboarding only)']
-
-### `AFI-Protocol/afi-agents`
-
-- **Purpose:** A pre-archival scaffold providing agent/persona definitions plus a yargs CLI wrapper that delegates protocol commands (validate-codex, simulate-signal, invoke-validator, invoke-mentor, run-local-deploy) to sibling repos (afi-config, afi-infra, afi-core, afi-ops), with a demo React SignalValidator UI and an in-memory mentor-pairing registry.
-- **Classification:** STALE
-- **Rationale:** Repo is ARCHIVED (gh api archived:true), 21 KB, last pushed 2025-07-15, and is one of the stale repo names explicitly flagged in the North Star tension list (afi-agents). README is a one-line stub ("This repository contains the afi-agents module for AFI Protocol"). Content is an early scaffold: a ya…
-- **Touchpoints:** USS/CPJ ingest (only as demo mock SignalData, NOT canonical USS), DAG/pipeline (CLI invoke-validator -> afi-core PoIValidator, delegated), schemas (stub-only, schemas/index.ts empty), SDK/API (yargs CLI entry-points / cli_manifest.json), registries/reputation (in-memory mentor_registry only, non-canonical)
-- **Dependencies:** upstream=['afi-config (cli_utils/codex_validator)', 'afi-core (cli_hooks/validator_invoker, PoIValidator, MentorRegistry)', 'afi-infra (cli_templates/signal_simulator)', 'afi-ops (scripts/deploy_local.sh)']; downstream=[]
+- **Dependencies:** upstream=[]; downstream=['afi-reactor (referenced as DAG source of truth)', 'afi-core (validators/mentors/scoring; agent_manifest entries)', 'afi-infra (signal templates/simulators; agent_manifest entry)', 'afi-config (codex/persona schemas)', 'afi-ops (deployment/health)', 'afi-docs (documentation; ARCHITECTURE_STATUS.md, droid_contributor_guide.md, archive/langgraph-migration-2025)', 'afi-gateway (optional Eliza client)', 'afi-labs (private, onboarding only)']
 
 ### `afi-reactor`
 

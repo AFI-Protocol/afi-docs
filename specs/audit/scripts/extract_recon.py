@@ -29,7 +29,7 @@ DEFAULT_OUT_DIR = SCRIPT_DIR.parent / "recon"
 
 
 def repo_slug(repo_name: str) -> str:
-    """Sanitize repo name for filename (e.g. AFI-Protocol/afi-agents -> afi-agents)."""
+    """Sanitize repo name for filename (e.g. AFI-Protocol/afi-foo -> afi-foo)."""
     name = repo_name.strip()
     if "/" in name:
         name = name.split("/")[-1]

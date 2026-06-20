@@ -99,7 +99,7 @@ Low-effort, high-clarity fixes — mostly documentation, metadata, or one-line c
 
 ## 2. Scope & method
 
-**Charter.** Solidify the portable AFI protocol along [`AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md`](../../AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md): map what is *normative* (protocol law), *reference implementation*, *aspirational*, *stale*, and what *contradicts* the portable direction, across the **31 repositories** of the AFI-Protocol org (29 local `afi-*`/`.github` checkouts + 2 GitHub-archived: `afi-agents`, `afi-construct`).
+**Charter.** Solidify the portable AFI protocol along [`AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md`](../../AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md): map what is *normative* (protocol law), *reference implementation*, *aspirational*, *stale*, and what *contradicts* the portable direction, across the **28 repositories** of the AFI-Protocol org (local `afi-*`/`.github` checkouts).
 
 **Phases.** This is a read-only forensic audit executed in four phases (Phase 1 recon was completed and persisted before this mission):
 
@@ -125,34 +125,31 @@ Reconciled against the recon corpus (`audit/recon/AFI_RECON_CORPUS.json:1`, `ini
 | 3 | `afi-assets` | PRIVATE | SUPPORTING | no | Brand assets; empty `.gitkeep` placeholders. |
 | 4 | `afi-benchkit` | PUBLIC | SUPPORTING | no | Validator benchmark toolkit; "Does NOT contain DAG/engine/scoring runtime". |
 | 5 | `afi-cli-framework` | PRIVATE | SUPPORTING | no | Commander.js CLI scaffold; zero protocol surface. |
-| 6 | `afi-cli-shared` | PRIVATE | SUPPORTING | no | Click CLI framework; zero protocol surface. |
-| 7 | `afi-config` | PUBLIC | **NORMATIVE** | anchor | Canonical schema/spec library; engine enum `afi-config/schemas/vault.schema.json:14-23`. |
-| 8 | `afi-construct` | PRIVATE | STALE | no | GitHub-archived white-room blueprint scaffold. |
-| 9 | `afi-core` | PUBLIC | REFERENCE_IMPL | yes | UWR scorer / decay / novelty `afi-core/validators/UniversalWeightingRule.ts`. |
-| 10 | `afi-docs` | PRIVATE | DOCS | no | Documentation hub (hosts the North Star); "NOT for code". |
-| 11 | `afi-econ` | PRIVATE | RESEARCH | no | "Research-Grade / Placeholder"; gauge splits `afi-econ/README.md:24-26`. |
-| 12 | `afi-factory` | PUBLIC | SUPPORTING | no | Agent-template registry; mirrors afi-config schemas. |
-| 13 | `afi-gateway` | PUBLIC | REFERENCE_IMPL | **yes (ingest)** | Ingest endpoint `afi-gateway/src/http/app.ts:123`. |
-| 14 | `afi-governance` | PRIVATE | REFERENCE_IMPL | no (governance plane) | Universal Proposal Signal + Snapshot/Safe execution. |
-| 15 | `afi-infra` | PRIVATE | **NORMATIVE** | anchor + vault | Canonical TSSD types `afi-infra/src/tssd/types.ts:331`; `ITSSDVaultClient` `:36-68`. |
-| 16 | `afi-labs` | PRIVATE | RESEARCH | no | "experimental playground… prototypes, PoCs"; Mongo-only MVP scaffolds. |
-| 17 | `afi-math` | PUBLIC | SUPPORTING | no (consumed) | Deterministic math; emissions schedule `afi-math/src/emissions/emissionsSchedule.ts:60`. |
-| 18 | `afi-mint` | PRIVATE | REFERENCE_IMPL | **yes (off-chain mint)** | FSM `afi-mint/src/orchestrator/MintExecutor.ts:33`. |
-| 19 | `afi-ops` | PRIVATE | SUPPORTING | no | Ops/devops scaffold; bakes Mongo as required infra. |
-| 20 | `afi-plugins` | PUBLIC | REFERENCE_IMPL | **yes (DAG nodes)** | Plugin registry `afi-plugins/src/types/plugin.ts:22-26`; "NOT production logic". |
-| 21 | `afi-protocol` | PRIVATE | DOCS | no | Governance/onboarding meta-repo; zero code. |
-| 22 | `afi-agents` | PRIVATE | STALE | no | GitHub-archived scaffold (pushed 2025-07-15); flagged in North Star. |
-| 23 | `afi-reactor` | PUBLIC | REFERENCE_IMPL | **yes (orchestrator)** | Reference Froggy DAG `afi-reactor/src/services/pipelineRunner.ts:161`; "ONLY orchestrator" `afi-reactor/README.md:137`. |
-| 24 | `afi-research-site` | PRIVATE | OUT_OF_SCOPE | no | Next.js marketing site (Axleo template); "explicitly separate from the protocol stack". |
-| 25 | `afi-sdk-python` | PRIVATE | STALE | no | Empty scaffold; non-functional import `afi-sdk-python/README.md:28`. |
-| 26 | `afi-sdk-ts` | PRIVATE | STALE | no | Empty scaffold; `afi-sdk-ts/package.json:6` (`main` → missing `dist`). |
-| 27 | `afi-skills` | PUBLIC | SUPPORTING | no | Versioned agent-skill library; scoped skill contract only. |
-| 28 | `afi-starters` | PRIVATE | SUPPORTING | no | Clone-and-extend deploy kit; bakes Mongo `afi-starters/self-hosted-pipeline/.env.example:1-4`. |
-| 29 | `afi-tiny-brains` | PRIVATE | REFERENCE_IMPL | **yes (ML enrich)** | FastAPI ML microservice `afi-tiny-brains/README.md:11`. |
-| 30 | `afi-token` | PRIVATE | REFERENCE_IMPL | **yes (on-chain)** | BASE contracts `afi-token/src/AFIMintCoordinator.sol:68`, `afi-token/src/AFIToken.sol:92`. |
-| 31 | `afi-xerc20` | PUBLIC | OUT_OF_SCOPE | no | Vendored defi-wonderland/xERC20 fork `afi-xerc20/package.json:6`. |
+| 6 | `afi-config` | PUBLIC | **NORMATIVE** | anchor | Canonical schema/spec library; engine enum `afi-config/schemas/vault.schema.json:14-23`. |
+| 7 | `afi-core` | PUBLIC | REFERENCE_IMPL | yes | UWR scorer / decay / novelty `afi-core/validators/UniversalWeightingRule.ts`. |
+| 8 | `afi-docs` | PRIVATE | DOCS | no | Documentation hub (hosts the North Star); "NOT for code". |
+| 9 | `afi-econ` | PRIVATE | RESEARCH | no | "Research-Grade / Placeholder"; gauge splits `afi-econ/README.md:24-26`. |
+| 10 | `afi-factory` | PUBLIC | SUPPORTING | no | Agent-template registry; mirrors afi-config schemas. |
+| 11 | `afi-gateway` | PUBLIC | REFERENCE_IMPL | **yes (ingest)** | Ingest endpoint `afi-gateway/src/http/app.ts:123`. |
+| 12 | `afi-governance` | PRIVATE | REFERENCE_IMPL | no (governance plane) | Universal Proposal Signal + Snapshot/Safe execution. |
+| 13 | `afi-infra` | PRIVATE | **NORMATIVE** | anchor + vault | Canonical TSSD types `afi-infra/src/tssd/types.ts:331`; `ITSSDVaultClient` `:36-68`. |
+| 14 | `afi-labs` | PRIVATE | RESEARCH | no | "experimental playground… prototypes, PoCs"; Mongo-only MVP scaffolds. |
+| 15 | `afi-math` | PUBLIC | SUPPORTING | no (consumed) | Deterministic math; emissions schedule `afi-math/src/emissions/emissionsSchedule.ts:60`. |
+| 16 | `afi-mint` | PRIVATE | REFERENCE_IMPL | **yes (off-chain mint)** | FSM `afi-mint/src/orchestrator/MintExecutor.ts:33`. |
+| 17 | `afi-ops` | PRIVATE | SUPPORTING | no | Ops/devops scaffold; bakes Mongo as required infra. |
+| 18 | `afi-plugins` | PUBLIC | REFERENCE_IMPL | **yes (DAG nodes)** | Plugin registry `afi-plugins/src/types/plugin.ts:22-26`; "NOT production logic". |
+| 19 | `afi-protocol` | PRIVATE | DOCS | no | Governance/onboarding meta-repo; zero code. |
+| 20 | `afi-reactor` | PUBLIC | REFERENCE_IMPL | **yes (orchestrator)** | Reference Froggy DAG `afi-reactor/src/services/pipelineRunner.ts:161`; "ONLY orchestrator" `afi-reactor/README.md:137`. |
+| 21 | `afi-research-site` | PRIVATE | OUT_OF_SCOPE | no | Next.js marketing site (Axleo template); "explicitly separate from the protocol stack". |
+| 22 | `afi-sdk-python` | PRIVATE | STALE | no | Empty scaffold; non-functional import `afi-sdk-python/README.md:28`. |
+| 23 | `afi-sdk-ts` | PRIVATE | STALE | no | Empty scaffold; `afi-sdk-ts/package.json:6` (`main` → missing `dist`). |
+| 24 | `afi-skills` | PUBLIC | SUPPORTING | no | Versioned agent-skill library; scoped skill contract only. |
+| 25 | `afi-starters` | PRIVATE | SUPPORTING | no | Clone-and-extend deploy kit; bakes Mongo `afi-starters/self-hosted-pipeline/.env.example:1-4`. |
+| 26 | `afi-tiny-brains` | PRIVATE | REFERENCE_IMPL | **yes (ML enrich)** | FastAPI ML microservice `afi-tiny-brains/README.md:11`. |
+| 27 | `afi-token` | PRIVATE | REFERENCE_IMPL | **yes (on-chain)** | BASE contracts `afi-token/src/AFIMintCoordinator.sol:68`, `afi-token/src/AFIToken.sol:92`. |
+| 28 | `afi-xerc20` | PUBLIC | OUT_OF_SCOPE | no | Vendored defi-wonderland/xERC20 fork `afi-xerc20/package.json:6`. |
 
-**Class tallies (31 total):** NORMATIVE = 2; REFERENCE_IMPL = 8; SUPPORTING = 11; RESEARCH = 2; DOCS = 2; STALE = 4; OUT_OF_SCOPE = 2. `2 + 8 + 11 + 2 + 2 + 4 + 2 = 31`.
+**Class tallies (28 total):** NORMATIVE = 2; REFERENCE_IMPL = 8; SUPPORTING = 10; RESEARCH = 2; DOCS = 2; STALE = 2; OUT_OF_SCOPE = 2. `2 + 8 + 10 + 2 + 2 + 2 + 2 = 28`.
 
 ---
 
@@ -217,40 +214,31 @@ Versioned agent-skill library + tooling; scoped skill contract only.
 ### 4.19 `afi-cli-framework` — SUPPORTING
 Generic Commander.js CLI scaffold; zero protocol surface.
 
-### 4.20 `afi-cli-shared` — SUPPORTING
-Generic Click (Python) CLI framework; zero protocol surface.
-
-### 4.21 `afi-artifacts` — SUPPORTING
+### 4.20 `afi-artifacts` — SUPPORTING
 Zenodo paper reproducibility bundle; schema snapshots are point-in-time copies, not canonical.
 
-### 4.22 `afi-assets` — SUPPORTING
+### 4.21 `afi-assets` — SUPPORTING
 Brand/design assets; directories are empty `.gitkeep` placeholders.
 
-### 4.23 `.github` — SUPPORTING
+### 4.22 `.github` — SUPPORTING
 Org-level config and the org-profile README (which still labels reactor as THE orchestrator and lists archived repos — stale-arch-docs).
 
-### 4.24 `afi-docs` — DOCS
+### 4.23 `afi-docs` — DOCS
 Documentation hub hosting the North Star itself; "NOT for code implementation" (`afi-docs/AGENTS.md`). Several docs self-declare authority without naming the portable spec as canonical (C-SD-3).
 
-### 4.25 `afi-protocol` — DOCS
+### 4.24 `afi-protocol` — DOCS
 Governance/onboarding meta-repo; zero code or schemas.
 
-### 4.26 `afi-sdk-python` — STALE
+### 4.25 `afi-sdk-python` — STALE
 Empty scaffold (only `pyproject.toml` + README) versioned `1.0.0`; README import `from afi_sdk import AFIClient` cannot resolve (`afi-sdk-python/README.md:28`). Part of B1's "no public protocol API" gap.
 
-### 4.27 `afi-sdk-ts` — STALE
+### 4.26 `afi-sdk-ts` — STALE
 Empty scaffold (only `package.json` + README); `main` points at a non-existent `dist` and `test` is a TBD stub (`afi-sdk-ts/package.json:6,16`).
 
-### 4.28 `afi-construct` — STALE
-GitHub-archived white-room blueprint scaffold; divergent blueprint stub. Must not be read as live spine code.
-
-### 4.29 `afi-agents` — STALE
-GitHub-archived (pushed 2025-07-15); one of the stale names the North Star flags. Still referenced in live topology docs (C-SD-2).
-
-### 4.30 `afi-research-site` — OUT_OF_SCOPE
+### 4.27 `afi-research-site` — OUT_OF_SCOPE
 Next.js marketing site (Axleo template); "explicitly separate from the AFI Network protocol stack".
 
-### 4.31 `afi-xerc20` — OUT_OF_SCOPE
+### 4.28 `afi-xerc20` — OUT_OF_SCOPE
 Vendored defi-wonderland/xERC20 bridge fork (`afi-xerc20/package.json:6`); not an AFI mint/receipt artifact and must not be read as the commitment layer.
 
 ---

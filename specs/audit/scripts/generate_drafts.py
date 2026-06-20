@@ -35,7 +35,7 @@ TENSION_KEYWORDS = {
     "BASE-ledger": re.compile(r"on-?chain|base|receipt|breadcrumb|ledger|commitment", re.I),
     "econ-splits": re.compile(r"split|gauge|beneficiary|payout|60/30|55/25", re.I),
     "mint-model": re.compile(r"mint|epoch|per-signal|batch|coordinateMint", re.I),
-    "stale-arch-docs": re.compile(r"stale|afi-pipeline|afi-agents|afi-construct|archived|repository.?map", re.I),
+    "stale-arch-docs": re.compile(r"stale|afi-pipeline|archived|repository.?map", re.I),
 }
 
 MANDATORY_STACK = re.compile(r"mongo|reactor|org infra|mandatory|only orchestrator|afi-reactor", re.I)
