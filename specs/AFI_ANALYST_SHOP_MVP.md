@@ -1,5 +1,7 @@
 # AFI Analyst Shop MVP — Product Sketch
 
+> **DEPRECATED / SUPERSEDED:** This document predates AFI Settlement v1 doctrine. It may describe v0 per-signal minting, ERC-1155 receipts, direct beneficiary payouts, stale ENS/Snapshot references, or missing vault architecture. See `afi-docs/specs/AFI_SETTLEMENT_V1_DOCTRINE.md` for canonical architecture.
+
 **Status:** Draft — positioning & scope  
 **Date:** 2026-06-03  
 **Audience:** Product, protocol architects, analyst onboarding  

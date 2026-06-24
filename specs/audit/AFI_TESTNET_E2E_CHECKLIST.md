@@ -1,5 +1,7 @@
 # AFI Base Sepolia — Testnet E2E Checklist (with references)
 
+> **DEPRECATED / SUPERSEDED:** This document predates AFI Settlement v1 doctrine. It may describe v0 per-signal minting, ERC-1155 receipts, direct beneficiary payouts, stale ENS/Snapshot references, or missing vault architecture. See `afi-docs/specs/AFI_SETTLEMENT_V1_DOCTRINE.md` for canonical architecture.
+
 **Workspace root:** `/home/user/AFI-Protocol/`  
 **Chain:** Base Sepolia (chain ID `84532`)  
 **Purpose:** Track what is needed to run the full signal → score → allocate → mint → vault loop on testnet, with **immediate links** to evidence and source files.
