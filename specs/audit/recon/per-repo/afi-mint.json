@@ -27,7 +27,7 @@
   "reference_only_assumptions": [
     {
       "path": "/home/user/AFI-Protocol/afi-mint/src/orchestrator/types.ts",
-      "quote": "snapshotSpaceId: 'afi.eth' ... DEFAULT_VALIDATOR_CONFIG"
+      "quote": "snapshotSpaceId: 'afidao.eth' ... DEFAULT_VALIDATOR_CONFIG"
     },
     {
       "path": "/home/user/AFI-Protocol/afi-mint/src/snapshot/SnapshotClient.ts",
@@ -162,7 +162,7 @@
       "title": "DEFAULT_VALIDATOR_CONFIG hardcodes economic/governance parameters in code",
       "severity": "P3",
       "theme": "pipeline|orchestrator|emissions",
-      "evidence": "src/orchestrator/types.ts:199-217 minDecayScoreThreshold 0.5, challengeSuccessThreshold 0.66, minChallengeStake '100000000000000000000', challengeSlashRate 0.5, snapshotSpaceId 'afi.eth'",
+      "evidence": "src/orchestrator/types.ts:199-217 minDecayScoreThreshold 0.5, challengeSuccessThreshold 0.66, minChallengeStake '100000000000000000000', challengeSlashRate 0.5, snapshotSpaceId 'afidao.eth'",
       "recommendation": "AGENTS.md:135 forbids hardcoding minting parameters ('use config from afi-config'). These defaults are reasonable for a reference impl but should be clearly marked reference-only and sourced from afi-config in production paths."
     },
     {
