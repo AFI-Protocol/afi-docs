@@ -130,11 +130,11 @@
       "recommendation": "None. Boundary is clean: skills define capabilities, afi-reactor (reference orchestrator) wires them. No claim here that reactor is THE protocol orchestrator."
     },
     {
-      "title": "No BigQuery/Kafka/warehouse and no Postgres/Timescale/Influx references",
+      "title": "No Kafka/warehouse and no Postgres/Timescale/Influx references",
       "severity": "Info",
-      "theme": "BigQuery|kafka|warehouse|postgresql|timescaledb|influxdb",
-      "evidence": "grep for BigQuery|kafka|warehouse|pubsub|data lake and postgresql|postgres|timescaledb|influxdb returns zero hits across repo.",
-      "recommendation": "None. Analytics and storage-engine concerns correctly absent from this capability library."
+      "theme": "kafka|warehouse|snowflake|datalake|postgresql|timescaledb|influxdb",
+      "evidence": "grep for kafka|warehouse|snowflake|datalake and postgresql|postgres|timescaledb|influxdb returns zero hits across repo.",
+      "recommendation": "None. Analytics and storage-engine concerns correctly absent from this capability library; the implemented evidence store for the reference spine is MongoDB TSSD."
     },
     {
       "title": "'Canonical/source of truth' phrasing is scoped to skills but invites protocol-law misreading",

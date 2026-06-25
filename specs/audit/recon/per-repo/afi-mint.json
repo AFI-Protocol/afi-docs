@@ -145,11 +145,11 @@
       "recommendation": "Duplicated emissions constants/algorithm risk drift from the canonical afi-math source, undermining deterministic replay. Replace the inlined copy with a versioned import or pin a shared emissions ruleset version recorded in the receipt."
     },
     {
-      "title": "BigQuery/Kafka/warehouse and Postgres/Timescale/Influx entirely absent",
+      "title": "Kafka/warehouse/snowflake/datalake and Postgres/Timescale/Influx entirely absent",
       "severity": "Info",
-      "theme": "BigQuery|kafka|warehouse|postgres",
-      "evidence": "grep for BigQuery|kafka|warehouse|postgresql|timescaledb|influxdb returned zero hits",
-      "recommendation": "Consistent with afi-mint being commitment-coordination, not the analytics/market or evidence-vault plane. No action for this repo; multi-engine concern lives in vault.schema.json / afi-infra."
+      "theme": "kafka|warehouse|snowflake|postgres",
+      "evidence": "grep for kafka|warehouse|snowflake|datalake|postgresql|timescaledb|influxdb returned zero hits. Analytics/warehouse integrations are absent; MongoDB TSSD is the implemented evidence store. No separate warehouse plane is planned for the reference implementation.",
+      "recommendation": "Consistent with afi-mint being commitment-coordination, not the evidence-vault plane. No action for this repo; the vault/evidence-store concern lives in vault.schema.json / afi-infra (MongoDB TSSD)."
     },
     {
       "title": "reputation_bridge is an unimplemented placeholder that explicitly defers to canonical invariants",

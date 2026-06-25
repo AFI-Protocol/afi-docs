@@ -146,11 +146,11 @@
       "recommendation": "Either remove Epoch Pulse claims or add the pulse/ design; current state misrepresents repo scope."
     },
     {
-      "title": "No USS v1.1 / CPJ ingest, no mint/receipt contracts, no Mongo/BigQuery/Postgres present",
+      "title": "No USS v1.1 / CPJ ingest, no mint/receipt contracts, no Mongo TSSD evidence store present",
       "severity": "Info",
       "theme": "scope confirmation",
-      "evidence": "grep for usignal|USS|cpj => 0 hits; mintForSignal|coordinateMint => 0 hits; AFIMintCoordinator|AFISignalReceipt|EmissionsMinted => 0 hits; mongodb|BigQuery|kafka|postgres|timescale|influx => 0 hits.",
-      "recommendation": "Confirms this repo touches none of the canonical ingest/commitment/evidence/analytics stores; classify firmly as the governance plane only."
+      "evidence": "grep for usignal|USS|cpj => 0 hits; mintForSignal|coordinateMint => 0 hits; AFIMintCoordinator|AFISignalReceipt|EmissionsMinted => 0 hits; mongodb|kafka|postgres|timescale|influx => 0 hits (the implemented evidence store is MongoDB TSSD, which lives in afi-reactor/afi-infra, not here).",
+      "recommendation": "Confirms this repo touches none of the canonical ingest/commitment/evidence stores; classify firmly as the governance plane only."
     }
   ]
 }

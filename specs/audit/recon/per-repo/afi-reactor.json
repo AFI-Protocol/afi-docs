@@ -54,7 +54,7 @@
   "contradictions": [
     {
       "title": "Reactor self-declares as THE single orchestrator, contradicting portable-protocol (DAG is pluggable)",
-      "detail": "North Star treats the Scoring DAG plane as pluggable (afi-reactor / custom DAG / Mage blocks if outputs conform). The repo repeatedly asserts itself as the sole/canonical orchestrator and that the DAG is 'law', which would forbid an external validator from running a conformant DAG on a different stack.",
+      "detail": "North Star treats the Scoring DAG plane as pluggable (afi-reactor / custom DAG / any conforming orchestrator if outputs conform). The repo repeatedly asserts itself as the sole/canonical orchestrator and that the DAG is 'law', which would forbid an external validator from running a conformant DAG on a different stack.",
       "evidence": "README.md:137 \"afi-reactor is the ONLY orchestrator in AFI Protocol.\"; docs/AFI_ORCHESTRATOR_DOCTRINE.md:38-40 \"The DAG is law... ad-hoc flows are anti-patterns\"; AGENTS.md:3 \"This is the ONLY orchestrator in the AFI ecosystem\"",
       "severity": "P1"
     },
@@ -165,11 +165,11 @@
       "recommendation": "Observation: the public/proprietary vault surface split (North Star evidence plane) is not modeled here. If reactor is to remain the reference write path, document where the public surface is derived vs the proprietary detail it persists, or defer entirely to afi-infra vault.schema.json."
     },
     {
-      "title": "No analytics/market plane engines (BigQuery/Kafka/warehouse) and that is consistent with reactor scope",
+      "title": "No analytics/warehouse engines (Kafka/warehouse/snowflake/datalake) and that is consistent with reactor scope",
       "severity": "Info",
-      "theme": "BigQuery|kafka|warehouse|postgresql|timescaledb|influxdb",
-      "evidence": "grep found only ObserverNode.ts:250 comment \"Message queues (e.g., RabbitMQ, Kafka)\"; no BigQuery/warehouse/postgres/timescale/influx usage",
-      "recommendation": "None for reactor itself; flag at org level that the market/analytics plane (BigQuery, Kafka/PubSub) is absent from the reference spine and must be documented as a separate pluggable plane, not folded into the reactor vault."
+      "theme": "kafka|warehouse|snowflake|datalake|postgresql|timescaledb|influxdb",
+      "evidence": "grep found only ObserverNode.ts:250 comment \"Message queues (e.g., RabbitMQ, Kafka)\"; no warehouse/snowflake/datalake/postgres/timescale/influx usage. MongoDB TSSD is the implemented evidence store.",
+      "recommendation": "Analytics/warehouse integrations absent; MongoDB TSSD is the implemented evidence store. No separate warehouse plane is planned for the reference implementation; the reactor persists scored signals directly to the Mongo TSSD vault."
     },
     {
       "title": "Multi-repo schema ownership modeled via ownerRepo (healthy separation signal)",

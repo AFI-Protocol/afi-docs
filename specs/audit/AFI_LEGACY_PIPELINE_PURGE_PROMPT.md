@@ -2,7 +2,7 @@
 
 **Mission:** Remove the deprecated Froggy **demo chain** from the AFI monorepo. We are AFI — ingest → score → evidence → (later) mint. Not Alpha Scout → Pixel Rick → Val Dook → execution sim.
 
-**Canonical spine (keep):** USS v1.1 ingest → `uss-telemetry-deriver` → Froggy enrichment → `froggy-analyst` (UWR) → evidence export. See [`froggyPipeline.ts`](../../../afi-reactor/src/config/froggyPipeline.ts) REMOVED STAGES comment and [`AFI_FROGGY_MAGE_MIGRATION_MAP.md`](./AFI_FROGGY_MAGE_MIGRATION_MAP.md).
+**Canonical spine (keep):** USS v1.1 ingest → `uss-telemetry-deriver` → Froggy enrichment → `froggy-analyst` (UWR) → Mongo TSSD vault write. See [`froggyPipeline.ts`](../../../afi-reactor/src/config/froggyPipeline.ts) REMOVED STAGES comment.
 
 **Copy-paste prompt below.**
 
@@ -37,7 +37,7 @@ These share names but are NOT the legacy reactor plugins:
 | `afi-reactor` canonical Froggy plugins (enrichment, analyst, UWR) | Active scoring path |
 | `afi-reactor/src/uss/*`, `cpj/*`, `froggyDemoService.ts` canonical USS path | Production ingest |
 | `afi-docs/specs/audit/**` historical audit JSON/transcripts | Forensic record — update only if they falsely claim legacy is current; do not delete audit corpus |
-| `AFI_FROGGY_MAGE_MIGRATION_MAP.md` DROP rows | Intentional documentation of what was removed |
+| Purge-record DROP rows in the audit corpus | Intentional documentation of what was removed |
 
 When `validatorDecision` appears in **replay/vault tests**, refactor fixtures to scored-only semantics — do not delete replay infrastructure blindly.
 
@@ -131,7 +131,6 @@ Do NOT mass-edit afi-docs/specs/audit/themes/*.json or recon corpus — those ar
 ## OUT OF SCOPE
 
 - Mongo removal (separate track)
-- Mage/GCP pipeline build
 - afi-mint Snapshot challenge logic
 - Deleting afi-core ValidatorDecision types
 ```
@@ -140,6 +139,6 @@ Do NOT mass-edit afi-docs/specs/audit/themes/*.json or recon corpus — those ar
 
 ## After the purge
 
-Update [`AFI_FROGGY_MAGE_MIGRATION_MAP.md`](./AFI_FROGGY_MAGE_MIGRATION_MAP.md) DROP section if paths changed.
+Update the purge-record DROP section in the audit corpus if paths changed.
 
 Link from [`AFI_TESTNET_E2E_CHECKLIST.md`](./AFI_TESTNET_E2E_CHECKLIST.md) optional housekeeping row if desired.

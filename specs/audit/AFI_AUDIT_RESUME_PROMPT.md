@@ -94,7 +94,7 @@ Write each completed theme to `afi-docs/specs/audit/themes/<key>.json` using thi
 
 **E — Scoring DAG:** all pipeline/DAG definitions; replay-critical nodes; scoring formula locations; reactor-as-only-orchestrator quotes.
 
-**F — Analytics:** BigQuery/Kafka/warehouse integrations; Mage fit; operational vs analytics plane separation.
+**F — Analytics:** Kafka/warehouse/snowflake/datalake integrations (expected absent — MongoDB TSSD is the implemented evidence store; no separate warehouse plane is planned for the reference implementation); operational vs analytics plane separation.
 
 **G — Emissions/mint:** emissions handoff math→mint→token; per-signal vs epoch batch; beneficiary model; treasury vs mint recipient.
 
@@ -106,7 +106,7 @@ Write each completed theme to `afi-docs/specs/audit/themes/<key>.json` using thi
 
 ### Search patterns
 
-`mongodb`, `MongoTSSD`, `vault`, `TSSD`, `VaultedSignalRecord`, `usignal`, `USS`, `cpj`, `CPJ`, `mintForSignal`, `coordinateMint`, `beneficiary`, `epoch`, `replay`, `ReplaySession`, `determinism`, `codex`, `publicSurface`, `proprietaryDetail`, `AFIMintCoordinator`, `AFISignalReceipt`, `EmissionsMinted`, `pipeline`, `DAG`, `froggy`, `orchestrator`, `doctrine`, `BigQuery`, `kafka`, `warehouse`, `normative`, `canonical`, `postgresql`, `timescaledb`, `influxdb`
+`mongodb`, `MongoTSSD`, `vault`, `TSSD`, `VaultedSignalRecord`, `usignal`, `USS`, `cpj`, `CPJ`, `mintForSignal`, `coordinateMint`, `beneficiary`, `epoch`, `replay`, `ReplaySession`, `determinism`, `codex`, `publicSurface`, `proprietaryDetail`, `AFIMintCoordinator`, `AFISignalReceipt`, `EmissionsMinted`, `pipeline`, `DAG`, `orchestrator`, `doctrine`, `kafka`, `warehouse`, `snowflake`, `datalake`, `normative`, `canonical`, `postgresql`, `timescaledb`, `influxdb`
 
 ---
 

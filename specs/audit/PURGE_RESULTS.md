@@ -69,7 +69,7 @@ Every other runtime/config file that previously matched is now clean, including 
 
 ### AUDIT CORPUS (`afi-docs/specs/audit/**`) — 9 files, left intact by design
 
-The forensic recon corpus, `themes/*.json`, `AFI_RECON_CORPUS.json`, the `AFI_FROGGY_MAGE_MIGRATION_MAP.md` DROP rows, and `AFI_LEGACY_PIPELINE_PURGE_PROMPT.md` (the purge prompt itself) intentionally retain the legacy names as the investigation record. Per mission: do not mass-edit the audit corpus.
+The forensic recon corpus, `themes/*.json`, `AFI_RECON_CORPUS.json`, and `AFI_LEGACY_PIPELINE_PURGE_PROMPT.md` (the purge prompt itself) intentionally retain the legacy names as the investigation record. Per mission: do not mass-edit the audit corpus.
 
 ---
 

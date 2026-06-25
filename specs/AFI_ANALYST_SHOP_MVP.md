@@ -5,7 +5,7 @@
 **Status:** Draft — positioning & scope  
 **Date:** 2026-06-03  
 **Audience:** Product, protocol architects, analyst onboarding  
-**Context:** GCP + Mage reference spine; Mongo deprecated; Ably optional for live proof
+**Context:** afi-reactor + Mongo reference implementation; Ably optional for live proof
 
 **Related:** [`AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md`](./AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md) · [`audit/AFI_TESTNET_E2E_CHECKLIST.md`](./audit/AFI_TESTNET_E2E_CHECKLIST.md) · [`audit/AFI_HUMAN_REVIEW_WORKSHEET.md`](./audit/AFI_HUMAN_REVIEW_WORKSHEET.md)
 
@@ -25,9 +25,9 @@ AFI accelerates the **back office** (ingest → score → commit). Ably accelera
 |------------|--------------|----------------------|
 | **Identity** | `providerId`, channel metadata, beneficiary wallet | Registered in config / onboarding |
 | **Ingest** | Webhook or bot posts signals into AFI | USS v1.1 or CPJ v0.1 conformant payload |
-| **Processing** | Enrichment + UWR score + qualify/reject | Mage pipeline (reference) or conforming orchestrator |
+| **Processing** | Enrichment + UWR score + qualify/reject | `afi-reactor` (reference) or any conforming orchestrator |
 | **Commitment** | Mint to beneficiary when qualified | `afi-mint` → Base Sepolia |
-| **Audit trail** | Immutable history for challenge/replay | BigQuery append-only evidence log |
+| **Audit trail** | Immutable history for challenge/replay | Mongo TSSD scored signal record |
 | ***(Optional)* Proof feed** | Subscribers see SCORED/MINTED live | Ably (or polling, Telegram mirror, etc.) |
 
 **Shop is “open” when rows 1–5 work.** Row 6 is marketing and trust, not protocol membership.
@@ -41,9 +41,8 @@ flowchart TB
   subgraph required["Required — Analyst Shop back office"]
     ID[Provider onboarding\nproviderId + beneficiary]
     ING[Ingest\nTelegram / TV / API → USS/CPJ]
-    PS[GCP Pub/Sub\nsignal-raw → scored → minted]
-    MG[Mage scoring DAG]
-    BQ[(BQ afi_evidence.signals_lifecycle)]
+    RX[afi-reactor\nenrich → UWR score → qualify]
+    TSSD[(Mongo TSSD\nreactor_scored_signals_v1)]
     MINT[afi-mint → Base Sepolia]
   end
   subgraph optional["Optional — Storefront & visibility"]
@@ -51,20 +50,20 @@ flowchart TB
     UI[Vercel analyst portal]
     TG[Telegram mirror bot]
   end
-  ID --> ING --> PS --> MG --> BQ
-  MG --> PS --> MINT --> BQ
-  BQ -.-> UI
-  PS -.->|signal-minted fan-out| ABLY
+  ID --> ING --> RX --> TSSD
+  TSSD --> MINT
+  TSSD -.-> UI
+  MINT -.->|minted fan-out| ABLY
   ABLY --> UI
   ABLY -.-> TG
 ```
 
 | Layer | Technology | Required? | Accelerates |
 |-------|------------|-----------|-------------|
-| Ingest API | `afi-gateway` or Cloud Run webhook | **Yes** | Getting signals into protocol |
-| Workflow bus | **GCP Pub/Sub** (not Ably) | **Yes** | Reliable score → mint handoff |
-| Scoring | Mage + UWR (sidecar or Python port) | **Yes** | Deterministic qualify/mint path |
-| Evidence | BigQuery append-only log | **Yes** | Replay, challenge, audit |
+| Ingest API | `afi-gateway` webhook | **Yes** | Getting signals into protocol |
+| Orchestration | **afi-reactor** (not Ably) | **Yes** | Reliable score → mint handoff |
+| Scoring | `afi-reactor` + UWR | **Yes** | Deterministic qualify/mint path |
+| Evidence | Mongo TSSD vault | **Yes** | Replay, challenge, audit |
 | Commitment | `afi-token` / `afi-mint` on Base Sepolia | **Yes** | Rewards attribution |
 | Live proof | **Ably** | No | Subscriber trust, dashboard UX |
 | Distribution | Telegram/Discord (analyst’s own) | No* | Reach (*analyst usually already has this) |
@@ -80,10 +79,19 @@ flowchart TB
 | A1 | Register as provider | `providerId`, API key, beneficiary address form | No |
 | A2 | Choose ingest source | Template: TradingView webhook URL, Telegram bot token, or REST | No |
 | A3 | Send test signal | USS/CPJ validation errors surfaced clearly | No |
-| A4 | Confirm scored | Row in `afi_evidence.signals_lifecycle` stage=SCORED | No |
-| A5 | Confirm mint (testnet) | `MintCoordinated` on Base Sepolia + stage=MINTED in BQ | No |
+| A4 | Confirm scored | Scored signal record in Mongo TSSD (`reactor_scored_signals_v1`) stage=SCORED | No |
+| A5 | Confirm mint (testnet) | `MintCoordinated` on Base Sepolia + stage=MINTED in TSSD record | No |
 
 **Done = shop is operational.** Analyst can mint-attributed signals on testnet.
+
+**Reference run (testnet demo):** point the reference spine at a Mongo TSSD instance and start it:
+
+```
+export AFI_MONGO_URI="mongodb://..."   # required — TSSD scored-signal vault
+npm run start:demo                     # webhook → afi-reactor score → Mongo TSSD persist → afi-mint → Base Sepolia
+```
+
+The reference spine has a single required dependency (`AFI_MONGO_URI`); no separate warehouse plane is provisioned for the reference implementation.
 
 ### Phase B — Proof channel (optional, ~hours if templated)
 
@@ -91,7 +99,7 @@ flowchart TB
 |------|----------------|--------------|----------------|
 | B1 | Enable “public proof feed” | Scoped Ably channel: `afi:proof:{providerId}` | **Yes** |
 | B2 | Share proof page link | Read-only Vercel page subscribing to channel | **Yes** |
-| B3 | *(Optional)* Mirror to Telegram | Bot posts “✅ Minted signal X” on mint event | Ably or Pub/Sub fan-out |
+| B3 | *(Optional)* Mirror to Telegram | Bot posts “✅ Minted signal X” on mint event | Ably or reactor mint fan-out |
 
 **Done = subscribers see live protocol proof.** Trust UX, not protocol core.
 
@@ -102,9 +110,9 @@ flowchart TB
 ### AFI accelerates (back office)
 
 - Canonical ingest dialect (USS/CPJ) and validation  
-- Scoring pipeline on GCP (no self-hosted Mongo/reactor ops)  
-- Event-driven mint with idempotency (Pub/Sub → `afi-mint`)  
-- Append-only evidence for disputes  
+- Scoring pipeline via `afi-reactor` (reference orchestrator)  
+- Event-driven mint with idempotency (`afi-mint` reads scored signal from Mongo)  
+- Mongo TSSD evidence records for disputes  
 - Testnet contract addresses and role wiring (reference operator)
 
 ### Analyst still brings
@@ -113,7 +121,7 @@ flowchart TB
 - Signal content and strategy (proprietary edge)  
 - Beneficiary wallet and key custody  
 - Compliance / disclaimers for their jurisdiction  
-- *(If no Ably)* Their own way to show proof (screenshots, BQ export, block explorer)
+- *(If no Ably)* Their own way to show proof (screenshots, TSSD export, block explorer)
 
 ### Ably accelerates (storefront only)
 
@@ -135,10 +143,10 @@ flowchart TB
 
 | Tier | Name | Includes | Target analyst |
 |------|------|----------|----------------|
-| **T0** | Protocol participant | Ingest + score + mint + BQ log | Technical, brings own UI |
+| **T0** | Protocol participant | Ingest + score + mint + TSSD record | Technical, brings own UI |
 | **T1** | Shop MVP | T0 + onboarding wizard + ingest templates | Semi-technical channel owner |
 | **T2** | Shop + Proof | T1 + Ably proof channel + public proof page | Wants subscriber-visible trust |
-| **T3** | Shop + Proof + Analytics | T2 + market context in `afi_analytics` | Full-time signal operator |
+| **T3** | Shop + Proof + Analytics | T2 + market context derived from TSSD records | Full-time signal operator |
 
 **Testnet goal:** ship **T1**; demo **T2** on one pilot analyst.
 
@@ -169,14 +177,14 @@ These reduce time-to-shop more than Ably:
 
 **Rules:**
 
-- Publish only **after** BQ append and/or on-chain confirm (Ably is read model, not source of truth).  
+- Publish only **after** Mongo TSSD persist and/or on-chain confirm (Ably is read model, not source of truth).  
 - Never put `proprietaryDetail` on Ably — `publicSurface` only per [`afi-infra` TSSD spec](../../afi-infra/docs/TSSD_VAULT_SPEC.md).  
 - Token auth: Ably capabilities scoped per `providerId`; subscribers get read-only.
 
 **Fan-out wiring:**
 
 ```
-Pub/Sub signal-minted → Cloud Run fan-out (tiny) → Ably REST publish
+afi-mint minted event → tiny fan-out service → Ably REST publish
 ```
 
 ---
@@ -185,8 +193,8 @@ Pub/Sub signal-minted → Cloud Run fan-out (tiny) → Ably REST publish
 
 | Bus | Role | Use Ably here? |
 |-----|------|----------------|
-| GCP Pub/Sub | Internal pipeline (`raw` → `scored` → `minted`) | **No** |
-| BigQuery | Canonical evidence log | **No** |
+| afi-reactor | Internal pipeline (`raw` → `scored` → `minted`) | **No** |
+| Mongo TSSD | Canonical evidence store | **No** |
 | Base | Commitment | **No** |
 | Ably | External live proof + dashboard | **Yes (optional)** |
 
@@ -200,7 +208,7 @@ Pub/Sub signal-minted → Cloud Run fan-out (tiny) → Ably REST publish
 | Time from signup → first testnet mint | < 3 days | < 3 days |
 | Ingest templates shipped | ≥ 2 (TV + Telegram) | ≥ 2 |
 | Analyst-built WebSocket code | 0 | 0 (Ably handles) |
-| Proof page without Ably | Possible (poll BQ) | Ably live < 2s latency |
+| Proof page without Ably | Possible (poll TSSD) | Ably live < 2s latency |
 
 ---
 
@@ -223,7 +231,7 @@ Pub/Sub signal-minted → Cloud Run fan-out (tiny) → Ably REST publish
 | “Ably lets your subscribers *see* your shop is real” | **Yes** — T2 proof channel |
 | “AFI is portable; Ably is optional reference UX” | **Yes** — align with north star |
 
-**Invest first in:** ingest templates, provider onboarding, Pub/Sub + Mage + mint path.  
+**Invest first in:** ingest templates, provider onboarding, afi-reactor + Mongo TSSD + mint path.  
 **Add Ably when:** you want a demo-ready **live proof storefront** for pilot analysts and the Codex UI.
 
 ---

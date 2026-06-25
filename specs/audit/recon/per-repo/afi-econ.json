@@ -69,10 +69,10 @@
   "recommended_action": "tag stale (rename internal afi-econ-kit identifiers + remove hardcoded path) and clarify reference-vs-normative (gate the 'WHITEPAPER READY' audit claim against the placeholder-model warning)",
   "notable_findings": [
     {
-      "title": "No Mongo / USS / CPJ / TSSD / vault / on-chain / BigQuery references anywhere",
+      "title": "No Mongo / USS / CPJ / TSSD / vault / on-chain / analytics-warehouse references anywhere",
       "severity": "Info",
-      "theme": "mongodb|vault|TSSD ; usignal|USS|cpj ; BigQuery|kafka|warehouse ; postgresql|timescaledb|influxdb",
-      "evidence": "grep for mongodb|MongoTSSD|vault|TSSD|VaultedSignalRecord, usignal|USS|cpj|CPJ, BigQuery|kafka|warehouse, postgresql|timescaledb|influxdb across all .ts/.py/.md/.json/.yaml returned zero hits (only non-protocol substring matches excluded).",
+      "theme": "mongodb|vault|TSSD ; usignal|USS|cpj ; kafka|warehouse|snowflake|datalake ; postgresql|timescaledb|influxdb",
+      "evidence": "grep for mongodb|MongoTSSD|vault|TSSD|VaultedSignalRecord, usignal|USS|cpj|CPJ, kafka|warehouse|snowflake|datalake, postgresql|timescaledb|influxdb across all .ts/.py/.md/.json/.yaml returned zero hits (only non-protocol substring matches excluded). Analytics/warehouse integrations are absent; MongoDB TSSD is the implemented evidence store. No separate warehouse plane is planned for the reference implementation.",
       "recommendation": "None. Confirms repo holds no evidence/commitment/analytics storage layer and imposes no stack mandate -- it is purely a sim harness."
     },
     {

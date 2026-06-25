@@ -70,4 +70,4 @@ Left as-is (out of scope — afi-infra dependency/tsconfig hygiene is its own ta
 - `--ignore-scripts` is no longer needed — it was **not** used as the fix.
 - Not committed (repo is not a git repo; no commit requested).
 
-**Next:** afi-core build is green and installable; ready for Phase A1 (Mage/GCP) per `AFI_FROGGY_MAGE_MIGRATION_MAP.md`.
+**Next:** afi-core build is green and installable; ready for downstream `afi-reactor` + Mongo TSSD reference-implementation work.

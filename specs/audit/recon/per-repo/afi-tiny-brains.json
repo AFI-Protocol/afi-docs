@@ -56,8 +56,8 @@
     {
       "title": "No commitment/evidence/analytics persistence: pure stateless transform",
       "severity": "Info",
-      "theme": "mongodb|vault|TSSD|postgres|bigquery|kafka",
-      "evidence": "Pattern searches for vault|TSSD|VaultedSignalRecord|mongodb|postgresql|timescaledb|influxdb|bigquery|kafka|warehouse returned ZERO hits across .py/.md/.toml. Only persistence is local model files: .gitignore \"models/*.joblib ... models/*.txt\".",
+      "theme": "mongodb|vault|TSSD|postgres|kafka",
+      "evidence": "Pattern searches for vault|TSSD|VaultedSignalRecord|mongodb|postgresql|timescaledb|influxdb|kafka|snowflake|datalake|warehouse returned ZERO hits across .py/.md/.toml. Only persistence is local model files: .gitignore \"models/*.joblib ... models/*.txt\". Analytics/warehouse integrations are absent; MongoDB TSSD is the implemented evidence store for the reference spine, and no separate warehouse plane is planned for the reference implementation.",
       "recommendation": "Confirm this stays a stateless scoring helper; it does not and should not collapse commitment/evidence/analytics planes. No persistence-store coupling exists, so no multi-engine tension here."
     },
     {

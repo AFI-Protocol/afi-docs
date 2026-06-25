@@ -61,7 +61,7 @@
       "title": "Canonical schema library omits the Commitment plane and the Market/analytics plane (2 of 5 protocol planes unrepresented)",
       "severity": "P1",
       "theme": "A-normative-surface",
-      "evidence": "afi-config/schemas/ contains vault/pipeline/blueprint/plugin/validator/USS/CPJ schemas but no on-chain receipt/anchor schema and no analytics schema; grep BigQuery|kafka|warehouse|mintForSignal|EmissionsMinted|AFISignalReceipt across afi-config = 0 schema hits (only validatorConfig.schema.json:79-103 references a mint coordinatorAddress/chainId)",
+      "evidence": "afi-config/schemas/ contains vault/pipeline/blueprint/plugin/validator/USS/CPJ schemas but no on-chain receipt/anchor schema and no analytics schema; grep kafka|warehouse|snowflake|mintForSignal|EmissionsMinted|AFISignalReceipt across afi-config = 0 schema hits (only validatorConfig.schema.json:79-103 references a mint coordinatorAddress/chainId)",
       "recommendation": "Add normative Commitment-plane (mint receipt: signalId/epoch/amounts/beneficiary/contentHash) and at least an interface schema for the analytics plane so external validators can validate on-chain<->off-chain linkage per decentralization rule 4; cross-link Theme C (anchor gap) and AFI_ONCHAIN_ANCHOR_GAP_ANALYSIS.md."
     },
     {

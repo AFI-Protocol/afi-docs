@@ -60,7 +60,7 @@
   "contradictions": [
     {
       "title": "Reactor presented as THE canonical orchestrator (reference spine asserted as protocol law)",
-      "detail": "Per the portable-protocol north star, afi-reactor is one reference DAG implementation among pluggable options (custom DAG / Mage blocks if outputs conform). afi-core docs and droid doctrine elevate afi-reactor to 'the canonical orchestrator' with a fixed '15-node DAG' as if it were normative, which can drive wrong architectural decisions about whether the DAG framework is swappable.",
+      "detail": "Per the portable-protocol north star, afi-reactor is the reference DAG implementation, and any conforming orchestrator (custom DAG, if outputs conform) may substitute for it. afi-core docs and droid doctrine elevate afi-reactor to 'the canonical orchestrator' with a fixed '15-node DAG' as if it were normative, which can drive wrong architectural decisions about whether the DAG framework is swappable.",
       "evidence": "docs/AFI_CORE_RUNTIME_OVERVIEW.md:39 'AFI-Reactor (already hardened) is the **canonical orchestrator** for AFI Protocol'; :29 'DAG Topology / Policy - That's afi-reactor (15-node DAG ...)'; .factory/droids/schema-validator-droid.md:91 'afi-reactor is the orchestrator of AFI'",
       "severity": "P2"
     },
@@ -143,7 +143,7 @@
       "title": "No persistence/DB/warehouse/contract code in this repo — vault and chain are referenced only",
       "severity": "Info",
       "theme": "TSSD/vault",
-      "evidence": "package.json has zero DB/warehouse/queue deps; grep for mongo/postgres/timescale/influx/bigquery/kafka returns no code hits; vault/TSSD appear only as out-of-repo finality targets (validators/ValidatorDecision.ts:5; runtime/afiRuntimeAdapter.ts:141)",
+      "evidence": "package.json has zero DB/warehouse/queue deps; grep for mongo/postgres/timescale/influx/kafka/snowflake/datalake returns no code hits; vault/TSSD appear only as out-of-repo finality targets, with MongoDB TSSD as the implemented evidence store for the reference spine (validators/ValidatorDecision.ts:5; runtime/afiRuntimeAdapter.ts:141)",
       "recommendation": "None for the Mongo/multi-engine tension — this repo is correctly storage-agnostic and does not collapse evidence/commitment/analytics into a store. Good model for storage-neutrality."
     },
     {

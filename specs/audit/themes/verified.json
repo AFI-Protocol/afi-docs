@@ -41,7 +41,7 @@
       "title": "Canonical schema library omits the Commitment plane and the Market/analytics plane (2 of 5 protocol planes unrepresented)",
       "original_severity": "P1",
       "confirmed": true,
-      "corrected_evidence": "afi-config/schemas/ holds vault/pipeline/blueprint/plugin/validator/USS/CPJ schemas but no on-chain receipt/anchor schema and no analytics schema; the only on-chain reference is a coordinator address/chainId field at afi-config/schemas/validatorConfig.schema.json:82-87 ('coordinatorAddress' at :82, 'chainId' at :87), not a commitment-plane schema. Reproducible negative searches (run from /home/user/AFI-Protocol): 'rg -nwi -c \"bigquery|kafka|warehouse|snowflake|redshift\" afi-config/schemas' => 0 hits; 'rg -nc \"EmissionsMinted|mintForSignal|AFISignalReceipt|contentHash\" afi-config/schemas' => 0 hits",
+      "corrected_evidence": "afi-config/schemas/ holds vault/pipeline/blueprint/plugin/validator/USS/CPJ schemas but no on-chain receipt/anchor schema and no analytics schema; the only on-chain reference is a coordinator address/chainId field at afi-config/schemas/validatorConfig.schema.json:82-87 ('coordinatorAddress' at :82, 'chainId' at :87), not a commitment-plane schema. Reproducible negative searches (run from /home/user/AFI-Protocol): 'rg -nwi -c \"kafka|warehouse|snowflake|redshift|datalake\" afi-config/schemas' => 0 hits; 'rg -nc \"EmissionsMinted|mintForSignal|AFISignalReceipt|contentHash\" afi-config/schemas' => 0 hits",
       "revised_severity": "P1",
       "note": "Confirmed. Two scoped, collision-safe greps over afi-config/schemas return zero hits for analytics-plane and on-chain-commitment terms, so the Commitment and Market/analytics planes have no canonical schema. P1 stands (external validators cannot validate on-chain<->off-chain linkage from the schema library)."
     },
@@ -104,7 +104,7 @@
       "title": "afi-reactor self-declares as THE 'ONLY' orchestrator and 'the DAG is law', presenting the reference scoring-DAG plane as protocol law",
       "original_severity": "P1",
       "confirmed": true,
-      "corrected_evidence": "afi-reactor/README.md:137 '**afi-reactor is the ONLY orchestrator in AFI Protocol.**'; afi-reactor/AGENTS.md:3 'This is the **ONLY orchestrator** in the AFI ecosystem'; afi-reactor/docs/AFI_ORCHESTRATOR_DOCTRINE.md:38-40 '### 3. The DAG is law ... ad-hoc flows are anti-patterns' vs afi-docs/specs/AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md:53 'afi-reactor, custom DAG, Mage blocks (if outputs conform)'",
+      "corrected_evidence": "afi-reactor/README.md:137 '**afi-reactor is the ONLY orchestrator in AFI Protocol.**'; afi-reactor/AGENTS.md:3 'This is the **ONLY orchestrator** in the AFI ecosystem'; afi-reactor/docs/AFI_ORCHESTRATOR_DOCTRINE.md:38-40 '### 3. The DAG is law ... ad-hoc flows are anti-patterns' vs afi-docs/specs/AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md:53 'afi-reactor, custom DAG, any conforming orchestrator (if outputs conform)'",
       "revised_severity": "P1",
       "note": "Confirmed verbatim at all three reactor sites; North Star (:53, :68 'any conforming orchestrator') frames the scoring-DAG plane as pluggable. Reference-as-law contradiction that misdirects architecture. P1 stands (shared with draft:83)."
     },
@@ -203,7 +203,7 @@
       "title": "No analytics/market plane and no on-chain commitment schema in the canonical schema library",
       "original_severity": "P1",
       "confirmed": true,
-      "corrected_evidence": "afi-config/schemas/ — the only on-chain reference is a coordinator address/chainId at afi-config/schemas/validatorConfig.schema.json:82-87 ('coordinatorAddress' at :82, 'chainId' at :87), not a commitment-plane schema, and there is no analytics schema. Reproducible negative searches (from /home/user/AFI-Protocol): 'rg -nwi -c \"bigquery|kafka|warehouse|snowflake|redshift\" afi-config/schemas' => 0 hits; 'rg -nc \"EmissionsMinted|mintForSignal|AFISignalReceipt|contentHash\" afi-config/schemas' => 0 hits",
+      "corrected_evidence": "afi-config/schemas/ — the only on-chain reference is a coordinator address/chainId at afi-config/schemas/validatorConfig.schema.json:82-87 ('coordinatorAddress' at :82, 'chainId' at :87), not a commitment-plane schema, and there is no analytics schema. Reproducible negative searches (from /home/user/AFI-Protocol): 'rg -nwi -c \"kafka|warehouse|snowflake|redshift|datalake\" afi-config/schemas' => 0 hits; 'rg -nc \"EmissionsMinted|mintForSignal|AFISignalReceipt|contentHash\" afi-config/schemas' => 0 hits",
       "revised_severity": "P1",
       "note": "Confirmed (matches theme:A-normative-surface#4). Scoped collision-safe greps over afi-config/schemas show neither an analytics-plane schema nor an on-chain commitment/anchor schema exists. P1 stands."
     },
@@ -275,7 +275,7 @@
       "title": "Reactor self-declares as THE single orchestrator, contradicting portable-protocol pluggability",
       "original_severity": "P1",
       "confirmed": true,
-      "corrected_evidence": "afi-reactor/README.md:137 '**afi-reactor is the ONLY orchestrator in AFI Protocol.**'; afi-reactor/docs/AFI_ORCHESTRATOR_DOCTRINE.md:38-40 '### 3. The DAG is law ... ad-hoc flows are anti-patterns' vs afi-docs/specs/AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md:53 'afi-reactor, custom DAG, Mage blocks (if outputs conform)' and :68 'any conforming orchestrator'",
+      "corrected_evidence": "afi-reactor/README.md:137 '**afi-reactor is the ONLY orchestrator in AFI Protocol.**'; afi-reactor/docs/AFI_ORCHESTRATOR_DOCTRINE.md:38-40 '### 3. The DAG is law ... ad-hoc flows are anti-patterns' vs afi-docs/specs/AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md:53 'afi-reactor, custom DAG, any conforming orchestrator (if outputs conform)' and :68 'any conforming orchestrator'",
       "revised_severity": "P1",
       "note": "Confirmed (same as theme:E-scoring-dag#1, verified independently). Reactor's README/Doctrine assert single-orchestrator/DAG-is-law; the portable spec makes the scoring-DAG plane pluggable. P1 stands."
     },

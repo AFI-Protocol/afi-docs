@@ -1,0 +1,157 @@
+{
+  "investigated_at": "2026-06-20T08:31:38Z",
+  "method": "ripgrep sweep + per-repo file:line trace + multi-agent fan-out + adversarial verification",
+  "canonical_evidence_store": "MongoDB TSSD",
+  "mongo_runtime_path_intact": true,
+  "mongo_mvp_runnable": "yes",
+  "purge_left_mongo_path_intact": true,
+  "retrospective_note": "A warehouse/streaming evidence plane was proposed in planning docs only and never implemented; it was retracted and scrubbed 2026-06. See AFI_EVIDENCE_STORE_DECISION.md.",
+  "verdict": "Mongo ingest->score->persist path is INTACT and runnable; MongoDB TSSD is the canonical reference evidence store.",
+  "sweep_counts_top_repos": [
+    { "repo": "afi-docs", "files": 43, "hits": 349 },
+    { "repo": "afi-infra", "files": 22, "hits": 221 },
+    { "repo": "afi-gateway", "files": 15, "hits": 151 },
+    { "repo": "afi-reactor", "files": 35, "hits": 98 },
+    { "repo": "afi-ops", "files": 5, "hits": 19 },
+    { "repo": "afi-token", "files": 4, "hits": 14 },
+    { "repo": "afi-core", "files": 7, "hits": 7 },
+    { "repo": "afi-labs", "files": 3, "hits": 5 },
+    { "repo": "afi-skills", "files": 3, "hits": 4 },
+    { "repo": "afi-research-site", "files": 2, "hits": 2 },
+    { "repo": "afi-mint", "files": 2, "hits": 2 },
+    { "repo": "afi-config", "files": 2, "hits": 2 },
+    { "repo": "afi-artifacts", "files": 1, "hits": 1 }
+  ],
+  "mongodb_runtime_deps": [
+    { "repo": "afi-reactor", "version": "^6.18.0", "fileLine": "afi-reactor/package.json:42" },
+    { "repo": "afi-infra", "version": "^7.0.0", "fileLine": "afi-infra/package.json:27" },
+    { "repo": "afi-gateway", "version": "^6.21.0", "fileLine": "afi-gateway/package.json:50" }
+  ],
+  "runtime_path": {
+    "surface_a_reactor_scored_store": {
+      "role": "reference spine (fastest demo)",
+      "classification": "RUNTIME",
+      "reachable": true,
+      "persist_op": "insertOne (append, not upsert)",
+      "collection": "afi_reactor.reactor_scored_signals_v1",
+      "hops": [
+        { "step": "entry", "fileLine": "afi-reactor/src/server.ts:159", "detail": "POST /api/webhooks/tradingview (twin: /api/ingest/cpj :290)" },
+        { "step": "invoke", "fileLine": "afi-reactor/src/server.ts:229", "detail": "runFroggyTrendPullbackFromCanonicalUss" },
+        { "step": "pipeline", "fileLine": "afi-reactor/src/services/froggyDemoService.ts:196", "detail": "runPipelineDag(FROGGY_TREND_PULLBACK_PIPELINE)" },
+        { "step": "score", "fileLine": "afi-reactor/plugins/froggy.trend_pullback_v1.plugin.ts:36", "detail": "afi-core scoreFroggyTrendPullbackFromEnriched (UWR)" },
+        { "step": "persist-gate", "fileLine": "afi-reactor/src/services/froggyDemoService.ts:268", "detail": "getTssdVaultService() (null iff AFI_MONGO_URI unset)" },
+        { "step": "persist-call", "fileLine": "afi-reactor/src/services/froggyDemoService.ts:315", "detail": "vaultService.insertSignalDocument(reactorDoc)" },
+        { "step": "persist-write", "fileLine": "afi-reactor/src/services/tssdVaultService.ts:112", "detail": "collection.insertOne(doc)" }
+      ],
+      "naming_traps": [
+        { "artifact": "DAG stage tssd-vault-write", "fileLine": "afi-reactor/src/config/froggyPipeline.ts:145", "status": "no-op handler (froggyDemoService.ts:188-193 returns payload)" },
+        { "artifact": "plugins/tssd-vault-service.ts", "fileLine": "afi-reactor/plugins/tssd-vault-service.ts:7-15", "status": "DEAD dev stub, wired only via unused config/dag.codex.json:19" },
+        { "artifact": "src/services/tssdVaultService.ts", "fileLine": "afi-reactor/src/services/tssdVaultService.ts:112", "status": "REAL Mongo write (the live persistence)" }
+      ]
+    },
+    "surface_b_gateway_tssd_vault": {
+      "role": "multi-tenant ingest",
+      "classification": "RUNTIME",
+      "reachable": true,
+      "reachable_via": "start:minimal only (default start=server-full.ts has no vault)",
+      "persist_op": "upsert (findOne+deleteOne+insertOne)",
+      "collection": "afi_tssd.tssd_signals (native time-series)",
+      "hops": [
+        { "step": "entry", "fileLine": "afi-gateway/src/http/app.ts:122", "detail": "POST /api/v1/signals (apiKeyAuth + tenant scope)" },
+        { "step": "factory", "fileLine": "afi-gateway/src/services/vaultFactory.ts:24", "detail": "createVaultFactoryFromEnv() -> TenantScopedTSSDVaultClient" },
+        { "step": "persist", "fileLine": "afi-gateway/src/http/app.ts:133", "detail": "vault.upsert(record)" },
+        { "step": "persist-impl", "fileLine": "afi-infra/src/tssd/MongoTSSDVaultClient.ts:120", "detail": "upsert() -> insertOne; dynamic import(\"mongodb\") :219-221" }
+      ]
+    }
+  },
+  "required_env": {
+    "reactor_surface_a": [
+      { "name": "AFI_MONGO_URI", "default": "(empty = vault disabled)", "required": true, "fileLine": "afi-reactor/src/services/tssdVaultService.ts:57" },
+      { "name": "AFI_MONGO_DB_NAME", "default": "afi_reactor", "required": false, "fileLine": "afi-reactor/src/services/tssdVaultService.ts:58" },
+      { "name": "AFI_MONGO_COLLECTION_SCORED", "default": "reactor_scored_signals_v1", "required": false, "fileLine": "afi-reactor/src/services/tssdVaultService.ts:59" },
+      { "name": "AFI_PRICE_FEED_SOURCE", "default": "demo", "required": false, "fileLine": "afi-reactor/src/adapters/exchanges/priceFeedRegistry.ts:59" },
+      { "name": "WEBHOOK_SHARED_SECRET", "default": "(unset = auth skipped)", "required": false, "fileLine": "afi-reactor/src/server.ts:193" }
+    ],
+    "gateway_surface_b": [
+      { "name": "AFI_TSSD_MONGODB_URI", "default": "(throws in prod if unset; falls back to MONGODB_URI/MONGO_URI)", "required": true, "fileLine": "afi-infra/src/tssd/MongoTSSDVaultClient.ts:86" },
+      { "name": "AFI_TSSD_DB_NAME", "default": "afi_tssd", "required": false, "fileLine": "afi-infra/src/tssd/MongoTSSDVaultClient.ts" },
+      { "name": "AFI_TSSD_COLLECTION", "default": "tssd_signals", "required": false, "fileLine": "afi-infra/src/tssd/MongoTSSDVaultClient.ts" },
+      { "name": "OPENAI_API_KEY", "default": "(hard-required by gateway env)", "required": true, "fileLine": "afi-gateway/src/config/env.ts" }
+    ]
+  },
+  "min_demo_commands": [
+    "docker run -d --name afi-mongo -p 27017:27017 mongo:7   # local Mongo on :27017",
+    "cd afi-reactor && npm install && npm run build",
+    "AFI_MONGO_URI='mongodb://localhost:27017' AFI_MONGO_DB_NAME=afi_reactor npm run start:demo   # node dist/src/server.js :8080",
+    "curl -X POST http://localhost:8080/api/webhooks/tradingview -H 'Content-Type: application/json' -d '{\"symbol\":\"BTCUSDT\",\"timeframe\":\"15m\",\"strategy\":\"froggy_trend_pullback_v1\",\"direction\":\"long\"}'",
+    "mongosh afi_reactor --eval 'db.reactor_scored_signals_v1.find().pretty()'"
+  ],
+  "graceful_degradation": {
+    "no_uri": "getTssdVaultService() returns null; persist skipped; webhook returns 200 with score (tssdVaultService.ts:61-64)",
+    "mongo_down": "insertSignalDocument try/catch logs failure, returns 'failed', throw swallowed; webhook returns 200 (tssdVaultService.ts:104-122)",
+    "hard_fail": "provenance guardrail throws HTTP 500 iff priceSource/venueType missing (froggyDemoService.ts:272-278) — never trips on demo path (adapter always sets both, :646-653)"
+  },
+  "purge_check": {
+    "tssd_vault_write_in_pipeline": "yes",
+    "plugin_file_exists": "yes (dead dev stub)",
+    "vault_service_imported_on_webhook": "yes",
+    "purged_plugins_were_demo_only": "yes",
+    "evidence": "froggyPipeline.ts:144-151 (stage present); plugins/tssd-vault-service.ts is a stub wired only via unused config/dag.codex.json:19; froggyDemoService.ts:23/268 imports+calls real tssdVaultService.ts; removed plugins named only in REMOVED STAGES comment froggyPipeline.ts:90-94; guardrail test test/guardrails/no-legacy-ingest.test.ts:114-118 enforces their absence"
+  },
+  "active_docs_mongo_canonical": [
+    { "path": "afi-infra/docs/TSSD_VAULT_SPEC.md", "says": "single source of truth for the signal lifecycle", "evidenceLine": "L7,98,133-137" },
+    { "path": "afi-docs/AFI_Full_Architecture.md", "says": "canonical Time-Series Storage: MongoDB", "evidenceLine": "L353-358,557-561" },
+    { "path": "afi-reactor/AGENTS.md", "says": "pipeline terminus = MongoDB collection", "evidenceLine": "L27,382,394" },
+    { "path": "afi-reactor/docs/HTTP_WEBHOOK_SERVER.md", "says": "persists scored signal to MongoDB", "evidenceLine": "L278" },
+    { "path": "afi-docs/AFI_System_Atlas.md", "says": "TSSD vault persistence via tssdVaultService.ts", "evidenceLine": "L18" },
+    { "path": "afi-docs/specs/audit/AFI_TESTNET_E2E_CHECKLIST.md", "says": "reference spine = afi-reactor + Mongo TSSD", "evidenceLine": "Reference spine table" }
+  ],
+  "repos": {
+    "afi-reactor": { "classification": "RUNTIME", "mvp_relevance": "critical", "runnable": "yes",
+      "runtime_files": ["afi-reactor/src/server.ts", "afi-reactor/src/services/froggyDemoService.ts", "afi-reactor/src/services/tssdVaultService.ts", "afi-reactor/src/services/pipelineRunner.ts", "afi-reactor/src/config/froggyPipeline.ts", "afi-reactor/plugins/froggy.trend_pullback_v1.plugin.ts"],
+      "dead_files": ["afi-reactor/plugins/tssd-vault-service.ts (dev stub, wired only via unused config/dag.codex.json)"],
+      "test_files": ["afi-reactor/test/guardrails/no-legacy-ingest.test.ts"],
+      "doc_files": ["afi-reactor/AGENTS.md", "afi-reactor/docs/HTTP_WEBHOOK_SERVER.md"] },
+    "afi-infra": { "classification": "RUNTIME", "mvp_relevance": "critical", "runnable": "unknown (library, no entrypoint)",
+      "runtime_files": ["afi-infra/src/tssd/MongoTSSDVaultClient.ts", "afi-infra/src/tssd/TSSDVaultClient.ts", "afi-infra/src/tssd/TenantScopedTSSDVaultClient.ts", "afi-infra/src/tssd/types.ts", "afi-infra/src/tssd/index.ts"],
+      "dead_files": ["afi-infra/src/tssd/TSSDReplayRunner.ts (read-only replay stub, not re-exported)"],
+      "test_files": ["afi-infra/tests/tssd/MongoTSSDVaultClient.test.ts", "afi-infra/src/tssd/__tests__/TenantScopedTSSDVaultClient.test.ts", "afi-infra/tests/tssd/TSSDReplayRunner.test.ts"],
+      "doc_files": ["afi-infra/docs/TSSD_VAULT_SPEC.md"] },
+    "afi-gateway": { "classification": "RUNTIME", "mvp_relevance": "supporting", "runnable": "yes (start:minimal)",
+      "runtime_files": ["afi-gateway/src/services/vaultFactory.ts", "afi-gateway/src/http/app.ts", "afi-gateway/src/server.ts", "afi-gateway/src/lib/db/mongo.ts", "afi-gateway/src/services/apiKeyStore.ts", "afi-gateway/src/middleware/apiKeyAuth.ts"],
+      "config_files": ["afi-gateway/src/config/env.ts", "afi-gateway/.env.example (TSSD vault vars MISSING)", "afi-gateway/package.json"],
+      "no_vault_entrypoint": "afi-gateway/src/server-full.ts (default start; ElizaOS, zero Mongo/vault wiring)",
+      "test_files": ["afi-gateway/tests/api-gateway.test.ts (in-memory)", "afi-gateway/scripts/mongo-smoke.ts (gateway-local mongo only)"] },
+    "afi-mint": { "classification": "RUNTIME (types; NO Mongo)", "mvp_relevance": "supporting", "runnable": "yes",
+      "note": "TSSD/vault only in JSDoc; persistence is InMemory* Map seams; package.json has zero DB drivers. T2 gap: implement a Mongo reader for ISignalMetadataFetcher.",
+      "runtime_files": ["afi-mint/src/adapters/EmissionsMintDataProvider.ts", "afi-mint/src/orchestrator/types.ts", "afi-mint/src/orchestrator/SignalStateManager.ts"] },
+    "afi-config": { "classification": "CONFIG/DOCS", "mvp_relevance": "supporting", "runnable": "yes",
+      "note": "vault.schema.json is engine-agnostic (mongodb is one enum among postgresql/timescaledb/influxdb)",
+      "config_files": ["afi-config/schemas/vault.schema.json"], "test_files": ["afi-config/tests/schema-validation.test.ts"], "doc_files": ["afi-config/docs/AFI_CONFIG_OVERVIEW.md"] },
+    "afi-docs": { "classification": "DOCS", "mvp_relevance": "supporting", "runnable": "n/a",
+      "note": "active operator/architecture docs correctly present Mongo TSSD as canonical persistence" },
+    "afi-ops": { "classification": "CONFIG/DOCS (stubs)", "mvp_relevance": "supporting", "runnable": "no", "note": "health/status scripts are TODO stubs; no mongodb import" },
+    "afi-token": { "classification": "DOCS", "mvp_relevance": "supporting", "runnable": "unknown", "note": "TSSD only in Solidity NatSpec comments; explicitly off-chain, not in contracts" },
+    "afi-core": { "classification": "DOCS", "mvp_relevance": "supporting", "runnable": "unknown", "note": "every TSSD hit is a docstring invariant; ValidatorDecision.ts is a future cert type, NOT a reactor vault plugin (not conflated)" },
+    "afi-labs": { "classification": "DEAD", "mvp_relevance": "supporting", "runnable": "no",
+      "note": "code-sandbox/infra/mongo.ts (new MongoClient) and agent_registry_server_mongo.py (motor) are genuine Mongo code but unwired sandbox; no package.json declares mongodb",
+      "dead_files": ["afi-labs/code-sandbox/infra/mongo.ts", "afi-labs/code-sandbox/agents/registry/agent_registry_server_mongo.py"] },
+    "afi-skills": { "classification": "CONFIG/DOCS", "mvp_relevance": "supporting", "runnable": "unknown", "note": "all hits are the tssd:read permission scope in manifest/index/frontmatter; no DB code" },
+    "afi-research-site": { "classification": "DEAD", "mvp_relevance": "dead", "runnable": "unknown", "note": "both hits are the Boxicons .bxl-mongodb brand glyph (vendor asset noise)" },
+    "afi-artifacts": { "classification": "CONFIG/TEST", "mvp_relevance": "supporting", "runnable": "no", "note": "vaulted_tssd.schema.json validation artifact + stubbed replay tool (console.log placeholder)" }
+  },
+  "four_questions": {
+    "q1_mongo_path_implemented_in_code": "yes — afi-reactor webhook->score->insertOne live (server.ts:159 .. tssdVaultService.ts:112); afi-gateway upsert path live via start:minimal",
+    "q2_documented_active_or_deprecated": "active/canonical — Mongo TSSD is the canonical reference evidence store; active operator/architecture docs present it as such with no conflict",
+    "q3_min_env_and_commands": "AFI_MONGO_URI=mongodb://localhost:27017 + (docker compose up -d mongo) + npm run build && npm run start:demo + POST /api/webhooks/tradingview; verify via mongosh. No API keys (demo price feed + fail-soft enrichment).",
+    "q4_t2_mint_gap": "afi-mint needs a concrete Mongo reader (ISignalMetadataFetcher of reactor_scored_signals_v1) + an on-chain mintForSignal client to complete ingest->score->Mongo->mint on Base Sepolia (testnet checklist §1.4)"
+  },
+  "verification": {
+    "agents": 10,
+    "adversarial_passes": 3,
+    "verdicts": [
+      { "claim": "Mongo persist path reachable from POST /api/webhooks/tradingview today", "verdict": "confirmed", "confidence": "high" },
+      { "claim": "Purge left the Mongo vault path intact (demo-chain plugins only removed)", "verdict": "confirmed", "confidence": "high" }
+    ]
+  }
+}

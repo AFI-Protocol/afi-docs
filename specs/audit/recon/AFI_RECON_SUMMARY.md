@@ -80,13 +80,13 @@ Companion: [`AFI_RECON_CORPUS.json`](./AFI_RECON_CORPUS.json) | Checkpoint: [`..
   - Evidence: `src/http/app.ts:122-141 'app.post("/api/v1/signals", auth, ... const vault = vaultFactory(tenantId); await vault.upsert(parsed.record); ... res.status(202).json({ status: "accepted", ... signalId })'; server.ts:76 advertises 'POST /api/v1/signals — Ingest signal into TSSD (tenant scoped)'`
 - **[P1] `afi-gateway`** — Ingest validation is 4-field presence check, no canonical schema validation
   - Evidence: `src/http/app.ts:20-57 normalizeSignalPayload: 'const required = ["signalId","epochId","market","timeframe"]; ... stages: payload.stages ?? {}, publicSurface: payload.publicSurface ?? {...}, proprietaryDetail: payload.proprietaryDetail'`
-- **[P1] `afi-infra`** — Persistence layer is MongoDB-only across spec, client, factory, replay (Mongo tunnel vision)
-  - Evidence: `68 mongo grep hits; src/tssd/MongoTSSDVaultClient.ts is the sole persistent client; TSSDVaultClient.ts:218 returns MongoTSSDVaultClient; replay spec line 24 "only talk to TSSD (Mongo)"; grep postgresql|timescaledb|influxdb = 0 hits`
+- **[P1] `afi-infra`** — Persistence layer is MongoDB TSSD across spec, client, factory, replay (reference evidence store)
+  - Evidence: `68 mongo grep hits; src/tssd/MongoTSSDVaultClient.ts is the sole persistent client; TSSDVaultClient.ts:218 returns MongoTSSDVaultClient; replay spec line 24 "only talk to TSSD (Mongo)"; grep postgresql|timescaledb|influxdb|snowflake = 0 hits`
 - **[P1] `afi-mint`** — Snapshot governance vote determines mint finality (selection vs finality boundary)
   - Evidence: `src/orchestrator/DisputeResolver.ts:106-122 evaluateChallengeOutcome + src/orchestrator/SignalStateManager.ts:280-290 'if (challengeSucceeded) { ... overturn original decision }'`
 - **[P1] `afi-reactor`** — README and doctrine present reference orchestrator as protocol law ('ONLY orchestrator', 'DAG is law')
   - Evidence: `README.md:137 "afi-reactor is the ONLY orchestrator in AFI Protocol."; docs/AFI_ORCHESTRATOR_DOCTRINE.md:290 "This doctrine is authoritative. All afi-reactor code must comply."`
-- **[P1] `afi-reactor`** — Vault persistence is Mongo-only and canonical contract is BSON-typed; violates multi-engine evidence plane
+- **[P1] `afi-reactor`** — Vault persistence is Mongo TSSD and canonical contract is BSON-typed; MongoDB TSSD is the reference evidence store
   - Evidence: `src/services/tssdVaultService.ts:22 "import { MongoClient, Db, Collection } from \"mongodb\";"; config/schema.codex.json:49-53 vaulted-signal meta uses bsonType; config/dag.codex.json:196 "persists execution result to MongoDB vault."`
 - **[P1] `afi-token`** — EMISSIONS_ROLE concentration is the only gate on minting
   - Evidence: `src/AFIToken.sol:92 'function mintEmissions(address beneficiary, uint256 amount) external onlyRole(EMISSIONS_ROLE)' with mainnet Pattern A granting EMISSIONS_ROLE to the Treasury Safe (DeployAFITokenMainnet.s.sol:63)`

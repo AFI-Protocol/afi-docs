@@ -4,7 +4,7 @@
 
 **Context:** Legacy pipeline purge is done. Reactor tests pass only when install skips `afi-core` prepare. Root cause is **2 TypeScript errors** in `afi-core` (verified 2026-06-19).
 
-**Parent:** Post-purge follow-up · blocks Phase A1 Mage/GCP work
+**Parent:** Post-purge follow-up · unblocks downstream `file:` consumers
 
 ---
 
@@ -122,11 +122,10 @@ Gateway uwrAxes drift (NOT required for this mission):
 
 ## Out of scope
 
-- Mage/GCP pipeline
 - Mongo removal
 - afi-mint changes
 - Moving AnalystScoreTemplate file location (path fix only)
-- Gateway ingest / signal-raw work
+- Gateway ingest work
 ```
 
 ---
@@ -141,4 +140,4 @@ Gateway uwrAxes drift (NOT required for this mission):
 
 ---
 
-*After green: proceed to Phase A1 per [`AFI_FROGGY_MAGE_MIGRATION_MAP.md`](./AFI_FROGGY_MAGE_MIGRATION_MAP.md)*
+*After green: afi-core is installable; proceed with downstream `afi-reactor` + Mongo TSSD reference-implementation work.*
