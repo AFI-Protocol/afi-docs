@@ -65,10 +65,7 @@ Companion: [`AFI_RECON_CORPUS.json`](./AFI_RECON_CORPUS.json) | Checkpoint: [`..
 | `afi-protocol` | DOCS | none | A governance/onboarding meta-repo that orchestrates the AFI ("Agentic Financial … |
 | `afi-reactor` | REFERENCE_IMPL | critical | afi-reactor is the reference TypeScript orchestrator that runs a flexible, plugi… |
 | `afi-research-site` | OUT_OF_SCOPE | none | Public-facing marketing/brochure website (Next.js App Router, Axleo template ski… |
-| `afi-sdk-python` | STALE | none | Intended official Python SDK for building on AFI Protocol (signal submission/val… |
-| `afi-sdk-ts` | STALE | none | Intended (currently unimplemented) official TypeScript/JavaScript SDK for buildi… |
 | `afi-skills` | SUPPORTING | partial | A canonical, versioned library of AFI agent "skills" -- discrete reusable capabi… |
-| `afi-starters` | SUPPORTING | none | Provides clone-and-extend starter templates and a self-hosted deployment kit (Do… |
 | `afi-tiny-brains` | REFERENCE_IMPL | partial | A FastAPI microservice exposing POST /predict/froggy that runs a three-brain ens… |
 | `afi-token` | REFERENCE_IMPL | partial | afi-token implements the AFI Protocol's on-chain Commitment plane on BASE: an xE… |
 | `afi-xerc20` | OUT_OF_SCOPE | none | A vendored fork of the defi-wonderland/xERC20 (Connext xTokens) Solidity standar… |

@@ -4,7 +4,7 @@
 **Inputs:** all 10 themes (A–J) + `themes/verified.json` (Phase 3 adversarial re-confirmation) + the persisted recon corpus (`audit/recon/AFI_RECON_CORPUS.json`, 31 records) + `drafts/AFI_CONTRADICTION_REGISTER.draft.md` + the five sibling Phase-4 reports.
 **Status:** Staged in `afi-docs/specs/audit/final/`. Read-only forensic synthesis; no protocol code, schema, or contract was modified.
 
-This is the master deliverable the North Star calls for — *"a master report with executive summary, findings, and severity"* ([`AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md`](../../AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md) §6). It consolidates the other five reports into a single decision surface: an alignment scorecard, the top-10 solidification blockers, the top-10 quick wins, the consolidated 31-repo classification, per-repo subsections, all P0/P1 findings by severity with their Phase-3 verified status, a Phase 0–4 solidification roadmap, open questions for human review, and a Definition-of-Done checklist with cross-links.
+This is the master deliverable the North Star calls for — *"a master report with executive summary, findings, and severity"* ([`AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md`](../../AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md) §6). It consolidates the other five reports into a single decision surface: an alignment scorecard, the top-10 solidification blockers, the top-10 quick wins, the consolidated repo classification, per-repo subsections, all P0/P1 findings by severity with their Phase-3 verified status, a Phase 0–4 solidification roadmap, open questions for human review, and a Definition-of-Done checklist with cross-links.
 
 All paths are relative to `/home/user/AFI-Protocol/`. Every P0/P1 item carries the **Verified** status drawn from `themes/verified.json` (Phase 3 re-opened all 33 P0/P1 sources; the gate reports **33/33 covered, all `confirmed=true`, zero refutations, zero severity changes**).
 
@@ -72,7 +72,7 @@ The North Star is unambiguous that third-party interoperability is the *defining
 
 Reading that promise as a **hard requirement**, this master report **escalates the following two confirmed-P1 findings to P0/blocker rank** for solidification prioritization:
 
-- **B1 — `theme:I-sdks-gateway#2` (external-validator interoperability is unbuilt).** Three sites declare validator certification "moved to an external certification layer", yet no external-validator service, endpoint, or interop schema exists, and the official SDKs are empty 1.0.0 scaffolds (`theme:I-sdks-gateway#3`). The promised third-party Replay Contract is undelivered. Under the hard-requirement reading this is a textbook P0: an external validator literally *cannot interoperate* because there is no surface to integrate against. The Phase-3 verifier kept it at P1 only because, at the artifact level, it is a *missing-feature/contradiction gap* rather than a live production-path rule violation (`verified.json` note on `theme:I-sdks-gateway#2`: *"borderline P0 for third-party interop, but kept at P1"*). The master honours that evidence severity (P1/CONFIRMED is recorded unchanged) but ranks it **P0/blocker #1** because it negates the protocol's defining interoperability promise. *(If a reviewer instead treats third-party validation as aspirational for v1.0, B1 stays P1 — see Open Question Q1, §7.)*
+- **B1 — `theme:I-sdks-gateway#2` (external-validator interoperability is unbuilt).** Three sites declare validator certification "moved to an external certification layer", yet no external-validator service, endpoint, or interop schema exists. The promised third-party Replay Contract is undelivered. Under the hard-requirement reading this is a textbook P0: an external validator literally *cannot interoperate* because there is no surface to integrate against. The Phase-3 verifier kept it at P1 only because, at the artifact level, it is a *missing-feature/contradiction gap* rather than a live production-path rule violation (`verified.json` note on `theme:I-sdks-gateway#2`: *"borderline P0 for third-party interop, but kept at P1"*). The master honours that evidence severity (P1/CONFIRMED is recorded unchanged) but ranks it **P0/blocker #1** because it negates the protocol's defining interoperability promise. *(If a reviewer instead treats third-party validation as aspirational for v1.0, B1 stays P1 — see Open Question Q1, §7.)*
 
 - **B2 — `theme:C-onchain-anchor#1` (third-party on-chain verifiability).** From chain data a third party can confirm only that *an authorized role minted within the cap*; they cannot verify the mint was legitimately scored or bound to real evidence, because no content/ruleset hash is anchored (`theme:C-onchain-anchor#0`) and mint is gated solely by `EMISSIONS_ROLE`. The verifier likewise considered and declined a P0 at the evidence level (*"a conforming external validator can still interoperate; it merely cannot independently attest scoring legitimacy"*). The master escalates it to **P0/blocker rank** because third-party verifiability is the entire point of the Commitment plane (§3.5); the evidence severity remains **P1/CONFIRMED**.
 
@@ -88,7 +88,6 @@ Low-effort, high-clarity fixes — mostly documentation, metadata, or one-line c
 | Q2 | Annotate the vault engine enum to state only `mongodb` is implemented today, and reframe the prod guard as "a persistent `ITSSDVaultClient` is required" (engine-agnostic). | Doc/schema note | `afi-config/schemas/vault.schema.json:14-23`; `afi-infra/src/tssd/TSSDVaultClient.ts:197-201` | C-MO-1 |
 | Q3 | Add a banner to `afi-reactor` README/Doctrine: "reference orchestrator, not the only one; any conforming version-pinned DAG output is valid." | Doc | `afi-reactor/README.md:137`; `afi-reactor/docs/AFI_ORCHESTRATOR_DOCTRINE.md:38-40` | C-RO-1 |
 | Q4 | Reconcile `dag.codex.json` with the runtime pipeline — delete or mark the four REMOVED nodes. | Config | `afi-reactor/config/dag.codex.json:100,113,156,173` vs `afi-reactor/src/config/froggyPipeline.ts:90-94` | C-RO-2 |
-| Q5 | Tag stale/empty repos and de-version the SDK scaffolds (currently `1.0.0` with imports that fail). | Metadata | `afi-sdk-python/pyproject.toml:3`; `afi-sdk-ts/package.json:6` | C-RO-3 (`theme:I-sdks-gateway#3`) |
 | Q6 | Add an enumerated `stage` field (`RAW…REPLAYED`) to `afi-config` vault schema instead of only a boolean index hint. | Small schema | `afi-config/schemas/vault.schema.json:95-98`; enum source `afi-infra/src/tssd/types.ts:8-15` | C-MO-3 (partial) |
 | Q7 | Correct `afi-token` stale metadata: coordinator is `AFIMintCoordinator.sol` (not `AFICoordinator.sol`); toolchain is Foundry/Base (not Hardhat/Sepolia). | Metadata | `afi-token/.droid.json:3-4`; `afi-token/.afi-codex.json:8` vs `afi-token/src/AFIMintCoordinator.sol:1` | C-SD-1 |
 | Q8 | Purge `afi-pipeline` from live topology docs and add a doc-hierarchy banner naming the portable spec as canonical. | Doc | `afi-docs/AFI_Repository_Map.md:24,54,168`; `afi-docs/ARCHITECTURE_STATUS.md:4` | C-SD-2, C-SD-3 |
@@ -114,7 +113,7 @@ Low-effort, high-clarity fixes — mostly documentation, metadata, or one-line c
 
 ---
 
-## 3. Consolidated 31-repo classification table
+## 3. Consolidated repo classification table
 
 Reconciled against the recon corpus (`audit/recon/AFI_RECON_CORPUS.json:1`, `init.sh` reports `corpus records: 31`) and theme B; identical to the detailed table in [`AFI_REFERENCE_IMPL_MAP.md`](./AFI_REFERENCE_IMPL_MAP.md) §3. "Spine?" marks repos on the reference spine **ingest → scoring DAG → evidence vault → mint coordination → on-chain commitment**.
 
@@ -141,15 +140,12 @@ Reconciled against the recon corpus (`audit/recon/AFI_RECON_CORPUS.json:1`, `ini
 | 19 | `afi-protocol` | PRIVATE | DOCS | no | Governance/onboarding meta-repo; zero code. |
 | 20 | `afi-reactor` | PUBLIC | REFERENCE_IMPL | **yes (orchestrator)** | Reference Froggy DAG `afi-reactor/src/services/pipelineRunner.ts:161`; "ONLY orchestrator" `afi-reactor/README.md:137`. |
 | 21 | `afi-research-site` | PRIVATE | OUT_OF_SCOPE | no | Next.js marketing site (Axleo template); "explicitly separate from the protocol stack". |
-| 22 | `afi-sdk-python` | PRIVATE | STALE | no | Empty scaffold; non-functional import `afi-sdk-python/README.md:28`. |
-| 23 | `afi-sdk-ts` | PRIVATE | STALE | no | Empty scaffold; `afi-sdk-ts/package.json:6` (`main` → missing `dist`). |
-| 24 | `afi-skills` | PUBLIC | SUPPORTING | no | Versioned agent-skill library; scoped skill contract only. |
-| 25 | `afi-starters` | PRIVATE | SUPPORTING | no | Clone-and-extend deploy kit; bakes Mongo `afi-starters/self-hosted-pipeline/.env.example:1-4`. |
-| 26 | `afi-tiny-brains` | PRIVATE | REFERENCE_IMPL | **yes (ML enrich)** | FastAPI ML microservice `afi-tiny-brains/README.md:11`. |
-| 27 | `afi-token` | PRIVATE | REFERENCE_IMPL | **yes (on-chain)** | BASE contracts `afi-token/src/AFIMintCoordinator.sol:68`, `afi-token/src/AFIToken.sol:92`. |
-| 28 | `afi-xerc20` | PUBLIC | OUT_OF_SCOPE | no | Vendored defi-wonderland/xERC20 fork `afi-xerc20/package.json:6`. |
+| 22 | `afi-skills` | PUBLIC | SUPPORTING | no | Versioned agent-skill library; scoped skill contract only. |
+| 23 | `afi-tiny-brains` | PRIVATE | REFERENCE_IMPL | **yes (ML enrich)** | FastAPI ML microservice `afi-tiny-brains/README.md:11`. |
+| 24 | `afi-token` | PRIVATE | REFERENCE_IMPL | **yes (on-chain)** | BASE contracts `afi-token/src/AFIMintCoordinator.sol:68`, `afi-token/src/AFIToken.sol:92`. |
+| 25 | `afi-xerc20` | PUBLIC | OUT_OF_SCOPE | no | Vendored defi-wonderland/xERC20 fork `afi-xerc20/package.json:6`. |
 
-**Class tallies (28 total):** NORMATIVE = 2; REFERENCE_IMPL = 8; SUPPORTING = 10; RESEARCH = 2; DOCS = 2; STALE = 2; OUT_OF_SCOPE = 2. `2 + 8 + 10 + 2 + 2 + 2 + 2 = 28`.
+**Class tallies (25 total):** NORMATIVE = 2; REFERENCE_IMPL = 8; SUPPORTING = 9; RESEARCH = 2; DOCS = 2; OUT_OF_SCOPE = 2. `2 + 8 + 9 + 2 + 2 + 2 = 25`.
 
 ---
 
@@ -199,46 +195,37 @@ Experimental playground; Mongo-only MVP scaffolds and a mock-only mint. Not prot
 ### 4.14 `afi-benchkit` — SUPPORTING
 Validator benchmark toolkit; explicitly contains no DAG/engine/scoring runtime. Merit/reputation weights here are blended into allocation in research (`afi-econ`), an Info-level coupling.
 
-### 4.15 `afi-starters` — SUPPORTING
-Clone-and-extend deploy kit; presents Mongo as the only persistence layer (`afi-starters/self-hosted-pipeline/.env.example:1-4`) — reinforces the Mongo-only tension.
-
-### 4.16 `afi-ops` — SUPPORTING
+### 4.15 `afi-ops` — SUPPORTING
 Ops/devops scaffold; declares Mongo a REQUIRED dependency and reactor as THE engine (reactor-only / Mongo-only tensions).
 
-### 4.17 `afi-factory` — SUPPORTING
+### 4.16 `afi-factory` — SUPPORTING
 Phase-1 agent-template registry; mirrors afi-config schemas without defining protocol law.
 
-### 4.18 `afi-skills` — SUPPORTING
+### 4.17 `afi-skills` — SUPPORTING
 Versioned agent-skill library + tooling; scoped skill contract only.
 
-### 4.19 `afi-cli-framework` — SUPPORTING
+### 4.18 `afi-cli-framework` — SUPPORTING
 Generic Commander.js CLI scaffold; zero protocol surface.
 
-### 4.20 `afi-artifacts` — SUPPORTING
+### 4.19 `afi-artifacts` — SUPPORTING
 Zenodo paper reproducibility bundle; schema snapshots are point-in-time copies, not canonical.
 
-### 4.21 `afi-assets` — SUPPORTING
+### 4.20 `afi-assets` — SUPPORTING
 Brand/design assets; directories are empty `.gitkeep` placeholders.
 
-### 4.22 `.github` — SUPPORTING
+### 4.21 `.github` — SUPPORTING
 Org-level config and the org-profile README (which still labels reactor as THE orchestrator and lists archived repos — stale-arch-docs).
 
-### 4.23 `afi-docs` — DOCS
+### 4.22 `afi-docs` — DOCS
 Documentation hub hosting the North Star itself; "NOT for code implementation" (`afi-docs/AGENTS.md`). Several docs self-declare authority without naming the portable spec as canonical (C-SD-3).
 
-### 4.24 `afi-protocol` — DOCS
+### 4.23 `afi-protocol` — DOCS
 Governance/onboarding meta-repo; zero code or schemas.
 
-### 4.25 `afi-sdk-python` — STALE
-Empty scaffold (only `pyproject.toml` + README) versioned `1.0.0`; README import `from afi_sdk import AFIClient` cannot resolve (`afi-sdk-python/README.md:28`). Part of B1's "no public protocol API" gap.
-
-### 4.26 `afi-sdk-ts` — STALE
-Empty scaffold (only `package.json` + README); `main` points at a non-existent `dist` and `test` is a TBD stub (`afi-sdk-ts/package.json:6,16`).
-
-### 4.27 `afi-research-site` — OUT_OF_SCOPE
+### 4.24 `afi-research-site` — OUT_OF_SCOPE
 Next.js marketing site (Axleo template); "explicitly separate from the AFI Network protocol stack".
 
-### 4.28 `afi-xerc20` — OUT_OF_SCOPE
+### 4.25 `afi-xerc20` — OUT_OF_SCOPE
 Vendored defi-wonderland/xERC20 bridge fork (`afi-xerc20/package.json:6`); not an AFI mint/receipt artifact and must not be read as the commitment layer.
 
 ---
@@ -272,7 +259,6 @@ All P0/P1 findings collapse to **23 register rows over 33 verified sources** (so
 | C-MO-10 | Mongo-only | `theme:D-evidence-vault#2` | P1 → P1 | CONFIRMED |
 | C-RO-1 | reactor-only | `theme:E-scoring-dag#1`; `draft:83` | P1 → P1 | CONFIRMED |
 | C-RO-2 | reactor-only | `theme:E-scoring-dag#0` | P1 → P1 | CONFIRMED |
-| C-RO-3 | reactor-only | `theme:I-sdks-gateway#3` | P1 → P1 | CONFIRMED |
 | C-BL-1 | BASE-ledger | `theme:C-onchain-anchor#0` | P1 → P1 | CONFIRMED |
 | C-BL-3 | BASE-ledger | `theme:G-emissions-mint#3` | P1 → P1 | CONFIRMED |
 | C-ES-1 | econ-splits | `theme:G-emissions-mint#4` | P1 → P1 | CONFIRMED |
@@ -297,7 +283,7 @@ All P0/P1 findings collapse to **23 register rows over 33 verified sources** (so
 A staged path from the current ≈32/100 alignment to a third-party-verifiable portable protocol. Phases are ordered by dependency and risk: Phase 0 is pure hygiene (no data-path change); Phases 1–2 complete and enforce the normative surface; Phase 3 closes the on-chain anchor (escalated blocker B2); Phase 4 delivers the external-validator interoperability surface (escalated blocker B1). Maps to the North Star's six solidification goals (§5).
 
 ### Phase 0 — Doc hygiene & honest labeling *(the top-10 quick wins; days)*
-Re-arm the CI schema gate (Q1), annotate the vault engine enum and prod guard (Q2), reframe reactor as the reference orchestrator (Q3), reconcile `dag.codex.json` with the runtime (Q4), tag/de-version stale repos and SDK scaffolds (Q5), correct `afi-token` metadata (Q7), purge stale repo names and add a doc-hierarchy banner naming the portable spec as canonical (Q8), reconcile the `provenance.timestamp` doc (Q9), resolve the receipt URI (Q10). **Exit:** docs no longer assert reference impls as protocol law; CI actually validates schemas.
+Re-arm the CI schema gate (Q1), annotate the vault engine enum and prod guard (Q2), reframe reactor as the reference orchestrator (Q3), reconcile `dag.codex.json` with the runtime (Q4), correct `afi-token` metadata (Q7), purge stale repo names and add a doc-hierarchy banner naming the portable spec as canonical (Q8), reconcile the `provenance.timestamp` doc (Q9), resolve the receipt URI (Q10). **Exit:** docs no longer assert reference impls as protocol law; CI actually validates schemas.
 
 ### Phase 1 — Complete the normative surface *(weeks)*
 Promote the lifecycle law into `afi-config`: add the enumerated `stage` field (Q6) and a normative `ValidatorReplaySession` schema; add the **missing-plane schemas** — a Commitment-plane receipt schema (`signalId`/epoch/amounts/beneficiary/`contentHash`/`rulesetVersion`) and at least an analytics-plane interface schema (closes B3); move the canonical `VaultedSignalRecord` shape into the normative library rather than a reference repo. **Exit:** all five planes have a normative schema; external stacks can machine-validate lifecycle/linkage from the source of truth. *(North Star goals 1, 4.)*
@@ -309,7 +295,7 @@ Add record-level `codexVersion`/`configSnapshotId`/`dagTopologyHash`/`payloadHas
 Add `bytes32 contentHash` + `rulesetVersion` to `MintRequest`/receipt so each mint is cryptographically bound to its off-chain evidence and the exact emissions ruleset; persist a minimal anchor mapping (`signalId → {epoch, contentHash}`) or document log-only provenance; replace the inlined afi-math schedule with a versioned import pinned on-chain/in-receipt (C-MM-1); reconcile on-chain vs off-chain receipt dialects; decide splits-vs-single-beneficiary in the normative spec (C-ES-1). **Exit:** a third party can verify a mint's legitimacy from chain data + published rules. *(North Star goal 4; on-chain anchor gap analysis §8.)*
 
 ### Phase 4 — External-validator interoperability & the Replay Contract (closes B1) *(quarter)*
-Define and publish the **third-party Replay Contract** (the cross-repo checklist of what a validator needs to reproduce a mint without org infra), deliver an external-validator service/endpoint and interop schema (the layer the code claims certification "moved to" but never built), and ship working SDKs against it (replacing the empty `1.0.0` scaffolds). Add a conformance test kit so a stranger's stack can self-certify. **Exit:** an external validator can interoperate end-to-end — the portable-protocol promise is met. *(North Star goals 2, 5.)*
+Define and publish the **third-party Replay Contract** (the cross-repo checklist of what a validator needs to reproduce a mint without org infra), deliver an external-validator service/endpoint and interop schema (the layer the code claims certification "moved to" but never built), and ship working SDKs against it. Add a conformance test kit so a stranger's stack can self-certify. **Exit:** an external validator can interoperate end-to-end — the portable-protocol promise is met. *(North Star goals 2, 5.)*
 
 ---
 

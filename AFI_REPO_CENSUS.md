@@ -24,10 +24,7 @@
 | afi-protocol | node/ts | 2025-11-24 | AFI Protocol (Meta‑Repo) |
 | afi-reactor | node/ts | 2025-12-17 | AFI-Reactor ⚡ |
 | afi-research-site | node/ts | 2025-11-24 | AFI Research Site |
-| afi-sdk-python | python | 2025-11-14 | afi-sdk-python |
-| afi-sdk-ts | node/ts | 2025-11-14 | afi-sdk-ts |
 | afi-skills | node/ts | 2025-11-28 | AFI Skills Library |
-| afi-starters | node/ts | 2025-11-26 | afi-starters |
 | afi-tiny-brains | python | 2025-12-13 | Tiny Brains Service |
 | afi-token | node/ts/solidity | 2025-11-28 | AFI Token Protocol |
 | augmentcode_rules | unknown | 2025-12-06 | No README found (augment code rules/config) |

@@ -106,7 +106,6 @@ Audit: **≈32/100** (partial / fragmented). Method: mean of five plane scores i
 - Code/docs claiming "external layer" but no implementation:
   - [`afi-gateway/src/afiClient.ts`](../../../afi-gateway/src/afiClient.ts) ~L46
   - [`afi-reactor/src/config/froggyPipeline.ts`](../../../afi-reactor/src/config/froggyPipeline.ts) ~L93
-- Empty SDKs: [`afi-sdk-ts/package.json`](../../../afi-sdk-ts/package.json), [`afi-sdk-python/pyproject.toml`](../../../afi-sdk-python/pyproject.toml)
 - Verifier note: [`themes/verified.json`](./themes/verified.json) → search `I-sdks-gateway#2`
 
 - [ ] **Yes — hard for v1.0** → B1 + B2 = **P0 blockers** ([§1.4](../AFI_PROTOCOL_SURFACE_AUDIT.md))
@@ -288,7 +287,6 @@ _________________________________________________________
 | [ ] | Q2 | Annotate vault engines (Mongo = reference default) | [`afi-config/schemas/vault.schema.json`](../../../afi-config/schemas/vault.schema.json), [`afi-infra/src/tssd/TSSDVaultClient.ts`](../../../afi-infra/src/tssd/TSSDVaultClient.ts) |
 | [ ] | Q3 | Reframe reactor as reference orchestrator | [`afi-reactor/README.md`](../../../afi-reactor/README.md), [`afi-reactor/docs/AFI_ORCHESTRATOR_DOCTRINE.md`](../../../afi-reactor/docs/AFI_ORCHESTRATOR_DOCTRINE.md) |
 | [ ] | Q4 | Reconcile `dag.codex.json` vs Froggy runtime | [`afi-reactor/config/dag.codex.json`](../../../afi-reactor/config/dag.codex.json), [`afi-reactor/src/config/froggyPipeline.ts`](../../../afi-reactor/src/config/froggyPipeline.ts) |
-| [ ] | Q5 | De-version / tag empty SDK scaffolds | [`afi-sdk-python/`](../../../afi-sdk-python/), [`afi-sdk-ts/`](../../../afi-sdk-ts/) |
 | [ ] | Q6 | Add `stage` enum to vault schema | [`afi-config/schemas/vault.schema.json`](../../../afi-config/schemas/vault.schema.json), copy enum from [`afi-infra/src/tssd/types.ts`](../../../afi-infra/src/tssd/types.ts) |
 | [ ] | Q7 | Fix `afi-token` stale metadata | [`afi-token/.droid.json`](../../../afi-token/.droid.json), [`afi-token/.afi-codex.json`](../../../afi-token/.afi-codex.json) |
 | [ ] | Q8 | Purge stale repo names; add canonical-doc banner | [`afi-docs/AFI_Repository_Map.md`](../../AFI_Repository_Map.md), [`afi-docs/ARCHITECTURE_STATUS.md`](../../ARCHITECTURE_STATUS.md) |
@@ -309,7 +307,7 @@ _________________________________________________________
 | [ ] **1** | Normative surface | [`afi-config/schemas/`](../../../afi-config/schemas/) | Commitment + lifecycle schemas (closes B3, B5) |
 | [ ] **2** | Replay + evidence | [`afi-infra/`](../../../afi-infra/), [`afi-reactor/`](../../../afi-reactor/), [`afi-gateway/`](../../../afi-gateway/) | Pinning, canonical scored store (B4, B6, B8, B10) |
 | [ ] **3** | On-chain anchors | [`afi-token/`](../../../afi-token/), [`afi-mint/`](../../../afi-mint/) | `contentHash`, `rulesetVersion` (B2) |
-| [ ] **4** | External validator + Replay Contract | [`afi-sdk-ts/`](../../../afi-sdk-ts/), [`afi-sdk-python/`](../../../afi-sdk-python/), new spec in `afi-config` | Interop surface (B1) |
+| [ ] **4** | External validator + Replay Contract | [`afi-gateway/`](../../../afi-gateway/), new spec in `afi-config` | Interop surface (B1) |
 
 **First phase after Phase 0:** Phase _____
 

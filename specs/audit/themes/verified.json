@@ -190,15 +190,6 @@
       "note": "Confirmed (citation-precision nit #3). Three sites declare certification 'moved to an external layer', but a scoped collision-safe grep over afi-gateway/src, afi-reactor/src and afi-config/schemas finds only comments referencing the moved-away layer and the INTERNAL validatorConfig.schema.json — no external-validator service, endpoint, or interop schema. The portable spec's promised third-party Replay Contract is undelivered. P1 stands (borderline P0 for third-party interop, but kept at P1 as a missing-feature/contradiction gap)."
     },
     {
-      "source": "theme:I-sdks-gateway#3",
-      "title": "Official SDKs (afi-sdk-python, afi-sdk-ts) are empty 1.0.0-versioned scaffolds with non-functional usage examples",
-      "original_severity": "P1",
-      "confirmed": true,
-      "corrected_evidence": "afi-sdk-python/pyproject.toml:3 'version = \"1.0.0\"' with only pyproject.toml + README.md present (no afi_sdk package dir); afi-sdk-python/README.md:28 'from afi_sdk import AFIClient' (import cannot resolve); afi-sdk-ts/package.json:6 '\"main\": \"./dist/index.js\"' (no dist; only package.json + README.md) and afi-sdk-ts/package.json:16 '\"test\": \"echo 'Test script TBD'\"'",
-      "revised_severity": "P1",
-      "note": "Confirmed. Directory listings show each SDK contains only a manifest + README (no source/dist), yet both are versioned 1.0.0 and the READMEs show install/import that immediately fail. P1 stands (external builders following the docs hit import/install failures)."
-    },
-    {
       "source": "draft:13",
       "title": "Vault schema lacks canonical lifecycle stage enum despite stages being indexed",
       "original_severity": "P1",

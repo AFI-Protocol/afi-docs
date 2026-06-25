@@ -57,7 +57,7 @@
 - `afi-benchkit` — Python benchmarking suite for PoI/PoInsight
 - `afi-labs` — Experimental code sandbox
 - `afi-artifacts` — Paper artifacts and reproducibility pack
-- `afi-docs`, `afi-governance`, `afi-factory`, `afi-starters` — Documentation and scaffolding
+- `afi-docs`, `afi-governance`, `afi-factory` — Documentation and scaffolding
 
 ### 1.2 Signal Lifecycle Flow
 

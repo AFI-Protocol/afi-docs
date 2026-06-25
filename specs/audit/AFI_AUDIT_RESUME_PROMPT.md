@@ -78,7 +78,7 @@ Write each completed theme to `afi-docs/specs/audit/themes/<key>.json` using thi
 | 5 | `A-normative-surface` | Normative Protocol Surface | `afi-config`, `afi-infra`, `afi-reactor`, `afi-token` |
 | 6 | `E-scoring-dag` | Scoring & DAG Plane | `afi-reactor`, `afi-core`, `afi-plugins` |
 | 7 | `J-docs-drift` | Documentation & Drift | `afi-docs`, all repos |
-| 8 | `I-sdks-gateway` | SDKs, Gateway, External Validators | `afi-sdk-*`, `afi-gateway`, `afi-starters` |
+| 8 | `I-sdks-gateway` | SDKs, Gateway, External Validators | `afi-gateway` |
 | 9 | `H-governance` | Governance, Registries, Reputation | `afi-governance`, `afi-config`, `afi-core` |
 | 10 | `F-analytics` | Market / Analytics Plane | `afi-benchkit`, `afi-econ`, `afi-reactor`, `afi-ops` |
 
