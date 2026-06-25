@@ -52,7 +52,7 @@ The portable spec frames the AFI surface as **normative law vs reference impleme
 | Tension | Entries (this register) | Highest severity | P0/P1 verified? |
 |---------|------------------------|------------------|-----------------|
 | Mongo-only | C-MO-1 … C-MO-9 (+draft P2/P3) | P1 | Yes — all CONFIRMED |
-| reactor-only | C-RO-1 … C-RO-3 (+draft P2/P3) | P1 | Yes — all CONFIRMED |
+| reactor-only | C-RO-1 … C-RO-2 (+draft P2/P3) | P1 | Yes — all CONFIRMED |
 | BASE-ledger | C-BL-1 … C-BL-3 (+draft P2/P3) | P1 | Yes — all CONFIRMED |
 | econ-splits | C-ES-1 (+draft Info) | P1 | Yes — CONFIRMED |
 | mint-model | C-MM-1 … C-MM-4 (+draft P2/P3) | P1 | Yes — all CONFIRMED |
@@ -80,21 +80,20 @@ The evidence plane and the production ingest path are hard-bound to MongoDB and 
 | **C-MO-9** | Reactor scoring output is part of the canonical evidence record (`stages.scored`) | Reactor writes a divergent `ReactorScoredSignalDocument` to a separate collection (`reactor_scored_signals_v1`); canonical `stages.scored` never populated | `afi-reactor/src/services/tssdVaultService.ts:6,59` + `afi-reactor/src/types/ReactorScoredSignalV1.ts:67` vs `afi-infra/src/tssd/types.ts:331` | P1 | `theme:D-evidence-vault#1` | **CONFIRMED (P1→P1)** |
 | **C-MO-10** | Public/proprietary surfaces are separated (publicSurface vs proprietaryDetail) | Separation is structural only — `proprietaryDetail` is stored plaintext in the same doc and returned by every read (no projection, no access control) | `afi-infra/src/tssd/MongoTSSDVaultClient.ts:278-281` (spreads whole record), `:163-191` (reads, no projection), `afi-infra/src/tssd/TSSDVaultClient.ts:88` ("No persistence, encryption, or access control") | P1 | `theme:D-evidence-vault#2` | **CONFIRMED (P1→P1)** |
 
-**Lower-severity Mongo-only rows (from draft, P2/P3):** schema descriptions hard-bind generic schemas to org repos (`draft:16`); dual USS canon v1 vs v1.1 without supersession (`draft:19`, `afi-config/schemas/usignal/v1/index.schema.json:207-209` vs `.../v1_1/index.schema.json:235-239`); gateway vault hardcoded to Mongo (`draft:44`); tenant scope mutates signal identity (`draft:45`, `afi-infra/src/tssd/TenantScopedTSSDVaultClient.ts:30-37`); ops declares Mongo a REQUIRED dependency (`draft:71`/`draft:72`); starters present Mongo as the only persistence layer (`draft:94`); labs models TSSD as Mongo-only timeseries (`draft:58`).
+**Lower-severity Mongo-only rows (from draft, P2/P3):** schema descriptions hard-bind generic schemas to org repos (`draft:16`); dual USS canon v1 vs v1.1 without supersession (`draft:19`, `afi-config/schemas/usignal/v1/index.schema.json:207-209` vs `.../v1_1/index.schema.json:235-239`); gateway vault hardcoded to Mongo (`draft:44`); tenant scope mutates signal identity (`draft:45`, `afi-infra/src/tssd/TenantScopedTSSDVaultClient.ts:30-37`); ops declares Mongo a REQUIRED dependency (`draft:71`/`draft:72`); labs models TSSD as Mongo-only timeseries (`draft:58`).
 
 ---
 
 ## 4. reactor-only tension
 
-`afi-reactor` is the reference orchestrator, but it (and the SDKs/docs pointing at it) is presented as protocol law.
+`afi-reactor` is the reference orchestrator, but it (and the docs pointing at it) is presented as protocol law.
 
 | ID | Doc says / intent | Code does | Evidence (`file:line`) | Severity | Source ID(s) | Verified |
 |----|-------------------|-----------|------------------------|----------|--------------|----------|
 | **C-RO-1** | Scoring-DAG plane is pluggable: "any conforming orchestrator" (afi-reactor, custom DAG, Mage blocks) | Reactor self-declares as THE "ONLY orchestrator" and "the DAG is law"; ad-hoc flows are "anti-patterns" | `afi-reactor/README.md:137`, `afi-reactor/AGENTS.md:3`, `afi-reactor/docs/AFI_ORCHESTRATOR_DOCTRINE.md:38-40` vs `AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md:53,68` | P1 | `theme:E-scoring-dag#1`, `draft:83` | **CONFIRMED (P1→P1)** |
 | **C-RO-2** | `dag.codex.json` is the "canonical orchestrator config" | The "canonical" codex DAG still lists nodes the runtime Froggy pipeline explicitly marks REMOVED | `afi-reactor/config/dag.codex.json:100,113,156,173` + `afi-reactor/README.md:122` vs `afi-reactor/src/config/froggyPipeline.ts:90-94` ("REMOVED STAGES") | P1 | `theme:E-scoring-dag#0` | **CONFIRMED (P1→P1)** |
-| **C-RO-3** | Official SDKs expose the canonical protocol surface | SDKs are empty 1.0.0 scaffolds whose READMEs frame the surface as "API clients for afi-reactor" and whose install/import immediately fail | `afi-sdk-python/pyproject.toml:3` + `afi-sdk-python/README.md:28`; `afi-sdk-ts/package.json:6,16` + `afi-sdk-ts/README.md:11` | P1 | `theme:I-sdks-gateway#3` | **CONFIRMED (P1→P1)** |
 
-**Lower-severity reactor-only rows (from draft, P2/P3):** charter hard-pins reactor as THE orchestrator (`draft:15`); afi-core runtime overview calls reactor "the canonical orchestrator" (`draft:23`); docs Orchestrator Doctrine "Status: Authoritative" (`draft:29`); internal doc-hierarchy conflict, no doc names the portable spec canonical (`draft:34`); plugins hardcode reactor/core/eliza as runtime targets (`draft:74`); ops/starters/tiny-brains present reactor as THE engine (`draft:73`/`draft:95`/`draft:97`); SDK narratives anchored to reactor (`draft:88`/`draft:90`).
+**Lower-severity reactor-only rows (from draft, P2/P3):** charter hard-pins reactor as THE orchestrator (`draft:15`); afi-core runtime overview calls reactor "the canonical orchestrator" (`draft:23`); docs Orchestrator Doctrine "Status: Authoritative" (`draft:29`); internal doc-hierarchy conflict, no doc names the portable spec canonical (`draft:34`); plugins hardcode reactor/core/eliza as runtime targets (`draft:74`); ops/tiny-brains present reactor as THE engine (`draft:73`/`draft:97`).
 
 ---
 
@@ -178,7 +177,6 @@ All P0/P1 contradictions cited in this register, mapped to their `themes/verifie
 | C-MO-10 | Mongo-only | `theme:D-evidence-vault#2` | P1 → P1 | CONFIRMED |
 | C-RO-1 | reactor-only | `theme:E-scoring-dag#1`; `draft:83` | P1 → P1 | CONFIRMED |
 | C-RO-2 | reactor-only | `theme:E-scoring-dag#0` | P1 → P1 | CONFIRMED |
-| C-RO-3 | reactor-only | `theme:I-sdks-gateway#3` | P1 → P1 | CONFIRMED |
 | C-BL-1 | BASE-ledger | `theme:C-onchain-anchor#0` | P1 → P1 | CONFIRMED |
 | C-BL-2 | BASE-ledger | `theme:C-onchain-anchor#1` | P1 → P1 | CONFIRMED |
 | C-BL-3 | BASE-ledger | `theme:G-emissions-mint#3` | P1 → P1 | CONFIRMED |
@@ -198,7 +196,7 @@ All P0/P1 contradictions cited in this register, mapped to their `themes/verifie
 
 1. **Decouple the evidence plane from Mongo (Mongo-only).** Document `ITSSDVaultClient` as the normative contract with Mongo as one reference adapter; add a non-Mongo adapter stub or an explicit "Postgres/Timescale/Influx are protocol-valid" note (C-MO-1). Route gateway ingest through USS/CPJ validation and the engine selector, and reconcile the two public ingest surfaces into one canonical API (C-MO-6, C-MO-7).
 2. **Make replay-pinning and lifecycle normative (Mongo-only / mint-model).** Add record-level `codexVersion`/`configSnapshotId`/`dagTopologyHash`/`payloadHash` to `VaultedSignalRecord`, an enumerated `stage` field to `afi-config`, and deterministic execution IDs in the reference DAG (C-MO-2, C-MO-3). Enforce vault append-only immutability (C-MO-8).
-3. **Reframe reactor as the reference orchestrator (reactor-only).** Change README/Doctrine/SDK language from "ONLY orchestrator / DAG is law" to "reference orchestrator for the reference spine"; reconcile `dag.codex.json` with the runtime pipeline (C-RO-1, C-RO-2); flesh out or de-version the SDK scaffolds (C-RO-3).
+3. **Reframe reactor as the reference orchestrator (reactor-only).** Change README/Doctrine language from "ONLY orchestrator / DAG is law" to "reference orchestrator for the reference spine"; reconcile `dag.codex.json` with the runtime pipeline (C-RO-1, C-RO-2).
 4. **Anchor a verifiable commitment (BASE-ledger).** Add `contentHash`/`rulesetVersion`/score axes to the on-chain `MintRequest`/receipt so a third party can verify scoring legitimacy without trusting the role holder (C-BL-1, C-BL-2, C-BL-3).
 5. **Reconcile the mint model and splits (mint-model / econ-splits).** Import the `afi-math` schedule instead of inlining it, align the documented goldpaper formula with the implemented allocation, pin reputation/epochPulse in the receipt, unify the validator-state machines (C-MM-1…C-MM-4), and document whether multi-role gauge splits are intended protocol or research-only (C-ES-1).
 6. **Fix the CI gate and define the external-validator surface (other).** Correct `validate:config` → `validate` so schema validation actually runs (C-OT-1); deliver the promised third-party certification/Replay Contract surface or remove the "moved to external layer" claims (C-OT-2).

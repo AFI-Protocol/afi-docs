@@ -178,7 +178,7 @@ Audit **all repositories** in the AFI-Protocol GitHub organization—public **an
 
 **Known local workspace repos (non-exhaustive):**
 
-`afi-artifacts`, `afi-assets`, `afi-benchkit`, `afi-cli-framework`, `afi-config`, `afi-core`, `afi-docs`, `afi-econ`, `afi-factory`, `afi-gateway`, `afi-governance`, `afi-infra`, `afi-labs`, `afi-math`, `afi-mint`, `afi-ops`, `afi-plugins`, `afi-protocol`, `afi-reactor`, `afi-research-site`, `afi-sdk-python`, `afi-sdk-ts`, `afi-skills`, `afi-starters`, `afi-tiny-brains`, `afi-token`, `afi-xerc20`
+`afi-artifacts`, `afi-assets`, `afi-benchkit`, `afi-cli-framework`, `afi-config`, `afi-core`, `afi-docs`, `afi-econ`, `afi-factory`, `afi-gateway`, `afi-governance`, `afi-infra`, `afi-labs`, `afi-math`, `afi-mint`, `afi-ops`, `afi-plugins`, `afi-protocol`, `afi-reactor`, `afi-research-site`, `afi-skills`, `afi-tiny-brains`, `afi-token`, `afi-xerc20`
 
 Also check for renamed, archived, or external-reference repos (e.g. historical `afi-pipeline` references in older docs).
 

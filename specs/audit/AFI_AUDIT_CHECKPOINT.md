@@ -47,10 +47,9 @@ Re-extract with: `python3 scripts/extract_recon.py`
 |----------------|-------|-------|
 | NORMATIVE | 2 | `afi-config`, `afi-infra` |
 | REFERENCE_IMPL | 8 | `afi-gateway`, `afi-mint`, `afi-governance`, `afi-reactor`, `afi-core`, `afi-plugins`, `afi-token`, `afi-tiny-brains` |
-| SUPPORTING | 10 | `afi-math`, `afi-starters`, `afi-skills`, `afi-benchkit`, `afi-factory`, `afi-artifacts`, `afi-ops`, `afi-cli-framework`, `afi-assets`, `.github` |
+| SUPPORTING | 9 | `afi-math`, `afi-skills`, `afi-benchkit`, `afi-factory`, `afi-artifacts`, `afi-ops`, `afi-cli-framework`, `afi-assets`, `.github` |
 | RESEARCH | 2 | `afi-econ`, `afi-labs` |
 | DOCS | 2 | `afi-protocol`, `afi-docs` |
-| STALE | 2 | `afi-sdk-python`, `afi-sdk-ts` |
 | OUT_OF_SCOPE | 2 | `afi-xerc20`, `afi-research-site` |
 
 **Replay-critical:** `afi-config`, `afi-infra`, `afi-reactor`  
@@ -64,9 +63,9 @@ Human summary: [`recon/AFI_RECON_SUMMARY.md`](./recon/AFI_RECON_SUMMARY.md)
 
 | Artifact | Path | Notes |
 |----------|------|-------|
-| Recon corpus (machine) | [`recon/AFI_RECON_CORPUS.json`](./recon/AFI_RECON_CORPUS.json) | 31 records + metadata |
+| Recon corpus (machine) | [`recon/AFI_RECON_CORPUS.json`](./recon/AFI_RECON_CORPUS.json) | 25 records + metadata |
 | Per-repo JSON | [`recon/per-repo/`](./recon/per-repo/) | One file per repo |
-| Reference impl map | [`drafts/AFI_REFERENCE_IMPL_MAP.draft.md`](./drafts/AFI_REFERENCE_IMPL_MAP.draft.md) | 103 contradictions aggregated elsewhere |
+| Reference impl map | [`drafts/AFI_REFERENCE_IMPL_MAP.draft.md`](./drafts/AFI_REFERENCE_IMPL_MAP.draft.md) | 97 contradictions aggregated elsewhere |
 | Contradiction register | [`drafts/AFI_CONTRADICTION_REGISTER.draft.md`](./drafts/AFI_CONTRADICTION_REGISTER.draft.md) | All six tension tags covered |
 
 ---
@@ -78,8 +77,7 @@ Human summary: [`recon/AFI_RECON_SUMMARY.md`](./recon/AFI_RECON_SUMMARY.md)
 3. **Weak ingest validation** — `afi-gateway` minimal field checks, not full USS/CPJ schema validation.
 4. **No commitment-plane schema** — `afi-config` lacks normative on-chain anchor / mint receipt schema.
 5. **Econ vs production mint** — `afi-econ` split models vs single `beneficiary` on-chain path.
-6. **SDK stubs** — `afi-sdk-ts` / `afi-sdk-python` have no real public protocol API.
-7. **CI validation gap** — `afi-config` schema validation script name mismatch (gate may be no-op).
+6. **CI validation gap** — `afi-config` schema validation script name mismatch (gate may be no-op).
 
 Full list: [`drafts/AFI_CONTRADICTION_REGISTER.draft.md`](./drafts/AFI_CONTRADICTION_REGISTER.draft.md)
 

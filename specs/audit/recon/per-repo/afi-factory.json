@@ -60,8 +60,7 @@
     "downstream": [
       "afi-reactor (consumer / orchestration)",
       "afi-ops (consumer per .afi-codex.json)",
-      "afi-core",
-      "afi-starters (per README Related Repositories)"
+      "afi-core"
     ]
   },
   "recommended_action": "clarify reference-vs-normative + tag stale: keep classified as SUPPORTING; (1) make schemas/index.ts explicitly generated-from / re-exported from afi-config to remove the second source of truth; (2) fix stale directory and entrypoint references (AGENTS.md, .afi-codex.json, loadTemplate paths); (3) if analyst-config templates here are ever to feed scoring, require per-plugin pinned versions for replay.",

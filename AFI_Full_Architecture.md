@@ -54,16 +54,16 @@
 │                      AFI Protocol Stack                      │
 ├─────────────────────────────────────────────────────────────┤
 │                                                               │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐      │
-│  │  afi-gateway │  │  afi-sdk-ts  │  │ afi-sdk-     │      │
-│  │   (External   │  │              │  │  python      │      │
-│  │   Integration)│  │ (TypeScript  │  │  (Python     │      │
-│  │  (Phoenix     │  │   SDK)       │  │   SDK)       │      │
-│  │   concierge; │  │              │  │              │      │
-│  │   scored-only)│  │              │  │              │      │
-│  └──────┬───────┘  └──────┬───────┘  └──────┬───────┘      │
-│         │                  │                  │              │
-│         └──────────────────┼──────────────────┘              │
+│  ┌──────────────┐                                            │
+│  │  afi-gateway │                                            │
+│  │   (External   │                                            │
+│  │   Integration)│                                            │
+│  │  (Phoenix     │                                            │
+│  │   concierge; │                                            │
+│  │   scored-only)│                                            │
+│  └──────┬───────┘                                            │
+│         │                                                     │
+│         └──────────────────┐                                  │
 │                            │                                 │
 │                    ┌───────▼────────┐                        │
 │                    │  afi-reactor   │                        │
@@ -112,7 +112,7 @@
 
 ### Repository Organization
 
-AFI Protocol is organized into **26 repositories**, each with specific responsibilities:
+AFI Protocol is organized into **23 repositories**, each with specific responsibilities:
 
 **Core Layer (3 repos):**
 - `afi-config` - Global configuration and schemas
@@ -130,11 +130,10 @@ AFI Protocol is organized into **26 repositories**, each with specific responsib
 - `afi-infra` - TSSD vault, templates, schemas
 - `afi-ops` - Deployment, health checks, runbooks
 
-**Extension Layer (4 repos):**
+**Extension Layer (3 repos):**
 - `afi-plugins` - Plugin registry and templates
 - `afi-skills` - Versioned skill library
 - `afi-factory` - Agent templates and spawning
-- `afi-starters` - Starter kits for developers
 
 **Integration Layer (2 repos):**
 - `afi-gateway` - ElizaOS integration (active concierge: Phoenix; Alpha/Froggy as generic names; legacy validator persona deprecated/removed)
@@ -144,10 +143,6 @@ AFI Protocol is organized into **26 repositories**, each with specific responsib
 - `afi-docs` - Protocol specifications and guides
 - `afi-artifacts` - Reproducibility bundle (paper-2025-v2.2)
 - `afi-benchkit` - Validator benchmarking
-
-**SDK Layer (2 repos):**
-- `afi-sdk-ts` - TypeScript SDK
-- `afi-sdk-python` - Python SDK
 
 **Other (5 repos):**
 - `afi-protocol` - Meta-repo (contributor manifest)
@@ -209,7 +204,7 @@ afi-core (depends on afi-config)
     ↓
 afi-reactor (depends on afi-core, afi-config)
     ↓
-Consumers (afi-gateway, afi-sdk-*, afi-ops)
+Consumers (afi-gateway, afi-ops)
 ```
 
 **Forbidden Patterns:**
@@ -1488,7 +1483,7 @@ UFBE_ENABLE_DEBUG=false
 - **Core Repos** - afi-config, afi-core, afi-reactor
 - **Token Repos** - afi-token, afi-mint, afi-governance, afi-math, afi-econ
 - **Infra Repos** - afi-infra, afi-ops
-- **Extension Repos** - afi-plugins, afi-skills, afi-factory, afi-starters
+- **Extension Repos** - afi-plugins, afi-skills, afi-factory
 - **Integration Repos** - afi-gateway, afi-tiny-brains
 - **Doc Repos** - afi-docs, afi-artifacts, afi-benchkit
 
@@ -1550,7 +1545,6 @@ UFBE_ENABLE_DEBUG=false
 - https://github.com/AFI-Protocol/afi-plugins
 - https://github.com/AFI-Protocol/afi-skills
 - https://github.com/AFI-Protocol/afi-factory
-- https://github.com/AFI-Protocol/afi-starters
 
 **Integration:**
 - https://github.com/AFI-Protocol/afi-gateway
@@ -1560,10 +1554,6 @@ UFBE_ENABLE_DEBUG=false
 - https://github.com/AFI-Protocol/afi-docs
 - https://github.com/AFI-Protocol/afi-artifacts
 - https://github.com/AFI-Protocol/afi-benchkit
-
-**SDKs:**
-- https://github.com/AFI-Protocol/afi-sdk-ts
-- https://github.com/AFI-Protocol/afi-sdk-python
 
 **Other:**
 - https://github.com/AFI-Protocol/afi-protocol

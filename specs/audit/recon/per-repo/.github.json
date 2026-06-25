@@ -10,7 +10,6 @@
     "contracts (named only: afi-token)",
     "schemas (named only: afi-config, afi-artifacts)",
     "registries/reputation (named only: validator/mentor registries)",
-    "SDK/API (named only: afi-sdk-ts, afi-sdk-python)",
     "replay/determinism (named only: afi-reactor replay, afi-artifacts replay)"
   ],
   "normative_artifacts": [],
@@ -54,9 +53,6 @@
       "afi-core",
       "afi-reactor",
       "afi-plugins",
-      "afi-sdk-ts",
-      "afi-sdk-python",
-      "afi-starters",
       "afi-protocol",
       "afi-governance",
       "afi-mint",

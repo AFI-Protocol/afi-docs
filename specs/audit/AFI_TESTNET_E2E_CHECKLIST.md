@@ -444,7 +444,7 @@ Track after T2 passes. Ordered roughly by audit roadmap Phase 2–4.
 | [ ] | Decide gauge splits (Q3) | `afi-econ`, `afi-token` | Worksheet Q3 |
 | [ ] | On-chain challenge registry (if desired) | `afi-mint/contracts` | A7 |
 | [ ] | Real `TSSDReplayRunner` | `afi-infra` | [`TSSDReplayRunner.ts`](../../../afi-infra/src/tssd/TSSDReplayRunner.ts) |
-| [ ] | External validator / SDK surface | `afi-sdk-ts`, `afi-sdk-python` | Master B1 |
+| [ ] | External validator surface | `afi-gateway` | Master B1 |
 
 ---
 

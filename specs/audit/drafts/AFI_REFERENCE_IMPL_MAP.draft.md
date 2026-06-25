@@ -59,10 +59,7 @@ normative surface: afi-config + afi-infra (TSSD types/spec)
 | `afi-protocol` | PRIVATE | DOCS | none | clarify reference-vs-normative |
 | `afi-reactor` | PUBLIC | REFERENCE_IMPL | critical | clarify reference-vs-normative |
 | `afi-research-site` | PRIVATE | OUT_OF_SCOPE | none | none |
-| `afi-sdk-python` | PRIVATE | STALE | none | clarify reference-vs-normative |
-| `afi-sdk-ts` | PRIVATE | STALE | none | tag stale |
 | `afi-skills` | PUBLIC | SUPPORTING | partial | clarify reference-vs-normative |
-| `afi-starters` | PRIVATE | SUPPORTING | none | clarify reference-vs-normative |
 | `afi-tiny-brains` | PRIVATE | REFERENCE_IMPL | partial | clarify reference-vs-normative |
 | `afi-token` | PRIVATE | REFERENCE_IMPL | partial | clarify reference-vs-normative |
 | `afi-xerc20` | PUBLIC | OUT_OF_SCOPE | none | clarify reference-vs-normative |
@@ -74,8 +71,8 @@ normative surface: afi-config + afi-infra (TSSD types/spec)
 - **Purpose:** Org-wide GitHub configuration repository for the AFI Protocol organization, holding the org profile/repository map plus a README describing intended reusable GitHub Actions workflows and templates (none of which are actually present in the repo yet).
 - **Classification:** SUPPORTING
 - **Rationale:** Contains only README.md, package.json (private, name '.github', description 'Organization-wide GitHub configuration for AFI Protocol'), and profile/README.md (the org repository map). No schemas, contracts, type defs, code, or specs. It is GitHub org tooling/config plus a documentation index, i.e. S…
-- **Touchpoints:** DAG/pipeline (named only, in repo map), mint/receipt (named only, in repo map), contracts (named only: afi-token), schemas (named only: afi-config, afi-artifacts), registries/reputation (named only: validator/mentor registries), SDK/API (named only: afi-sdk-ts, afi-sdk-python), replay/determinism (named only: afi-reactor replay, afi-artifacts replay)
-- **Dependencies:** upstream=[]; downstream=['afi-core', 'afi-reactor', 'afi-plugins', 'afi-sdk-ts', 'afi-sdk-python', 'afi-starters', 'afi-protocol', 'afi-governance', 'afi-mint', 'afi-token', 'afi-benchkit', 'afi-infra', 'afi-ops', 'afi-factory', 'afi-docs', 'afi-artifacts', 'afi-research-site', 'afi-config', 'afi-assets', 'afi-labs']
+- **Touchpoints:** DAG/pipeline (named only, in repo map), mint/receipt (named only, in repo map), contracts (named only: afi-token), schemas (named only: afi-config, afi-artifacts), registries/reputation (named only: validator/mentor registries), replay/determinism (named only: afi-reactor replay, afi-artifacts replay)
+- **Dependencies:** upstream=[]; downstream=['afi-core', 'afi-reactor', 'afi-plugins', 'afi-protocol', 'afi-governance', 'afi-mint', 'afi-token', 'afi-benchkit', 'afi-infra', 'afi-ops', 'afi-factory', 'afi-docs', 'afi-artifacts', 'afi-research-site', 'afi-config', 'afi-assets', 'afi-labs']
 
 ### `afi-artifacts`
 
@@ -178,7 +175,7 @@ normative surface: afi-config + afi-infra (TSSD types/spec)
 - **Classification:** SUPPORTING
 - **Rationale:** Phase-1 scaffolding repo for AFI agent templates/manifests/spawning, not a protocol-defining or replay-critical component. README.md:7 "where agent templates are registered, versioned, and spawned across the AFI Protocol"; README.md:33 "Phase 1 Scaffolding - Template registry and manifest are establ…
 - **Touchpoints:** DAG/pipeline (analyst enrichment-node topology config in schemas/index.ts + template_registry.ts), schemas (TypeScript mirrors of afi-config analyst-config & enrichment-node schemas), SDK/API (exported template_registry loaders and type guards), registries/reputation (template/agent registry only, not reputation)
-- **Dependencies:** upstream=['afi-config (schemas: analyst-config.schema.json, definitions/enrichment-node.schema.json)', 'afi-core (per .afi-codex.json dependsOn and README Related Repositories)', 'afi-config/codex/governance/droids/AFI_DROID_CHARTER.v0.1.md (governing charter)']; downstream=['afi-reactor (consumer / orchestration)', 'afi-ops (consumer per .afi-codex.json)', 'afi-core', 'afi-starters (per README Related Repositories)']
+- **Dependencies:** upstream=['afi-config (schemas: analyst-config.schema.json, definitions/enrichment-node.schema.json)', 'afi-core (per .afi-codex.json dependsOn and README Related Repositories)', 'afi-config/codex/governance/droids/AFI_DROID_CHARTER.v0.1.md (governing charter)']; downstream=['afi-reactor (consumer / orchestration)', 'afi-ops (consumer per .afi-codex.json)', 'afi-core']
 
 ### `afi-gateway`
 
@@ -301,21 +298,6 @@ normative surface: afi-config + afi-infra (TSSD types/spec)
 - **Classification:** OUT_OF_SCOPE
 - **Rationale:** This is a Next.js marketing/brochure website built on the purchased "Axleo" ThemeForest template (package.json name "axleo-next", README:3 "AFI Research Institute website (Next.js), adapted from the Axleo template"). It is the public portal for research programs, services, team, blog, and a fiat-onl…
 
-### `afi-sdk-python`
-
-- **Purpose:** Intended official Python SDK for building on AFI Protocol (signal submission/validation helpers, agent integration, ML/AI integration), but currently an empty scaffold with only README and pyproject.toml — no implementation exists.
-- **Classification:** STALE
-- **Rationale:** Repository contains only README.md and pyproject.toml with no source code, package, schemas, contracts, or tests. The afi_sdk package referenced in README usage examples does not exist. README Status line states "New repository created during multi-repo reorganization (2025-11-14)" and the single gi…
-- **Touchpoints:** USS/CPJ ingest (aspirational only: 'Signal submission and validation helpers'), SDK/API (intended client surface, not implemented)
-- **Dependencies:** upstream=['afi-reactor (named as API client target in README.md:11; not declared as a code dependency)']; downstream=[]
-
-### `afi-sdk-ts`
-
-- **Purpose:** Intended (currently unimplemented) official TypeScript/JavaScript SDK for building on AFI Protocol (README.md:3 "TypeScript SDK for AFI Protocol"; package.json:3).
-- **Classification:** STALE
-- **Rationale:** Repo contains only README.md and package.json with a single git commit "chore: initialize new repository" (c770140). No src/, schemas, contracts, or tests. README.md:43 states it is a "New repository created during multi-repo reorganization (2025-11-14)". package.json:6 points main to ./dist/index.j…
-- **Touchpoints:** SDK/API (aspirational only, no code), USS/CPJ ingest (implied by README 'Signal submission and validation helpers' but NOT implemented)
-
 ### `afi-skills`
 
 - **Purpose:** A canonical, versioned library of AFI agent "skills" -- discrete reusable capabilities defined as markdown + YAML front-matter (typed I/O, risk level, determinism flag, golden evals) with TS tooling (Zod schema, linter, manifest builder) and agent skillsets, consumed by afi-core/afi-reactor/afi-factory.
@@ -327,14 +309,6 @@ normative surface: afi-config + afi-infra (TSSD types/spec)
   - `/home/user/AFI-Protocol/afi-skills/scripts/shared/frontmatter-schema.ts (Zod SkillFrontMatterSchema enforcing the contract)`
   - `/home/user/AFI-Protocol/afi-skills/scripts/shared/risk-patterns.ts (security risk pattern set used in PR gating)`
 - **Dependencies:** upstream=['afi-config (declared dependsOn in .afi-codex.json:15; AGENTS.md/Charter authority afi-config/codex/governance/droids/AFI_DROID_CHARTER.v0.1.md)']; downstream=['afi-core (loads skills at runtime)', 'afi-reactor (uses skills in DAG nodes)', 'afi-factory (references skills in agent templates)', 'afi-docs (generates public documentation)', 'afi-evals (runs golden case validation)']
-
-### `afi-starters`
-
-- **Purpose:** Provides clone-and-extend starter templates and a self-hosted deployment kit (Docker/compose + Fly/Render/Railway manifests) so developers and agents can quickly bootstrap AFI-compatible projects, currently containing only a "self-hosted-pipeline" starter that stands up an afi-gateway + afi-reactor + MongoDB stack.
-- **Classification:** SUPPORTING
-- **Rationale:** This repo is a developer-onboarding scaffold collection, not a protocol authority. README.md:1-3 "Starter templates and boilerplates for AFI Protocol"; package.json:3 description matches; AGENTS.md:28 "This repo contains templates only, not runnable applications" and AGENTS.md:35 "Do not add product…
-- **Touchpoints:** DAG/pipeline (reactor enrichmentNodes configs + Pipehead plugin template), TSSD/vault (Mongo persistence env vars only, no schema), SDK/API (gateway server referenced as deploy target; README mentions afi-sdk-ts/afi-sdk-python starters not yet present)
-- **Dependencies:** upstream=['afi-gateway (Dockerfile clones GATEWAY_REPO; runs dist/src/server-full.js)', 'afi-reactor (Dockerfile clones REACTOR_REPO; runs dist/src/server.js; plugin template imports afi-reactor/src/types/dag.js)', 'afi-skills (Dockerfile clones SKILLS_REPO for manifest.json)', 'afi-config (AGENTS.md cites afi-config/codex/governance/droids/AFI_DROID_CHARTER.v0.1.md as global authority)']; downstream=['Developers/agents who fork starters', "afi-factory (AGENTS.md:48 'Consumed by: ... afi-factory (for agent instantiation)')"]
 
 ### `afi-tiny-brains`
 
@@ -421,13 +395,6 @@ Code/docs implying Mongo, reactor, or org infra is **mandatory** (not merely def
 | `afi-reactor` | `/home/user/AFI-Protocol/afi-reactor/src/services/tssdVaultService.ts` | Provides MongoDB persistence for scored signals from AFI Reactor. ... AFI_MONGO_URI: MongoDB connection string (required) |
 | `afi-reactor` | `/home/user/AFI-Protocol/afi-reactor/config/dag.codex.json` | "description": "Stores approved signals in the MongoDB T.S.S.D. Vault." |
 | `afi-reactor` | `/home/user/AFI-Protocol/afi-reactor/config/schema.codex.json` | "meta": { "bsonType": "object", "required": ["signalId", "timestamp", "score"] ...} (vaulted-signal schema expressed only as MongoDB BSON) |
-| `afi-sdk-python` | `/home/user/AFI-Protocol/afi-sdk-python/README.md:11` | - Pythonic API clients for afi-reactor |
-| `afi-sdk-ts` | `/home/user/AFI-Protocol/afi-sdk-ts/README.md:11` | Type-safe API clients for afi-reactor |
 | `afi-skills` | `/home/user/AFI-Protocol/afi-skills/AGENTS.md:55` | Consumed by: afi-core (loads skills at runtime), afi-reactor (uses skills in DAG nodes), afi-factory (references skills in agent templates) |
-| `afi-starters` | `self-hosted-pipeline/docker-compose.yml:4-10` | services:   mongo:     image: mongo:7     ... volumes:       - mongo_data:/data/db |
-| `afi-starters` | `self-hosted-pipeline/.env.example:1-4` | # Core persistence AFI_TSSD_MONGODB_URI=mongodb://mongo:27017 AFI_TSSD_DB_NAME=afi_tssd AFI_TSSD_COLLECTION=tssd_signals |
-| `afi-starters` | `self-hosted-pipeline/render.yaml:24-27` | databases:   - name: afi-mongo     databaseName: afi_tssd     ipAllowList: [] |
-| `afi-starters` | `self-hosted-pipeline/Dockerfile:2-3` | ARG GATEWAY_REPO=https://github.com/AFI-Protocol/afi-gateway.git ARG REACTOR_REPO=https://github.com/AFI-Protocol/afi-reactor.git |
-| `afi-starters` | `self-hosted-pipeline/plugins/custom.plugin.ts:1-2` | // Custom enrichment plugin template compatible with afi-reactor Pipehead interface import type { Pipehead, PipelineState } from "afi-reactor/src/types/dag.js"; |
 | `afi-tiny-brains` | `README.md:11` | This service is called by `afi-reactor` via the Tiny Brains client (`src/aiMl/tinyBrainsClient.ts`) when Froggy enrichment has `aiMl.enabled = true`. |
 | `afi-tiny-brains` | `README.md:120` | X-AFI-Client: afi-reactor-froggy-v1 |

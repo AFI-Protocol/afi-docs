@@ -71,8 +71,7 @@ afi-factory (template layer)
     ↓
     ├── afi-core (agent runtime)
     ├── afi-reactor (agent orchestration)
-    ├── afi-skills (agent skills)
-    └── afi-starters (starter templates)
+    └── afi-skills (agent skills)
 ```
 
 **Key Principle**: **afi-factory defines HOW agents are instantiated and configured** (templates, spawning logic, runtime configuration).

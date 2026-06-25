@@ -224,26 +224,6 @@ Template applied uniformly across all detected repositories in `/Users/secretser
 - Doc confidence: Medium.
 - Best Mintlify placement: Research > Site.
 
-## afi-sdk-python
-- Identity: afi-sdk-python (`afi-sdk-python/README.md`).
-- Documentable today: Python SDK.
-- Existing docs: README present.
-- Entry points: python modules/CLI (if any).
-- Public surfaces: SDK APIs.
-- Missing pieces: API reference and examples.
-- Doc confidence: Medium.
-- Best Mintlify placement: SDKs > Python.
-
-## afi-sdk-ts
-- Identity: afi-sdk-ts (`afi-sdk-ts/README.md`).
-- Documentable today: TypeScript SDK.
-- Existing docs: README present.
-- Entry points: package scripts.
-- Public surfaces: SDK exports.
-- Missing pieces: Usage guides.
-- Doc confidence: Medium.
-- Best Mintlify placement: SDKs > TypeScript.
-
 ## afi-skills
 - Identity: AFI Skills Library (`afi-skills/README.md`).
 - Documentable today: Skills modules.
@@ -253,16 +233,6 @@ Template applied uniformly across all detected repositories in `/Users/secretser
 - Missing pieces: Skill catalog and examples.
 - Doc confidence: Medium.
 - Best Mintlify placement: Developers > Skills Library.
-
-## afi-starters
-- Identity: afi-starters (`afi-starters/README.md`).
-- Documentable today: Starter templates.
-- Existing docs: README present.
-- Entry points: package scripts.
-- Public surfaces: template projects.
-- Missing pieces: Updated starter matrix.
-- Doc confidence: Medium.
-- Best Mintlify placement: Getting Started > Starters.
 
 ## afi-tiny-brains
 - Identity: Tiny Brains Service (`afi-tiny-brains/README.md`).

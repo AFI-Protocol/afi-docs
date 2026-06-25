@@ -4,8 +4,6 @@
   - What is AFI Protocol (from afi-protocol)
   - System Atlas (this repo)
 - Getting Started
-  - Starters (`afi-starters`)
-  - SDKs (`afi-sdk-ts`, `afi-sdk-python`)
   - Environment Setup (shared env vars)
 - Specs & Schemas
   - USS v1.1 (`afi-config/schemas/usignal/v1_1/*.json`)

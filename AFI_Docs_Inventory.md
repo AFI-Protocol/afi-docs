@@ -3,7 +3,7 @@
 Source: filesystem scan of `/Users/secretservice/AFI_Modular_Repos` (see machine-readable `AFI_Docs_Inventory.json`).
 
 ## Repos covered
-ElizaOS_Ext_Ref, Spartan_reference, _archived, afi-artifacts, afi-assets, afi-benchkit, afi-config, afi-core, afi-docs, afi-econ, afi-gateway, afi-factory, afi-governance, afi-infra, afi-labs, afi-math, afi-mint, afi-ops, afi-plugins, afi-protocol, afi-reactor, afi-research-site, afi-sdk-python, afi-sdk-ts, afi-skills, afi-starters, afi-tiny-brains, afi-token, augmentcode_rules, scripts.
+ElizaOS_Ext_Ref, Spartan_reference, _archived, afi-artifacts, afi-assets, afi-benchkit, afi-config, afi-core, afi-docs, afi-econ, afi-gateway, afi-factory, afi-governance, afi-infra, afi-labs, afi-math, afi-mint, afi-ops, afi-plugins, afi-protocol, afi-reactor, afi-research-site, afi-skills, afi-tiny-brains, afi-token, augmentcode_rules, scripts.
 
 ## Key documentation-rich repos
 - **afi-config**: USS schemas (`schemas/usignal/v1_1/*.json`), examples (`examples/`), templates. Anchor for schema docs.
@@ -33,7 +33,7 @@ ElizaOS_Ext_Ref, Spartan_reference, _archived, afi-artifacts, afi-assets, afi-be
 - **afi-gateway**: dev modes (CLI/server/full), start, tests (afi-reactor-actions, mongo), telemetry offline, afiscout smoke.
 - **afi-config**: build, validate, test, typecheck.
 - **afi-core**: build, test, typecheck, esm:check.
-- **afi-math / afi-plugins / afi-infra / afi-mint / afi-governance / afi-factory / afi-assets / afi-artifacts / afi-starters / afi-token / afi-sdk-ts**: build/test/typecheck variants.
+- **afi-math / afi-plugins / afi-infra / afi-mint / afi-governance / afi-factory / afi-assets / afi-artifacts / afi-token**: build/test/typecheck variants.
 - **afi-econ**: build, dev, cli, test, clean.
 - **afi-research-site**: dev/web/agent, build, analyze, backfill.
 - **afi-ops**: build, test, lint, deploy:local, health/status checks.

@@ -92,7 +92,7 @@ For each repo, classify as: `NORMATIVE` | `REFERENCE_IMPL` | `SUPPORTING` | `RES
 
 ### I. SDKs, Gateway, External Validators
 
-29. What do `afi-sdk-ts` and `afi-sdk-python` expose as the **public protocol API**?
+29. What **public protocol API** (SDKs/clients) is exposed for external builders?
 30. Can an external validator integrate without org-private infra? What's missing?
 
 ### J. Documentation & Drift

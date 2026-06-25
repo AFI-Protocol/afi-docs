@@ -1,7 +1,7 @@
 # AFI Reference Implementation Map
 
 **Phase 4 synthesis report — AFI Portable Protocol Audit**
-**Inputs:** theme B (reference implementation map) + the persisted recon corpus (`audit/recon/AFI_RECON_CORPUS.json`, 31 records) + `themes/verified.json`
+**Inputs:** theme B (reference implementation map) + the persisted recon corpus (`audit/recon/AFI_RECON_CORPUS.json`, 25 records) + `themes/verified.json`
 **Status:** Staged in `afi-docs/specs/audit/final/`. Read-only forensic synthesis; no protocol code modified.
 
 This map answers the North Star's core directive to separate **protocol law from reference plumbing**: it classifies every repo as `NORMATIVE | REFERENCE_IMPL | SUPPORTING | RESEARCH | DOCS | STALE | OUT_OF_SCOPE` and shows which repos own each segment of the reference spine **ingest → scoring DAG → evidence vault → mint coordination → on-chain commitment**. It implements the portable-protocol distinction between "normative schemas/invariants at the top" and "pluggable implementations below" ([`AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md`](../../AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md) §3, §4).
@@ -14,7 +14,7 @@ All paths are relative to `/home/user/AFI-Protocol/`. P0/P1 items carry a **Veri
 
 This map is one of six cross-linked Phase-4 reports. All link back to [`AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md`](../../AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md):
 
-- `AFI_PROTOCOL_SURFACE_AUDIT.md` — master report (exec summary, consolidated 31-repo table, findings by severity, roadmap).
+- `AFI_PROTOCOL_SURFACE_AUDIT.md` — master report (exec summary, consolidated repo table, findings by severity, roadmap).
 - `AFI_NORMATIVE_REGISTER.md` — every normative schema/invariant/contract with `file:line`; stated-but-unenforced invariants.
 - `AFI_CONTRADICTION_REGISTER.md` — all six doc/code tensions with verified status.
 - `AFI_REPLAY_READINESS_MATRIX.md` — per-lifecycle-stage replay readiness (RAW→ENRICHED→ANALYZED→SCORED→MINTED→REPLAYED).
@@ -71,7 +71,7 @@ normative surface (protocol law): afi-config (schemas) + afi-infra (TSSD types/s
 
 ---
 
-## 3. 31-repo classification table
+## 3. Repo classification table
 
 Classification reconciled against the recon corpus (`audit/recon/AFI_RECON_CORPUS.json:1`) and theme B (`themes/B-reference-impl.json` answer B2). "Spine?" marks repos on the reference spine of §2.
 
@@ -98,15 +98,12 @@ Classification reconciled against the recon corpus (`audit/recon/AFI_RECON_CORPU
 | 19 | `afi-protocol` | PRIVATE | DOCS | no | Governance/onboarding meta-repo; zero code/schemas. |
 | 20 | `afi-reactor` | PUBLIC | REFERENCE_IMPL | **yes (orchestrator)** | Reference Froggy DAG `afi-reactor/src/services/pipelineRunner.ts:161`; "ONLY orchestrator" claim `afi-reactor/README.md:137`. |
 | 21 | `afi-research-site` | PRIVATE | OUT_OF_SCOPE | no | Next.js marketing site (Axleo template); "explicitly separate from the protocol stack". |
-| 22 | `afi-sdk-python` | PRIVATE | STALE | no | Empty scaffold (README + pyproject only); non-functional examples `afi-sdk-python/README.md:11`. |
-| 23 | `afi-sdk-ts` | PRIVATE | STALE | no | Empty scaffold (README + package.json only); `afi-sdk-ts/README.md:11`. |
-| 24 | `afi-skills` | PUBLIC | SUPPORTING | no | Versioned agent-skill library + tooling; scoped skill contract only. |
-| 25 | `afi-starters` | PRIVATE | SUPPORTING | no | Clone-and-extend deploy kit; bakes Mongo `afi-starters/self-hosted-pipeline/.env.example:1-4`. |
-| 26 | `afi-tiny-brains` | PRIVATE | REFERENCE_IMPL | **yes (ML enrich)** | FastAPI ML microservice called by reactor `afi-tiny-brains/README.md:11`. |
-| 27 | `afi-token` | PRIVATE | REFERENCE_IMPL | **yes (on-chain)** | BASE/xERC20 contracts; `afi-token/src/AFIMintCoordinator.sol:68`, `afi-token/src/AFIToken.sol:92`. |
-| 28 | `afi-xerc20` | PUBLIC | OUT_OF_SCOPE | no | Vendored defi-wonderland/xERC20 fork; not an AFI artifact. |
+| 22 | `afi-skills` | PUBLIC | SUPPORTING | no | Versioned agent-skill library + tooling; scoped skill contract only. |
+| 23 | `afi-tiny-brains` | PRIVATE | REFERENCE_IMPL | **yes (ML enrich)** | FastAPI ML microservice called by reactor `afi-tiny-brains/README.md:11`. |
+| 24 | `afi-token` | PRIVATE | REFERENCE_IMPL | **yes (on-chain)** | BASE/xERC20 contracts; `afi-token/src/AFIMintCoordinator.sol:68`, `afi-token/src/AFIToken.sol:92`. |
+| 25 | `afi-xerc20` | PUBLIC | OUT_OF_SCOPE | no | Vendored defi-wonderland/xERC20 fork; not an AFI artifact. |
 
-**Class tallies (28 total):** NORMATIVE = 2 (`afi-config`, `afi-infra`); REFERENCE_IMPL = 8 (`afi-core`, `afi-gateway`, `afi-governance`, `afi-mint`, `afi-plugins`, `afi-reactor`, `afi-tiny-brains`, `afi-token`); SUPPORTING = 10 (`.github`, `afi-artifacts`, `afi-assets`, `afi-benchkit`, `afi-cli-framework`, `afi-factory`, `afi-math`, `afi-ops`, `afi-skills`, `afi-starters`); RESEARCH = 2 (`afi-econ`, `afi-labs`); DOCS = 2 (`afi-docs`, `afi-protocol`); STALE = 2 (`afi-sdk-python`, `afi-sdk-ts`); OUT_OF_SCOPE = 2 (`afi-research-site`, `afi-xerc20`). 2 + 8 + 10 + 2 + 2 + 2 + 2 = **28**.
+**Class tallies (25 total):** NORMATIVE = 2 (`afi-config`, `afi-infra`); REFERENCE_IMPL = 8 (`afi-core`, `afi-gateway`, `afi-governance`, `afi-mint`, `afi-plugins`, `afi-reactor`, `afi-tiny-brains`, `afi-token`); SUPPORTING = 9 (`.github`, `afi-artifacts`, `afi-assets`, `afi-benchkit`, `afi-cli-framework`, `afi-factory`, `afi-math`, `afi-ops`, `afi-skills`); RESEARCH = 2 (`afi-econ`, `afi-labs`); DOCS = 2 (`afi-docs`, `afi-protocol`); OUT_OF_SCOPE = 2 (`afi-research-site`, `afi-xerc20`). 2 + 8 + 9 + 2 + 2 + 2 = **25**.
 
 ---
 
@@ -117,7 +114,7 @@ The portable spec says the protocol law is *conforming outputs + pinned versions
 ### 4.1 MongoDB presented as the mandatory vault engine
 
 - `vault.schema.json` advertises a four-engine pluggable Evidence plane — enum `["mongodb","postgresql","timescaledb","influxdb"]` (`afi-config/schemas/vault.schema.json:14-23`) — but only `mongodb` is implemented: the sole persistent `ITSSDVaultClient` is `afi-infra/src/tssd/MongoTSSDVaultClient.ts:72` (dynamic `import('mongodb')` + `new MongoClient` at `afi-infra/src/tssd/MongoTSSDVaultClient.ts:220-221`); the only other clients are an in-memory dev stub (`afi-infra/src/tssd/TSSDVaultClient.ts:90`) and a tenant-scoping wrapper that defaults to Mongo (`afi-infra/src/tssd/TenantScopedTSSDVaultClient.ts:19-25`). **postgresql/timescaledb/influxdb are schema-listed-only with zero client code.**
-- Production hard-fails without a Mongo URI: `afi-infra/src/tssd/TSSDVaultClient.ts:197-201` — *"AFI_TSSD_MONGODB_URI is required in production. Falling back to in-memory is not allowed."* The reactor's scored-signal persistence is likewise Mongo-only and requires `AFI_MONGO_URI` (`afi-reactor/src/services/tssdVaultService.ts:6`), and ops/starters bake Mongo in as required infra (`afi-starters/self-hosted-pipeline/.env.example:1-4`).
+- Production hard-fails without a Mongo URI: `afi-infra/src/tssd/TSSDVaultClient.ts:197-201` — *"AFI_TSSD_MONGODB_URI is required in production. Falling back to in-memory is not allowed."* The reactor's scored-signal persistence is likewise Mongo-only and requires `AFI_MONGO_URI` (`afi-reactor/src/services/tssdVaultService.ts:6`), and ops bakes Mongo in as required infra.
 
 **Verified status (P0/P1 from `verified.json`):**
 
@@ -161,18 +158,10 @@ The engine-neutral seam (`ITSSDVaultClient`, `afi-infra/src/tssd/TSSDVaultClient
 
 | Repo | Why excluded from the live spine | Evidence |
 |------|----------------------------------|----------|
-| `afi-sdk-python` | Empty scaffold (no `afi_sdk` package); README advertises "API clients for afi-reactor" that cannot import | `afi-sdk-python/README.md:11` |
-| `afi-sdk-ts` | Empty scaffold (no `dist`/`src`); README advertises reactor clients | `afi-sdk-ts/README.md:11` |
 | `afi-xerc20` | Vendored defi-wonderland/xERC20 bridge fork; not an AFI mint/receipt artifact | corpus record `afi-xerc20` (homepage defi-wonderland/xERC20) |
 | `afi-research-site` | Marketing/brochure site; "explicitly separate from the AFI Network protocol stack" | corpus record `afi-research-site` |
 
-**Verified status (P0/P1 from `verified.json`):**
-
-| Source | Title | Orig | Verified | Revised |
-|--------|-------|------|----------|---------|
-| `theme:I-sdks-gateway#3` | Official SDKs are empty 1.0.0 scaffolds with non-functional examples | P1 | ✅ confirmed | P1 |
-
-Theme-B's stale-naming finding is **P3** (`themes/B-reference-impl.json` finding #3; tension `stale-arch-docs`). Detailed drift cataloguing is deferred to Theme J / `AFI_CONTRADICTION_REGISTER.md` (stale-arch-docs tension).
+Detailed drift cataloguing is deferred to Theme J / `AFI_CONTRADICTION_REGISTER.md` (stale-arch-docs tension).
 
 ---
 
@@ -180,8 +169,7 @@ Theme-B's stale-naming finding is **P3** (`themes/B-reference-impl.json` finding
 
 1. **Annotate the vault engine enum** (`afi-config/schemas/vault.schema.json:14-23`) to state only `mongodb` is implemented today, and reframe the prod guard (`afi-infra/src/tssd/TSSDVaultClient.ts:197-201`) as "a persistent `ITSSDVaultClient` is required in production" (engine-agnostic). [Mongo-only]
 2. **Reframe afi-reactor as the reference orchestrator** (not the only one): add a banner that any conforming, version-pinned DAG output is valid (`afi-reactor/README.md:137`). [reactor-only]
-3. **Tag stale/empty repos** (`afi-sdk-python`/`afi-sdk-ts` unimplemented scaffolds) so they are not mistaken for live spine segments. [stale-arch-docs]
-4. **Label the commitment segment precisely**: `afi-mint` = off-chain coordination; `afi-token/src` = sole on-chain commitment; `afi-xerc20` = OUT_OF_SCOPE vendored fork.
+3. **Label the commitment segment precisely**: `afi-mint` = off-chain coordination; `afi-token/src` = sole on-chain commitment; `afi-xerc20` = OUT_OF_SCOPE vendored fork.
 
 ---
 
@@ -189,6 +177,6 @@ Theme-B's stale-naming finding is **P3** (`themes/B-reference-impl.json` finding
 
 - Theme: `afi-docs/specs/audit/themes/B-reference-impl.json` (answers B1–B6; findings #0–#4).
 - Verification ledger: `afi-docs/specs/audit/themes/verified.json` (P0/P1 re-confirmation).
-- Recon corpus: `afi-docs/specs/audit/recon/AFI_RECON_CORPUS.json:1` (31 records).
+- Recon corpus: `afi-docs/specs/audit/recon/AFI_RECON_CORPUS.json:1` (25 records).
 - Draft baseline: `afi-docs/specs/audit/drafts/AFI_REFERENCE_IMPL_MAP.draft.md:13-62`.
 - North Star: [`AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md`](../../AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md) §3–§4.

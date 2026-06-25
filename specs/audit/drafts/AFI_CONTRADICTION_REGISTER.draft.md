@@ -2,7 +2,7 @@
 
 **Status:** DRAFT — unverified; adversarial verify required in Phase 3
 **Date:** 2026-06-15
-**Entries:** 103 contradictions from Phase 1 recon
+**Entries:** 97 contradictions from Phase 1 recon
 
 Promote to [`afi-docs/specs/AFI_CONTRADICTION_REGISTER.md`](../../AFI_CONTRADICTION_REGISTER.md) after verification.
 
@@ -110,15 +110,9 @@ Promote to [`afi-docs/specs/AFI_CONTRADICTION_REGISTER.md`](../../AFI_CONTRADICT
 | 85 | `afi-reactor` | other | P2 | DAG executor uses non-deterministic ordering/IDs, risking replay deter | `src/dag/DAGExecutor.ts:1002-1004 generateExecutionId uses Date.now()+Math.random; DAGExecutor.ts:716` | no |
 | 86 | `afi-reactor` | reactor-only | P2 | DAG spec/codex describe an aspirational 15-node design not matched by  | `config/schema.codex.json:289-291 "additional-schema.schema.json" ... "Additional schema to reach cou` | no |
 | 87 | `afi-reactor` | reactor-only | P3 | Doctrine claims 'Configuration is externalized' from afi-config but pi | `docs/AFI_ORCHESTRATOR_DOCTRINE.md:95-104 "Configuration is externalized... no hard-coded magic"; con` | no |
-| 88 | `afi-sdk-python` | reactor-only | P2 | SDK targets afi-reactor as the API client surface | `README.md:11 '- Pythonic API clients for afi-reactor'` | no |
-| 89 | `afi-sdk-python` | other | P3 | pyproject declares version 1.0.0 for an empty scaffold | `pyproject.toml:3 'version = "1.0.0"' vs README.md:41 '🚧 New repository created during multi-repo reo` | no |
-| 90 | `afi-sdk-ts` | reactor-only | P3 | SDK narrative anchored to afi-reactor (reference impl) rather than can | `/home/user/AFI-Protocol/afi-sdk-ts/README.md:11 'Type-safe API clients for afi-reactor'` | no |
 | 91 | `afi-skills` | Mongo-only | P3 | TSSD bound to a single named engine ('Time-Series Signal Database') | `skills/README.md:86 '`["tssd:read"]`: Read-only access to TSSD (Time-Series Signal Database)'` | no |
 | 92 | `afi-skills` | other | P2 | Determinism declared as protocol-critical but not enforced by tooling  | `scripts/lint-skills.ts:82-84 'if (fm.determinism_required) { // TODO: Add more determinism checks (e` | no |
 | 93 | `afi-skills` | other | P3 | Repo self-described as 'canonical source of truth' could be misread as | `README.md:28 '`afi-skills` is the **canonical source of truth** for AFI agent capabilities.' ; docs/` | no |
-| 94 | `afi-starters` | Mongo-only | P2 | Self-hosted starter presents Mongo as the only persistence layer (Mong | `self-hosted-pipeline/docker-compose.yml:4-10 'mongo:\n  image: mongo:7'; render.yaml:24-27 'database` | no |
-| 95 | `afi-starters` | reactor-only | P2 | Reactor presented as THE pipeline engine in the only starter | `self-hosted-pipeline/Dockerfile:3 'ARG REACTOR_REPO=https://github.com/AFI-Protocol/afi-reactor.git'` | no |
-| 96 | `afi-starters` | stale-arch-docs | P3 | README advertises many starters that do not exist (stale/aspirational  | `README.md:11-31 lists starter-signal-generator/.../starter-research-tool and 'cd afi-starters/starte` | no |
 | 97 | `afi-tiny-brains` | reactor-only | P2 | I/O contract hand-mirrored from afi-reactor TS types, not validated ag | `tiny_brains_service/models.py:12 "# Input Models (mirror TinyBrainsFroggyInput from src/aiMl/tinyBra` | no |
 | 98 | `afi-tiny-brains` | Mongo-only | P2 | Inference is non-deterministic / model versions not pinned in output ( | `tiny_brains_service/brains/chronos_brain.py:146 "num_samples=10,  # Generate multiple samples for un` | no |
 | 99 | `afi-token` | BASE-ledger | P2 | On-chain mint is single-beneficiary; no econ split / gauge despite age | `src/AFIMintCoordinator.sol:76 'token.mintEmissions(req.beneficiary, req.tokenAmount);' (single benef` | no |

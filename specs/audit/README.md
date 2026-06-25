@@ -2,9 +2,11 @@
 
 Persistent handoff for the portable-protocol surface investigation across the 31-repo workspace.
 
-**Status: COMPLETE.** All four phases are done — Phase 1 recon, Phase 2 themes (A–J), Phase 3 adversarial verification (`themes/verified.json`, 33/33 P0/P1 confirmed), and Phase 4 synthesis (6 master reports written, validated, and promoted to `afi-docs/specs/`). The deterministic gate `scripts/validate_audit.py all` reports `RESULT: PASS`.
+**Status: COMPLETE.** All four phases are done — Phase 1 recon, Phase 2 themes (A–J), Phase 3 adversarial verification (`themes/verified.json`, 32/32 P0/P1 confirmed), and Phase 4 synthesis (6 master reports written, validated, and promoted to `afi-docs/specs/`). The deterministic gate `scripts/validate_audit.py` reports `RESULT: PASS` for the `themes`, `verify`, and `reports` modes (the `citations` mode resolves against the live workspace checkout).
 
-**Org delta (2026-06-20):** Three repos were **permanently deleted** from GitHub: `afi-cli-shared`, `afi-agents`, `afi-construct`. The live org is **28 `afi-*` repos** (+ `.github`, `afi-xerc20`). Phase 4 classification reports below still reflect the **31-repo audit snapshot** (June 2026) — treat deleted repos as historical catalog entries, not operational dependencies. Operational docs (`AFI_Repository_Map.md`, governance READMEs) were scrubbed; forensic corpus (`recon/`, `themes/*.json`) was intentionally left intact.
+**Org delta (2026-06-20):** Three repos were **permanently deleted** from GitHub: `afi-cli-shared`, `afi-agents`, `afi-construct`. Operational docs (`AFI_Repository_Map.md`, governance READMEs) were scrubbed; forensic corpus (`recon/`, `themes/*.json`) was intentionally left intact.
+
+**Org delta (2026-06-25):** Three more repos were **permanently deleted** from GitHub: `afi-sdk-python`, `afi-sdk-ts`, `afi-starters` (empty SDK scaffolds + the starters kit). Unlike the 2026-06-20 pass, these were **fully erased everywhere** — operational docs, classification reports (rows/tallies/subsections), repo lists, the recon corpus (dedicated records + per-repo files + cross-refs), and the forensic themes (`I-sdks-gateway`, `B-reference-impl`) and contradiction register (`C-RO-3` retired). The classification reports now reflect a **25-repo** catalog (incl. `.github`, `afi-xerc20`); the `init.sh`/Phase-1 "31 records" provenance lines are retained as historical extraction facts.
 
 **Start here:** [`AFI_AUDIT_CHECKPOINT.md`](./AFI_AUDIT_CHECKPOINT.md) (phase status + Definition-of-Done tracker)  
 **Human review:** [`AFI_HUMAN_REVIEW_WORKSHEET.md`](./AFI_HUMAN_REVIEW_WORKSHEET.md) (Q1–Q7 decisions with file links)  
