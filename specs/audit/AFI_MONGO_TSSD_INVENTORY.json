@@ -16,7 +16,6 @@
     { "repo": "afi-token", "files": 4, "hits": 14 },
     { "repo": "afi-core", "files": 7, "hits": 7 },
     { "repo": "afi-labs", "files": 3, "hits": 5 },
-    { "repo": "afi-starters", "files": 2, "hits": 4 },
     { "repo": "afi-skills", "files": 3, "hits": 4 },
     { "repo": "afi-research-site", "files": 2, "hits": 2 },
     { "repo": "afi-mint", "files": 2, "hits": 2 },
@@ -81,8 +80,8 @@
     ]
   },
   "min_demo_commands": [
-    "cd afi-starters/self-hosted-pipeline && docker compose up -d mongo   # image mongo:7 on :27017",
-    "cd ../../afi-reactor && npm install && npm run build",
+    "docker run -d --name afi-mongo -p 27017:27017 mongo:7   # local Mongo on :27017",
+    "cd afi-reactor && npm install && npm run build",
     "AFI_MONGO_URI='mongodb://localhost:27017' AFI_MONGO_DB_NAME=afi_reactor npm run start:demo   # node dist/src/server.js :8080",
     "curl -X POST http://localhost:8080/api/webhooks/tradingview -H 'Content-Type: application/json' -d '{\"symbol\":\"BTCUSDT\",\"timeframe\":\"15m\",\"strategy\":\"froggy_trend_pullback_v1\",\"direction\":\"long\"}'",
     "mongosh afi_reactor --eval 'db.reactor_scored_signals_v1.find().pretty()'"
@@ -129,9 +128,6 @@
     "afi-config": { "classification": "CONFIG/DOCS", "mvp_relevance": "supporting", "runnable": "yes",
       "note": "vault.schema.json is engine-agnostic (mongodb is one enum among postgresql/timescaledb/influxdb)",
       "config_files": ["afi-config/schemas/vault.schema.json"], "test_files": ["afi-config/tests/schema-validation.test.ts"], "doc_files": ["afi-config/docs/AFI_CONFIG_OVERVIEW.md"] },
-    "afi-starters": { "classification": "CONFIG", "mvp_relevance": "supporting", "runnable": "unknown",
-      "note": "ships a one-command local Mongo (image mongo:7) for the TSSD backend",
-      "config_files": ["afi-starters/self-hosted-pipeline/docker-compose.yml", "afi-starters/self-hosted-pipeline/.env.example", "afi-starters/self-hosted-pipeline/railway.json", "afi-starters/self-hosted-pipeline/render.yaml"] },
     "afi-docs": { "classification": "DOCS", "mvp_relevance": "supporting", "runnable": "n/a",
       "note": "active operator/architecture docs correctly present Mongo TSSD as canonical persistence" },
     "afi-ops": { "classification": "CONFIG/DOCS (stubs)", "mvp_relevance": "supporting", "runnable": "no", "note": "health/status scripts are TODO stubs; no mongodb import" },

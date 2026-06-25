@@ -86,7 +86,6 @@ vault.upsert(record)  (findOne + deleteOne + insertOne)  app.ts:133-134
 | **afi-gateway** | 15 (vaultFactory, app, local mongo, api keys) | **RUNTIME** + CONFIG + TEST | supporting | yes (`start:minimal`) |
 | afi-mint | 2 (JSDoc only; DI seam) | RUNTIME types, **no Mongo** (in-memory stub) | supporting | yes |
 | afi-config | 2 (engine-agnostic `vault.schema.json`) | CONFIG/DOCS | supporting | yes |
-| afi-starters | 4 (`docker-compose` mongo:7, railway, render) | **CONFIG** (deploy) | supporting | unknown |
 | afi-docs | active operator + architecture + audit docs | DOCS | supporting | n/a |
 | afi-ops | 9 (env/compose templates, stub health scripts) | CONFIG + DOCS (stubs) | supporting | no |
 | afi-token | 4 (NatSpec comments; on-chain Solidity) | DOCS (off-chain provenance label) | supporting | unknown |
@@ -135,11 +134,11 @@ vault.upsert(record)  (findOne + deleteOne + insertOne)  app.ts:133-134
 ### Minimum commands to demo one scored signal in Mongo (Surface A — fastest)
 
 ```bash
-# 1. Provision a local Mongo (reuse the starters compose — image mongo:7 on :27017)
-cd afi-starters/self-hosted-pipeline && docker compose up -d mongo
+# 1. Provision a local Mongo (image mongo:7 on :27017)
+docker run -d --name afi-mongo -p 27017:27017 mongo:7
 
 # 2. Build + run the reactor, pointed at that Mongo
-cd ../../afi-reactor
+cd afi-reactor
 npm install
 npm run build                                   # tsc -> dist/
 AFI_MONGO_URI='mongodb://localhost:27017' \
@@ -197,7 +196,7 @@ The Mongo persist sits **downstream of `froggy-analyst`** and was never part of 
 
 ## Gaps / blockers (for a full T2 E2E)
 
-- **No blocker to a Mongo persist demo.** The only prerequisite is a reachable MongoDB + `AFI_MONGO_URI` (one env var). A one-command local Mongo ships (`afi-starters/self-hosted-pipeline/docker-compose.yml`, `mongo:7`).
+- **No blocker to a Mongo persist demo.** The only prerequisite is a reachable MongoDB + `AFI_MONGO_URI` (one env var). A local Mongo is one command away (`docker run -d -p 27017:27017 mongo:7`).
 - **T2 mint wire-up gap:** `afi-mint` reads scored-signal metadata via an injected `ISignalMetadataFetcher` with no concrete impl — a Mongo reader of `reactor_scored_signals_v1` must be implemented, plus an on-chain `mintForSignal` client. See testnet checklist §1.4.
 - **Config-doc gap (P1, gateway):** `AFI_TSSD_*` vault env vars are missing from `afi-gateway/.env.example`; Surface B throws on first `/api/v1/signals` unless `MONGODB_URI` fallback is set, and only `start:minimal` mounts the vault.
 - **Persistence-default OFF:** reactor ships with empty `AFI_MONGO_URI`, so a fresh checkout scores-but-does-not-persist until it is set.

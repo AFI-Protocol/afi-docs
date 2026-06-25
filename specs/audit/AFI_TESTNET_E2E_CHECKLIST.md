@@ -178,7 +178,7 @@ MongoDB TSSD is the canonical reference evidence store. No warehouse/stream plan
 
 | Done? | Decision | Choice | Notes |
 |-------|----------|--------|-------|
-| [ ] | Mongo deployment | [ ] **Local docker-compose** (`mongo:7`)  [ ] Atlas free tier  [ ] Self-host | Local compose ships in [`afi-starters/self-hosted-pipeline/docker-compose.yml`](../../../afi-starters/self-hosted-pipeline/docker-compose.yml) |
+| [ ] | Mongo deployment | [ ] **Local Docker** (`docker run -d -p 27017:27017 mongo:7`)  [ ] Atlas free tier  [ ] Self-host | One-command local Mongo; or point `AFI_MONGO_URI` at any reachable instance |
 | [ ] | Connection string | `AFI_MONGO_URI=mongodb://localhost:27017` | Used by `afi-reactor` (and `afi-mint` reader) |
 | [ ] | Database / collection | `afi_reactor` / `reactor_scored_signals_v1` (defaults) | [`tssdVaultService.ts:58-59`](../../../afi-reactor/src/services/tssdVaultService.ts) |
 
