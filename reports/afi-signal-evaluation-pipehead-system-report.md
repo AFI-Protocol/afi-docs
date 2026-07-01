@@ -5,6 +5,7 @@
 **Repo (this report):** `afi-docs` — branch `mission/afi-signal-evaluation-pipehead-system`
 **Type:** Determinism / plumbing proof-of-concept (POC). Demo-only — implements no production surface.
 **Governance:** Subordinate to `AFI_DROID_CHARTER.v0.1.md` and `AFI_DROID_PIPEHEAD_ADDENDUM.v0.1.md`. Where this report conflicts with governance, governance wins.
+**Merge status (2026-07-01 reconciliation):** afi-reactor PR #33 is **merged** to `main` (merge commit `dd15287`, 2026-06-30); the afi-config Pipehead Addendum is **merged** via PR #12 + #13 (`codex/governance/droids/AFI_DROID_PIPEHEAD_ADDENDUM.v0.1.md`). This afi-docs report (PR #5) is the remaining open reconciliation item. The "no changes to afi-config" note below refers to the reactor implementation footprint only; the governance addendum shipped through its own afi-config PRs.
 
 > **Status: non-production POC / demo.** Nothing in this system is intended for production use, and no output is canonical protocol truth. All scored output, receipts, and audit records are explicitly **demo-only / provisional**. This report describes the code that actually shipped, and records the real gate and demo outcomes captured while writing it.
 
