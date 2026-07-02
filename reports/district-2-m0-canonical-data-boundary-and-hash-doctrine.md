@@ -380,3 +380,140 @@ CPJ v0.1 (Canonical Parsed JSON, §2.3) is a **[Canonical]** schema-backed inter
 | `provenance.authorName` | dropped (never read by mapper) | pseudonymous `authorRef` / `authorHash` | same | same |
 
 All six rows are **[PROPOSED]** — new defaults offered for owner decision (§10). Nothing here is adopted; the canonical USS `facts` contract (`additionalProperties:false`) is unchanged, and no schema/code/runtime change is made by this report.
+
+---
+
+## 8. Replay Profile Policy
+
+Replayability — the ability to re-derive a signal's scored output from a pinned set of inputs — is an aspirational SLO and audit theme across the org, but there is **no structured replay profile** on any current signal record. USS v1.1 is deliberately broad: it defines a `facts` block ("replay-canonical market/strategy metadata populated at ingest time and persisted in TSSD vault for deterministic replay," `afi-config/schemas/usignal/v1_1/index.schema.json:31-33`) and an `additionalProperties:true` `provenance` object (`:293`) that already carries optional legacy replay pins — `datasetId` (`:271-274`), `codeCommit` (`:275-278`), and `seed` (`:279-286`) — but none of these is required, none is enforced as a replay contract, and most production signals omit them. This section recommends keeping USS broad while defining a **stricter D2 overlay** that makes replayability a first-class, verifiable property of D2-conformant provenance records. The recommendation is **[PROPOSED]**; the overlay shape is `ReplayProfile v1` (named in §3.3).
+
+### 8.1 Current state — replay pins exist but are optional, unenforced, and incomplete
+
+| Replay pin | Present on USS v1.1? | Status (`origin/main`) |
+|---|---|---|
+| `facts` (symbol/market/timeframe/strategy/direction) | **YES — required** | `index.schema.json:31-57`; the replay-canonical ingest metadata block (`:33` description). `additionalProperties:false` (`:57`) — a closed, stable replay contract. |
+| `datasetId` | **YES — optional, legacy** | `provenance.datasetId` (`index.schema.json:271-274`), described as "Source dataset identifier (legacy field from v1)." Optional; not required; not enforced as a replay pin. |
+| `codeCommit` | **YES — optional, legacy** | `provenance.codeCommit` (`:275-278`), "Code commit hash that generated this signal (legacy field from v1)." Optional; not required. |
+| `seed` | **YES — optional, legacy** | `provenance.seed` (`:279-286`), "Random seed for reproducibility (legacy field from v1)." Optional; typed `string \| number \| null`; not required. |
+| evidence hashes | **NO** (doctrine-only) | `contentHash`/`evidenceHash` exist only as Layer 1 provenance-leaf commitments (`AFI_SIGNAL_PROVENANCE_AND_EAS_SCHEMA.md:102,122`), not on the USS signal record. `payloadHash` is optional and never computed (`afi-infra/src/tssd/types.ts:53`). |
+| source refs (typed) | **PARTIAL — free-text** | `provenance.source` (free-text, `index.schema.json:241-244`), `providerRef` (free-form, `:267-270`). No canonical, typed `sourceRef` on the scored-signal record. |
+
+**The gap:** USS v1.1 *can* carry replay pins, but it does not *require* them, and it lacks evidence hashes and typed source refs entirely. A signal that omits `datasetId`/`codeCommit`/`seed` is perfectly valid USS — but it is **not reproducible**. There is no way today to distinguish a replayable signal from a non-replayable one at the record level. The POC pipehead's `golden.json` fixture (`afi-reactor/test/pipeheads/fixtures/golden.json`) pins `inputHash`/`bundleHash`/`outputHash` for its own determinism self-check (§4.8), but that machinery lives only under `src/pipeheads/**` (POC) and never reaches the production signal record.
+
+### 8.2 Recommendation — **[PROPOSED]** keep USS broad/optional; define a stricter `ReplayProfile v1` overlay
+
+**[PROPOSED]** Keep **USS v1.1 broad and optional** — do not add required replay pins to the canonical USS schema (that would be a schema change, out of scope for this docs-only mission, and would break signals that legitimately lack replay data). Instead, define a **stricter D2 `ReplayProfile v1` overlay** that a signal **opts into** when it claims D2-conformant replayability. The overlay rides on the `AnalystInputEnvelope v1` (§6.4, where `replayProfile?` is already listed as an optional field) and/or on the `ProvenanceRecord v1` (§9), not on USS `facts` (which is `additionalProperties:false` and carries only market/strategy metadata, not replay pins).
+
+**`ReplayProfile v1` — [PROPOSED] required fields for a D2-conformant provenance record:**
+
+| Field | Kind | Purpose | Cross-ref |
+|---|---|---|---|
+| `facts` | object (USS `facts`) | The replay-canonical ingest metadata (symbol/market/timeframe/strategy/direction) that scopes the signal — already required on USS (`index.schema.json:31-57`). The overlay requires its **presence and invariance** as the replay baseline. | §7.1; USS schema |
+| `datasetId` | string | Pinned source dataset identifier — the data snapshot the signal was computed against. Generalizes the optional USS `provenance.datasetId` (`:271-274`) into a **required** D2 pin. | §8.1 |
+| `codeCommit` | string (git SHA) | Pinned code commit hash that generated the signal — so the exact scoring/enrichment logic is reproducible. Generalizes the optional `provenance.codeCommit` (`:275-278`) into a **required** D2 pin. | §8.1 |
+| `seed` | string \| number \| null | Random seed for reproducibility — **where applicable** (stochastic pipelines). Generalizes the optional `provenance.seed` (`:279-286`) into a required D2 pin when the pipeline uses randomness. Deterministic-only pipelines MAY set `seed: null`. | §8.1 |
+| evidence hashes | `EvidenceRef v1[]` (hashes) | Hash-addressable references to each piece of evidence (payload/evidence hash + source ref + stage), so the evidence trail is pinned and verifiable. Absent from USS today (`contentHash`/`evidenceHash` are doctrine-only, `AFI_SIGNAL_PROVENANCE_AND_EAS_SCHEMA.md:102,122`). | §3.3 (`EvidenceRef v1`); §4.7; §5.4 |
+| source refs | typed `sourceId` / `sourceRef` | Canonical, typed source identifiers (replacing free-text `source`/`providerRef`, `index.schema.json:241-244,267-270`) so the source of each evidence piece is unambiguously pinned for replay. | §5.4 (`SourceDisclosureProfile v1`) |
+
+**[PROPOSED] The overlay is opt-in, not mandatory on all USS signals.** A signal without a `ReplayProfile v1` is still valid USS — it simply does not claim D2-conformant replayability. The overlay is the contract that makes "this signal is replayable" a **verifiable, machine-checkable** property: a verifier that sees a `ReplayProfile v1` can fetch the pinned `datasetId`, check out the pinned `codeCommit`, supply the `seed`, pull the evidence hashes, and re-derive the scored output. Without the overlay, replayability is an unverified aspiration.
+
+### 8.3 Relationship to the hash doctrine and provenance record
+
+`ReplayProfile v1` is the **replay-pin carrier**; the hash commitments it pins (evidence hashes) are produced by `CanonicalHash v1` (§4) under their domain tags (§4.2). The overlay is carried on the `AnalystInputEnvelope v1` (§6.4) and its commitments are recorded inside `ProvenanceRecord v1` (§9), which aligns to the canonical `signalLeaf` (`contentHash`) and `evidenceLeaf` (`evidenceHash`) so a future settlement layer could consume them. The overlay introduces **no** on-chain anchoring (§9) and **no** reward/claim consequence — it is a descriptive replayability contract, not a settlement artifact.
+
+---
+
+## 9. Settlement & Validator Boundary
+
+This section defines the boundary between District 2's provenance/disclosure work and the Settlement v1 manifest draft. The position is firm and deliberately conservative: **keep the settlement manifest draft frozen**, align `ProvenanceRecord v1` to the canonical `signalLeaf`/`evidenceLeaf` so a *future* settlement layer can consume D2 provenance, introduce **no** Layer-1 anchoring/rewards/claims/settlement/vault mechanics into D2, keep disclosure **visibility-only**, and **defer** validator-decision schemas as **[OPEN]**. Every claim is verified on `origin/main`.
+
+### 9.1 Settlement manifest draft stays **frozen [Canonical]**
+
+**[Canonical]** The Settlement v1 consolidation spec remains **DRAFT — not yet Accepted** (`afi-docs/specs/AFI_SETTLEMENT_V1_MANIFEST_AND_PROVENANCE_SCHEMA.md:3`), and its companion JSON Schema is explicitly a "DRAFT, non-implementation" schema (`afi-config/schemas/afiEpochSettlementManifest.draft.schema.json:4` title, `:6` `x-afiStatus: "draft-non-implementation"`). The *shapes* it restates are canonical — sourced from the Accepted Layer 3 spec (`afi-docs/specs/AFI_EPOCH_SETTLEMENT_MANIFEST.md:3` `**Status:** CANONICAL — Accepted (v1 doctrine)`) — but the consolidation document itself and every encoding are DRAFT/OPEN. District 2 does **not** resolve, implement, or promote any of its open items (O1–O8, S-A…S-D, `AFI_SETTLEMENT_V1_MANIFEST_AND_PROVENANCE_SCHEMA.md` §12).
+
+**[Canonical]** The manifest's four roots are proof-plane commitments plus a single money root:
+
+| Root | Plane | Commits | Status (`origin/main`) |
+|---|---|---|---|
+| `signalRoot` | proof | Merkle/EAS root over qualified **signal leaves** (§5.1) | Canonical (`AFI_SETTLEMENT_V1_MANIFEST_AND_PROVENANCE_SCHEMA.md:110`) |
+| `evidenceRoot` | proof | Merkle root over **evidence leaves** (§5.2) | Canonical (`:111`) |
+| `strategyRoot` | proof | Merkle root over strategy/epoch reputation set (§5.3) | Canonical root; leaf PROPOSED (`:112`) |
+| `claimRoot` | **money** | Merkle root over **claim leaves** (§5.4) — `(recipient, role, amount, …)`. **The only payout authority.** | Canonical content (`:113`) |
+
+**Load-bearing law [Canonical]:** proof roots confer **no** entitlement; `claimRoot` is the only crossing to money, gated by human/governance authorization. Provenance ≠ payout. District 2 touches **none** of these roots — it aligns its `ProvenanceRecord v1` *fields* to the canonical leaf shapes so future settlement *could* consume them, but it does not build, commit, or anchor any root.
+
+### 9.2 `ProvenanceRecord v1` aligned to canonical `signalLeaf` / `evidenceLeaf` — **[PROPOSED]**
+
+**[PROPOSED]** Align `ProvenanceRecord v1` (the promoted concept behind the POC `AuditRecord`, §3.3) to the **canonical** Layer 1 leaf shapes so a future settlement layer can consume D2 provenance without redesign. The alignment reuses canonical field names verbatim and preserves the canonical scoping and content-commitment semantics. The canonical sources are the Accepted Layer 1 spec (`AFI_SIGNAL_PROVENANCE_AND_EAS_SCHEMA.md`), restated in the DRAFT consolidation spec (`AFI_SETTLEMENT_V1_MANIFEST_AND_PROVENANCE_SCHEMA.md` §5.1–§5.2).
+
+**`signalLeaf` — CANONICAL (Layer 1 §6, `AFI_SIGNAL_PROVENANCE_AND_EAS_SCHEMA.md:93`)** — `ProvenanceRecord v1` signal-side fields align to:
+
+| `signalLeaf` field | `ProvenanceRecord v1` alignment | Canonical meaning (`AFI_SIGNAL_PROVENANCE_AND_EAS_SCHEMA.md`) |
+|---|---|---|
+| `signalId` | carry verbatim | Stable unique id (`:99`) |
+| `strategyId` | carry verbatim | Producing strategy; MUST equal batch `strategyId` (`:100`) |
+| `epochId` | carry verbatim | Epoch signal qualified in; MUST equal batch `epochId` (`:101`) |
+| `contentHash` | carry verbatim | Hash binding canonical off-chain content (raw + enriched) (`:102`) |
+| `scoreCommitment` | carry verbatim — a **commitment (hash)** to the deterministic score/decision; the score itself stays off-chain (`:103`) | Commitment, never cleartext score |
+| `producer` | carry verbatim — identity **reference** (ref/id/address ref, not raw PII); confers **no** token entitlement (`:104`) | Reference, not PII |
+| `timestamp` | carry verbatim | Authoritative time reference (e.g. scored-at) (`:105`) |
+| `rulesetHash` | carry verbatim | Ruleset version under which signal was scored/qualified (`:106`) |
+
+**`evidenceLeaf` — CANONICAL (Layer 1 §7, `AFI_SIGNAL_PROVENANCE_AND_EAS_SCHEMA.md:115`)** — `ProvenanceRecord v1` evidence-side fields align to:
+
+| `evidenceLeaf` field | `ProvenanceRecord v1` alignment | Canonical meaning (`AFI_SIGNAL_PROVENANCE_AND_EAS_SCHEMA.md`) |
+|---|---|---|
+| `signalId` | carry verbatim | Signal this evidence pertains to; MUST match a `signalLeaf` `signalId` (`:121`) |
+| `evidenceHash` | carry verbatim | Hash of the lifecycle evidence snapshot (`:122`) |
+| `stage` | carry verbatim | Lifecycle stage: `RAW` / `ENRICHED` / `SCORED` (`:123`) |
+| `disclosureStatus` | carry verbatim | Disclosure state of this snapshot; MAY differ per stage (`:124`) |
+
+**[Canonical] Scoping and content laws preserved:** `signalId + strategyId + epochId` uniquely scope a leaf within a batch (`AFI_SIGNAL_PROVENANCE_AND_EAS_SCHEMA.md:110`). The signal leaf **MUST NOT** contain the raw payload, cleartext score, **validator decisions**, or UWR axis values — only `contentHash` and `scoreCommitment` over them (`:109`). The evidence leaf **MUST NOT** carry snapshot contents — only `evidenceHash` (`:128`). `ProvenanceRecord v1` inherits these constraints verbatim.
+
+**[PROPOSED]** `ProvenanceRecord v1` is a **[PROPOSED]** promotion (named in §3.3). It is **not** the frozen POC `AuditRecord` demo shape (`afi-reactor/src/pipeheads/types.ts:108`, self-labeled `demoOnly: true`); it is the promoted *concept*, redesigned to align with the canonical leaves and to carry the D2 hash commitments (§4.7). It is **not** placed on-chain and **not** wired into any reward/claim path.
+
+### 9.3 No Layer-1 anchoring, rewards, claims, settlement, or vault — **[Canonical]**
+
+**[Canonical]** District 2 introduces **none** of the following:
+
+- **No Layer-1 anchoring** — no EAS attestation, no committed Merkle root, no `attestationUID`, no commitment/anchor contract, no manifest commit. The EAS anchoring model (spec §9) is direction-locked but encoding-OPEN (O6); D2 does not implement it. The v0 `AFIMintCoordinator.mintForSignal` flow — which mints reward + ERC-1155 `AFISignalReceipt` in a single call — is **not** the v1 anchor and **MUST NOT** be wired (EAS-7, `AFI_SETTLEMENT_V1_MANIFEST_AND_PROVENANCE_SCHEMA.md:389`). The precise commitment/anchor contract ("SettlementCoordinator") is to-be-specified and explicitly **not** `AFIMintCoordinator` (`:406`).
+- **No rewards, minting, or funding** — no `totalRewardPool`, no `claimRoot`/claim leaves, no `mintEligible`/`mintForSignal`/`AFIMintCoordinator` wiring, no ERC-1155/ERC-6909 receipt issuance.
+- **No claims or vault** — no `claimLeaf` (`recipient`/`role`/`amount`), no `roleAllocationRoots`/`roleAllocationLeaves`, no vault custody. The claim leaf is a **money-plane** shape (`AFI_SETTLEMENT_V1_MANIFEST_AND_PROVENANCE_SCHEMA.md:233-244`); D2 does not touch it.
+- **No settlement** — the manifest draft stays frozen (§9.1); no open item is resolved.
+
+**[Canonical] Boundary law (BND-1):** raw per-signal arrays, cleartext scores, UWR axes, **validator decisions**, or evidence blobs MUST NOT be written on-chain — only roots, `rulesetHash`, `disclosureWindow`/`disclosureStatus`, and pointers (`AFI_SETTLEMENT_V1_MANIFEST_AND_PROVENANCE_SCHEMA.md:280`). D2's off-chain `ProvenanceRecord v1` carries only content commitments (`contentHash`, `scoreCommitment`, `evidenceHash`), never cleartext scores or validator decisions — consistent with BND-1.
+
+### 9.4 Disclosure is visibility-only — **[Canonical]**
+
+**[Canonical]** Disclosure — `disclosureWindow` / `disclosureStatus` / `disclosureURI` — relates to **provenance visibility only**. It **MUST NOT gate, accelerate, or condition any reward payment** (DSC-3, `AFI_SETTLEMENT_V1_MANIFEST_AND_PROVENANCE_SCHEMA.md:309`; restated DISC-4, `AFI_SIGNAL_PROVENANCE_AND_EAS_SCHEMA.md:88`). Payout-affecting windows (`challengeWindow`, `holdbackPolicyRef`) are a distinct Layer 3/4 concern, separate parameters from `disclosureWindow`.
+
+**[Canonical]** This boundary carries directly into D2's `SourceDisclosureProfile v1` (§5): a richer `disclosureLevel` (§5.4) generalizes the binary `disclosureStatus` WITHHELD/DISCLOSED but **does not** alter its visibility-only semantics. Disclosure metadata makes provenance *describable*; it does not make disclosure *consequential*. No D2 disclosure field gates, accelerates, or conditions any payment — there is no payment path in D2 to gate (§9.3).
+
+### 9.5 Validator decision schemas deferred — **[OPEN]**
+
+**[OPEN]** Validator-decision schemas (verdict / accept-reject records) are **deferred** unless explicitly owner-approved. District 2 does **not** define, promote, or wire any validator-decision schema.
+
+**Why deferred — no canonical validator-decision schema exists.** There is **no** validator-decision root among the four manifest roots (`AFI_SETTLEMENT_V1_MANIFEST_AND_PROVENANCE_SCHEMA.md:110-113` — only `signalRoot`/`evidenceRoot`/`strategyRoot`/`claimRoot`), **no** validator-verdict leaf, and **no** accept/reject settlement record. In canonical Layer 3, "Validator" appears **only as a payout ROLE** in `roleAllocationRoots` (`AFI_EPOCH_SETTLEMENT_MANIFEST.md:85`) and in the closed claim-leaf role set `Provider | Analyst-Scorer | Validator` (`AFI_SETTLEMENT_V1_MANIFEST_AND_PROVENANCE_SCHEMA.md:241`) — not as a decision artifact. The signal leaf binds only a `scoreCommitment` — "a commitment to the deterministic score/decision … Score stays off-chain" (`AFI_SIGNAL_PROVENANCE_AND_EAS_SCHEMA.md:103`) — and **MUST NOT** contain validator decisions (`:109`). BND-1 bars validator decisions on-chain (`AFI_SETTLEMENT_V1_MANIFEST_AND_PROVENANCE_SCHEMA.md:280`). Any on-chain validator-decision or validator-verdict root/leaf would be a new artifact requiring a **separate, owner-approved spec/ADR** and MUST NOT be introduced by D2.
+
+**The only existing validator-decision code is v0/non-canonical and tied to deprecated mint-gating — do NOT wire it.** `afi-core/validators/ValidatorDecision.ts` (header: "ValidatorDecision v0.2 + UWR contracts + Decay Integration," `:1-2`) defines:
+
+- `ValidatorDecisionKind = "approve" | "reject" | "flag" | "abstain"` (`:17`) — a genuine accept/reject verdict enum;
+- `ValidatorDecisionBase` (`:91-114`) — `signalId`, `validatorId`, `decision`, `uwrConfidence`, `decayedScore?`, `ageHours?`, `regimeTag?`, `novelty?`, `reasonCodes?`, `notes?`, `createdAt`;
+- `ValidatorOutcome` (`:120-127`) — **`mintEligible: boolean`**, `mintReason?`, `replaySessionId?`, `decision`, `scoring?` — i.e. **wired to mint gating**.
+
+The file's own header states it is "Structural envelopes only; emissions/mint/replay wiring live in afi-token / afi-reactor / afi-infra" (`:6`), and its flow positioning says it is "Consumed by validators after scoring and novelty evaluation, **before mint gating**" (`:131`). This is the **v0 mint-gating path** — the same deprecated `mintForSignal` flow that EAS-7 (`AFI_SETTLEMENT_V1_MANIFEST_AND_PROVENANCE_SCHEMA.md:389`) explicitly closes: the v0 `AFIMintCoordinator.mintForSignal` flow "is **not** the v1 attester/anchor and MUST NOT be wired or promoted as such." `ValidatorDecision.ts` is v0/implementation-adjacent, non-canonical, and coupled to that deprecated mint-gating path. **[OPEN]** It MUST NOT be wired as the v1 validator-decision schema. A canonical settlement validator-decision artifact, if one is ever needed, would require a separate, owner-approved spec/ADR — it is not defined here and not defined by D2.
+
+**Signal leaves MUST NOT contain validator decisions.** This is a canonical constraint (`AFI_SIGNAL_PROVENANCE_AND_EAS_SCHEMA.md:109`), restated in the consolidation spec ("no raw payloads, cleartext scores, **validator decisions**, UWR axis values, or evidence blobs," `AFI_SETTLEMENT_V1_MANIFEST_AND_PROVENANCE_SCHEMA.md:180`). `ProvenanceRecord v1` inherits this verbatim: its signal-side fields carry `contentHash` and `scoreCommitment` (a commitment to the score, never the cleartext score or a validator verdict) — **never** a validator decision, a cleartext score, or UWR axis values.
+
+### 9.6 Summary — the D2 settlement/validator boundary
+
+| Boundary | Position | Label | Evidence (`origin/main`) |
+|---|---|---|---|
+| Settlement manifest draft | **FROZEN** — DRAFT, not Accepted; do not resolve O1–O8 / S-A…S-D | **[Canonical]** | `AFI_SETTLEMENT_V1_MANIFEST_AND_PROVENANCE_SCHEMA.md:3`; `afiEpochSettlementManifest.draft.schema.json:4,6`; `AFI_EPOCH_SETTLEMENT_MANIFEST.md:3` |
+| `ProvenanceRecord v1` field alignment | Align to canonical `signalLeaf` / `evidenceLeaf` | **[PROPOSED]** | `AFI_SIGNAL_PROVENANCE_AND_EAS_SCHEMA.md:93-106` (signalLeaf), `:115-124` (evidenceLeaf); restated `AFI_SETTLEMENT_V1_MANIFEST_AND_PROVENANCE_SCHEMA.md:182-195,199-208` |
+| Layer-1 anchoring / rewards / claims / settlement / vault | **NONE in D2** | **[Canonical]** | Four roots `:110-113`; BND-1 `:280`; EAS-7 `:389`; anchor contract `:406` |
+| Disclosure | **Visibility-only** — MUST NOT gate/accelerate/condition payment | **[Canonical]** | DSC-3 `AFI_SETTLEMENT_V1_MANIFEST_AND_PROVENANCE_SCHEMA.md:309`; DISC-4 `AFI_SIGNAL_PROVENANCE_AND_EAS_SCHEMA.md:88` |
+| Validator-decision schemas | **DEFERRED** — no canonical schema exists; existing v0 `ValidatorDecision.ts` is mint-gating, MUST NOT be wired | **[OPEN]** | No verdict root (`:110-113`); signal leaf MUST NOT contain validator decisions (`AFI_SIGNAL_PROVENANCE_AND_EAS_SCHEMA.md:109`); `ValidatorDecision.ts:1-2,17,91-127,131`; EAS-7 `:389` |
+| Signal leaves vs validator decisions | **MUST NOT** contain validator decisions | **[Canonical]** | `AFI_SIGNAL_PROVENANCE_AND_EAS_SCHEMA.md:109`; `AFI_SETTLEMENT_V1_MANIFEST_AND_PROVENANCE_SCHEMA.md:180,280` |
+
+All positions above are firm defaults for owner review (§10). Nothing here is adopted; the settlement manifest draft remains frozen, no anchoring/reward/claim/vault mechanic enters D2, disclosure stays visibility-only, and validator-decision schemas stay deferred.
