@@ -275,3 +275,108 @@ A scoped search across the org finds that almost none of the D2 target vocabular
 ### 5.5 Relationship to the canonical leaves and the envelope
 
 `SourceDisclosureProfile v1` is **descriptive metadata**, not a settlement leaf. It aligns with — but does not duplicate — the canonical `evidenceLeaf` (`signalId`, `evidenceHash`, `stage`, `disclosureStatus`, `AFI_SIGNAL_PROVENANCE_AND_EAS_SCHEMA.md:115-124`): the leaf commits a hash + stage + disclosure status; the profile carries the richer descriptive context (source class, withheld reason, license, replayability, summaries) that the leaf deliberately omits. Likewise it sits beside `signalLeaf` (`:93-106`), which carries only commitments and identity references (`producer` is a reference, not PII, `:104`), never validator decisions (`:109`). The profile is carried on the analyst-input envelope (`AnalystInputEnvelope v1`, §6) and its hashes are committed inside `ProvenanceRecord v1` (§9) — it is **not** placed on-chain (no L1 anchoring in D2, §9) and **not** wired into any reward/claim path (settlement frozen, §9).
+
+---
+
+## 6. Analyst Input Envelope
+
+The analyst in this org is the **afi-core Froggy UWR scorer** — `scoreFroggyTrendPullbackFromEnriched` — invoked on the production path by the `froggy-analyst` DAG plugin (`afi-reactor/plugins/froggy.trend_pullback_v1.plugin.ts:34` `async function run(enriched: FroggyEnrichedView)`, `:36` `scoreFroggyTrendPullbackFromEnriched(enriched)`). That scorer receives **exactly one typed argument: a `FroggyEnrichedView`** (`afi-core/analysts/froggy.enrichment_adapter.ts:104`), and nothing else. This section decides how provenance, disclosure, and evidence metadata should reach that analyst surface: push it into the strategy-local view (Option A), or wrap the view in a new protocol envelope (Option B). The recommendation is **[PROPOSED] Option B** — `AnalystInputEnvelope v1`.
+
+### 6.1 Current state — the analyst receives only `FroggyEnrichedView`, which carries no protocol provenance
+
+`FroggyEnrichedView` is **strategy-local** (classified in §3.1): a loose afi-core interface (`froggy.enrichment_adapter.ts:104`) with an untyped `indicators?: Record<string, number | null>` map and an `enrichedView: unknown` seam (`AnalysisBundle.enrichedView`, `afi-reactor/src/pipeheads/types.ts:84`), reactor-stubbed as ambient `any` (`afi-reactor/typings.d.ts:15`). It is produced in production by the enrichment adapter (`afi-reactor/plugins/froggy-enrichment-adapter.plugin.ts:622` `const enriched: FroggyEnrichedView = { … }`) and handed directly to the scorer with **no protocol metadata alongside it**. A field-by-field check against the District 2 transparency/provenance vocabulary (§5) shows the analyst-facing view is blind to every category D2 needs to surface:
+
+| District 2 capability the analyst needs | Present on `FroggyEnrichedView`? | Evidence (`origin/main`) |
+|---|---|---|
+| **Provider identity** | **NO** (only a coarse producer string) | The type (`froggy.enrichment_adapter.ts:104`) has no provider field. The production adapter attaches a single coarse string `enrichmentMeta.enrichedBy: "froggy-enrichment-adapter"` (`froggy-enrichment-adapter.plugin.ts:635`) and a price-source-only `_priceFeedMetadata.priceSource` (attached as `any`). No per-lane / per-provider identity. |
+| **Source disclosure metadata** | **PARTIAL** (news + price crumbs only) | Per-article `news.items[].source`/`url` and runtime `_priceFeedMetadata.priceSource`/`venueType` exist, but **nothing** for sentiment, pattern, or aiMl sources (`froggy.enrichment_adapter.ts:104`). |
+| **Licensing / withheld reasons** | **NO** | No such field exists in `FroggyEnrichedView` (`froggy.enrichment_adapter.ts:104`) or in the runtime extras. |
+| **Evidence hashes** | **NO** | No hash field on the view. Canonical hashes exist only in the POC `AuditRecord` (`afi-reactor/src/pipeheads/types.ts:108`) / `BundleProvenance.inputHash` (`:72`), and they are **never delivered to the analyst**. |
+| **Replay pins** (`datasetId`, `codeCommit`, `seed`, …) | **NO** | No pins on the view. `enrichmentMeta.enrichedAt` is a wall-clock timestamp (`froggy-enrichment-adapter.plugin.ts:636`), not a deterministic replay pin. The POC `inputHash` is the nearest analogue but lives only under `src/pipeheads/**`, not on the production analyst input. |
+| **Lane provenance** (which lane produced what) | **NO** (coarse categories only) | The type carries only `enrichmentMeta.categories?: string[]` (which categories ran). Per-field lane attribution and provisional/degraded status are **destroyed at normalize**: `projectTechnical` (`afi-reactor/src/pipeheads/normalizePipehead.ts:196-212`) keeps only `emaDistancePct` + `{ema20,ema50,rsi14,atr14}` and **drops** `trendBias`, `indicatorSource`, `canonicalIndicatorKernel`, and `note` — and the sibling projections drop each lane's `provisional`/`fixtureSource`/`note` likewise. Only the bundle-level `provisionalLanes` array survives, and it is **not** part of `FroggyEnrichedView`. |
+
+**This is the analyst provenance gap.** On the production path the scorer sees the enrichment — the *what* — but never the *where it came from, under what license, how replayable it is, which lane produced each field, or whether any lane was a provisional fixture*. It cannot make a provenance-aware decision, and any future evaluator (BenchKit, §5) that consumes the scored output inherits the same blindness because the transparency metadata never entered the pipeline at the analyst seam.
+
+### 6.2 Option A (metadata into `FroggyEnrichedView`) vs Option B (a new `AnalystInputEnvelope v1`)
+
+| | **Option A — expand `FroggyEnrichedView`** | **Option B — new `AnalystInputEnvelope v1` wrapping the view** |
+|---|---|---|
+| **What it does** | Add provider identity, `SourceDisclosureProfile`, `EvidenceRef`s, replay pins, and `EnrichmentProvenance` fields directly onto the `FroggyEnrichedView` interface (`froggy.enrichment_adapter.ts:104`). | Define a separate protocol envelope `{ enrichedView, provenance, disclosure, evidence, enrichmentProvenance, replayProfile? }` where `enrichedView` remains the **strategy-local** `FroggyEnrichedView`, unchanged, and the protocol metadata rides alongside it. |
+| **Coupling** | Couples protocol metadata to a **strategy-local** shape. `FroggyEnrichedView` is Froggy-specific (it carries Froggy's `technical`/`pattern`/`sentiment`/`news`/`aiMl` blocks) and loose (`indicators` untyped, reactor-stubbed `any`). Protocol-level provenance/disclosure/evidence fields would become fields of a strategy-owned object. | Keeps a **clean seam**: the strategy owns its enrichment view; the protocol owns the envelope. A different strategy's analyst could swap its own local view into the same envelope without touching protocol metadata, and protocol metadata can evolve without disturbing the strategy shape. |
+| **Pollution risk** | Pollutes a strategy shape with protocol metadata it was never designed to carry — and the view is **strategy-local**, explicitly **not** a candidate for promotion to canon (§3.1). Expanding a shape this report recommends *not* promoting would bake protocol fields into a non-canonical object. | Leaves `FroggyEnrichedView` untouched (it stays strategy-local, §3.1) and puts the protocol metadata on a **[PROPOSED]** canonical envelope that **is** a promotion candidate — the seam the protocol owns. |
+| **Lane-provenance handling** | Would have to retrofit per-lane attribution onto a view whose normalize step **already destroyed** the lane self-labels (`normalizePipehead.ts:196-212`). The view is the wrong place to re-introduce lane provenance — the loss happens *before* the view is built. | Carries `EnrichmentProvenance v1` (§3.3) **on the envelope**, populated upstream of normalize, so the per-lane attribution survives normalization and reaches the analyst regardless of what the strategy view projects. |
+| **Analyst contract** | The scorer's typed argument (`run(enriched: FroggyEnrichedView)`, `froggy.trend_pullback_v1.plugin.ts:34`) would have to change shape — every strategy analyst would need its own enrichment view to grow protocol fields. | The scorer continues to receive its strategy view; the envelope is a **protocol-level wrapper** the pipeline hands to the analyst stage, which can read the view for scoring and the metadata for provenance-aware context. The strategy contract is unchanged. |
+| **Consistency with §3 / §5** | Contradicts the §3.1 classification (do **not** promote `FroggyEnrichedView` — wrap it) and the §5 disclosure design (a dedicated `SourceDisclosureProfile v1`, not fields bolted onto a strategy view). | Directly implements the §3.1 "do not promote — wrap it" recommendation and the §5 disclosure profile as a carried field of the envelope. |
+
+### 6.3 Recommendation — **[PROPOSED]** Option B: `AnalystInputEnvelope v1`
+
+**[PROPOSED]** Adopt a new **`AnalystInputEnvelope v1`** that **wraps** the strategy-local `enrichedView` (a `FroggyEnrichedView` today, swappable for another strategy's view) alongside protocol-level provenance, disclosure, evidence, and lane-provenance metadata. The envelope is the **protocol-owned seam** between strategy-local enrichment and the analyst; the strategy view stays strategy-local and is never expanded with protocol fields.
+
+**Rationale (the load-bearing points):**
+
+1. **`FroggyEnrichedView` is strategy-local and loose, and this report recommends it stay that way** (§3.1). Pushing protocol metadata into it (Option A) would expand a shape explicitly classified as *not a promotion candidate* — baking canonical concerns into a non-canonical object. Wrapping (Option B) keeps the strategy shape clean and puts the protocol metadata where the protocol owns it.
+2. **Lane provenance is destroyed at normalize, before the view is built** (`normalizePipehead.ts:196-212`). The view is the wrong place to recover it. The envelope carries `EnrichmentProvenance v1` (§3.3) populated upstream, so per-lane attribution survives normalization and reaches the analyst regardless of what the strategy view projects.
+3. **The analyst contract should not have to change per strategy.** Every strategy analyst would need its own enrichment view to grow protocol fields under Option A. Under Option B the scorer keeps its strategy view; the envelope is a uniform protocol wrapper the pipeline stage hands to the analyst.
+4. **Consistency with §5.** The disclosure profile (`SourceDisclosureProfile v1`) is a dedicated shape (§5.4), not a set of fields bolted onto a strategy view. The envelope is its natural carrier.
+
+### 6.4 What the envelope carries (**[PROPOSED]**)
+
+`AnalystInputEnvelope v1` is a **[PROPOSED]** promotion (named in §3.3). Its illustrative shape — exact field-level definitions are an implementation decision, not fixed here — is:
+
+| Field | Kind | Purpose | Cross-ref |
+|---|---|---|---|
+| `enrichedView` | strategy-local object (`FroggyEnrichedView` today) | the strategy's enrichment, **unchanged** — the *what* the analyst scores | §3.1 (strategy-local) |
+| `provenance` | `ProvenanceRecord v1` (ref) | signal/evidence provenance and hash commitments | §3.3, §9 |
+| `disclosure` | `SourceDisclosureProfile v1` | per-source disclosure/transparency metadata (source class, disclosure level, withheld reason, license, replayability, freshness, attestation, summaries) | §5.4 |
+| `evidence` | `EvidenceRef v1[]` | hash-addressable evidence references (payload/evidence hash + source ref + stage) | §3.3, §4.7 |
+| `enrichmentProvenance` | `EnrichmentProvenance v1` | per-lane attribution (lane id, provisional/fixture status, kernel identity, source label) that normalize currently destroys | §3.3 |
+| `replayProfile?` | `ReplayProfile v1` (optional) | the stricter D2 replay overlay (facts, datasetId, codeCommit, seed, evidence hashes, source refs) when the signal is D2-conformant | §8 |
+
+**[PROPOSED]** The envelope is **not** placed on-chain (no L1 anchoring in D2, §9) and **not** wired into any reward/claim path (settlement frozen, §9). It is the protocol surface that makes the analyst provenance-aware; the strategy view inside it remains the strategy's own.
+
+---
+
+## 7. CPJ Survival Policy
+
+CPJ v0.1 (Canonical Parsed JSON, §2.3) is a **[Canonical]** schema-backed intermediate input that carries richer trade and author data than USS v1.1 can hold. The CPJ→USS mapper (`afi-reactor/src/uss/cpjMapper.ts:267` `mapCpjToUssV11`) builds the USS literal at `:306-329` and **drops** two classes of CPJ fields that have no USS slot: the **trade levels** (`entry`/`stopLoss`/`takeProfits`/`leverageHint`) and the **author identity** (`authorId`/`authorName`). This section recommends how District 2 should preserve both — not by forcing them into USS `facts` (which is `additionalProperties:false`), but as optional metadata and pseudonymous references respectively. Both recommendations are **[PROPOSED]**.
+
+### 7.1 Current state — CPJ carries trade levels and author identity; the mapper drops both
+
+**Trade levels are defined in CPJ and dropped from USS.** CPJ `extracted` carries `entry` (number or `{min,max}`, `afi-config/schemas/cpj/v0_1/core.schema.json:83-101`), `stopLoss` (`:102-105`), `takeProfits` (array of `{price, percentage?}`, `:106-118`), and `leverageHint` (`:119-122`); the TS type mirrors them (`afi-reactor/src/cpj/cpjValidator.ts:54-60`). They are populated in real examples — e.g. `entry: {min:42500, max:42800}`, `stopLoss: 41800`, `takeProfits: [{price:43500,percentage:50},…]`, `leverageHint: 5` (`afi-config/examples/cpj/v0_1/telegram-blofin-perp.example.json:16,20,21,35`). Yet in the mapper these fields appear **only** inside the ingest-hash canonicalization (`canonicalizeCpjForHashing`, `cpjMapper.ts:159-195` — entry at `:164-171`, takeProfits at `:177-178`, stopLoss at `:188-189`) and are **absent from the USS literal** (`:306-329`): the emitted `facts` carries only `{symbol, market, timeframe, strategy, direction}` (`:322-328`). `leverageHint` is not referenced in the mapper output at all. So the trade levels influence the `ingestHash` but are **not retrievable** downstream — they survive only as hash bits, never as data.
+
+**Author identity is defined in CPJ, populated in examples, and never emitted.** CPJ `provenance` carries optional `authorId` and `authorName` (`afi-config/schemas/cpj/v0_1/core.schema.json:55-62`; TS type `afi-reactor/src/cpj/cpjValidator.ts:47-48`). They are populated in the same real example — `authorId: "user-456"`, `authorName: "TraderAlpha"` (`afi-config/examples/cpj/v0_1/telegram-blofin-perp.example.json:10-11`). Yet a full grep of `cpjMapper.ts` finds **zero** references to `authorId` or `authorName`: the mapper's `provenance` block (`:308-320`) maps `providerType`, `providerId`, `signalId`, `ingestedAt`, `ingestHash`, `providerRef` (from `channelName`), `cpjMessageId`, `cpjPostedAt`, and `cpjParseConfidence` — and **never reads** the author fields. They are populated-but-unused: present in the CPJ input, absent from the USS output.
+
+**Why the loss is schema-enforced, not incidental.** USS `facts` is `additionalProperties:false` (`afi-config/schemas/usignal/v1_1/index.schema.json:31,57`) and defines only `symbol/market/timeframe/strategy/direction` — there is **no schema slot** for entry/SL/TP/leverage, so even ad-hoc attachment of trade levels to `facts` would fail USS validation. USS `provenance` is `additionalProperties:true` (`:293`), so author fields *could* be stashed there as extra keys — but they are not, and `additionalProperties:true` is a tolerance, not a contract. (Note: CPJ has `leverageHint` but **no** position-`size`/notional field, and USS has neither leverage nor size — §2.3 — so §7 recovers only fields that actually exist in CPJ.)
+
+### 7.2 Trade levels — **[PROPOSED]** optional `TradePlan v1` / `SignalLevels v1` metadata
+
+**[PROPOSED]** Preserve CPJ trade levels (`entry`, `stopLoss`, `takeProfits`, `leverageHint`) as **optional `TradePlan v1` / `SignalLevels v1` metadata**, carried alongside the USS signal — **not** forced into USS `facts`.
+
+**Why not into `facts`:** USS `facts` is `additionalProperties:false` (`afi-config/schemas/usignal/v1_1/index.schema.json:57`), so trade levels **cannot** be added there without a schema change (which is out of scope for this docs-only mission and would be an owner decision). `facts` is the replay-canonical ingest metadata (`index.schema.json:31-33`); trade levels are strategy/trade-plan detail, not replay-canonical market metadata, so they belong on a separate optional carrier even if the schema were extended.
+
+**Why optional metadata, not a required field:** CPJ trade levels are themselves optional in the CPJ schema (`core.schema.json:83-121` — none are in `extracted.required`, which is only `["symbolRaw","side"]` at `:69-72`). Many CPJ signals carry no levels. Making them optional metadata preserves the signal when levels are present and degrades cleanly when they are not, without requiring every USS signal to carry a `TradePlan`.
+
+**Where it rides:** `TradePlan v1` / `SignalLevels v1` is a **[PROPOSED]** promotion (named in §3.3). It is optional metadata on the analyst-input envelope (`AnalystInputEnvelope v1`, §6) or on the `ProvenanceRecord v1` (§9), not on USS `facts`. It carries the levels the mapper currently drops, so a downstream analyst/evaluator can see the signal author's intended entry/exit/leverage without altering the canonical USS replay contract. The levels MUST be canonicalized under the §4.4 number policy (prices/levels → fixed-precision decimal strings) if they are ever hash-committed.
+
+### 7.3 Author identity — **[PROPOSED]** pseudonymous `authorRef` / `authorHash`
+
+**[PROPOSED]** Preserve CPJ author identity (`authorId`/`authorName`) as a **pseudonymous `authorRef` / `authorHash`** — **not** raw, and **not** dropped.
+
+**Why pseudonymous, not raw:** Raw author identity may carry **PII and licensing constraints**. A display name like `"TraderAlpha"` (`telegram-blofin-perp.example.json:11`) and a platform user id like `"user-456"` (`:10`) can identify a person; redistributing raw identity in a protocol-level signal record could breach privacy expectations or source-platform licensing terms. A pseudonymous reference — a stable `authorRef` (opaque handle) and/or a `authorHash` (a `CanonicalHash v1`, §4, over the canonical author identity) — preserves the **provenance linkage** (the same author across signals is correlatable) **without exposing raw identity**. This mirrors the §3.7 / §9 principle that `signalLeaf.producer` is a reference, not PII (`AFI_SIGNAL_PROVENANCE_AND_EAS_SCHEMA.md:104`): the protocol carries identity *references*, not raw identity.
+
+**Why not dropped:** Today the mapper drops author identity entirely (§7.1), which means the signal loses its human-author provenance — there is no way downstream to attribute a signal to its author or to correlate an author's track record. That is silent data loss (flagged as a risk in §12). Preserving a pseudonymous ref/hash keeps the provenance linkage while respecting privacy/licensing.
+
+**Where it rides:** `authorRef` / `authorHash` is optional metadata carried on the `ProvenanceRecord v1` (§9) or the `AnalystInputEnvelope v1` (§6), not on USS `facts` (which is `additionalProperties:false` and carries no author field). It is **not** placed on-chain (no L1 anchoring in D2, §9) and **not** wired into any reward/claim path (settlement frozen, §9). If the owner later decides to surface raw author identity (e.g. under a disclosure window), that is a separate, explicit decision — the default D2 posture is pseudonymous.
+
+### 7.4 Summary — what survives, and how
+
+| CPJ field | Today (mapper) | **[PROPOSED]** D2 survival | Carrier | Rationale |
+|---|---|---|---|---|
+| `extracted.entry` | dropped (hash-only, `cpjMapper.ts:164-171`) | optional `TradePlan v1` / `SignalLevels v1` metadata | `AnalystInputEnvelope v1` (§6) or `ProvenanceRecord v1` (§9) | trade-plan detail, not replay-canonical `facts`; `facts` is `additionalProperties:false` |
+| `extracted.stopLoss` | dropped (hash-only, `:188-189`) | optional `TradePlan v1` / `SignalLevels v1` metadata | same | same |
+| `extracted.takeProfits` | dropped (hash-only, `:177-178`) | optional `TradePlan v1` / `SignalLevels v1` metadata | same | same |
+| `extracted.leverageHint` | dropped (not referenced in output) | optional `TradePlan v1` / `SignalLevels v1` metadata | same | same |
+| `provenance.authorId` | dropped (never read by mapper) | pseudonymous `authorRef` / `authorHash` | `ProvenanceRecord v1` (§9) or `AnalystInputEnvelope v1` (§6) | privacy/licensing: preserve linkage without raw PII |
+| `provenance.authorName` | dropped (never read by mapper) | pseudonymous `authorRef` / `authorHash` | same | same |
+
+All six rows are **[PROPOSED]** — new defaults offered for owner decision (§10). Nothing here is adopted; the canonical USS `facts` contract (`additionalProperties:false`) is unchanged, and no schema/code/runtime change is made by this report.
