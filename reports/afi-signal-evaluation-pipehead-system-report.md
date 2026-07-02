@@ -316,3 +316,43 @@ resolving both Decision Records recorded in §8 of this report:
 - **PRs opened, not merged.** The afi-reactor mission PR and this afi-docs
   addendum PR were opened for review only; nothing was merged and no protected
   branch was pushed.
+
+---
+
+## Addendum — Mission 1.5-B: Final Merged State (2026-07-02)
+
+*Append-only note. Nothing above this line has been modified. This note records
+the final merged state of Mission 1.5-B (District One Hardening) after the
+review-only PRs referenced above were merged.*
+
+Mission 1.5-B is now **fully merged**. The review-only PRs recorded in the
+preceding addendum have landed on their respective `main` branches:
+
+- **afi-reactor PR #36** — merged at `5f8c358` (DR-001 canonical USS validation).
+- **afi-reactor PR #37** — merged at `069f56c` (DR-002 canonical indicator kernel).
+- **afi-docs PR #6** — merged at `c3b65e3` (the District One Hardening addendum
+  above).
+
+Post-merge state:
+
+- **Post-merge gates green.** After merge, the afi-reactor verification gates
+  were re-run and remain green: `npm test -- --maxWorkers=2` (25 suites /
+  650 tests), `npx tsc -p tsconfig.pipeheads.json`, and
+  `bash scripts/esm-check-pipeheads.sh` all pass; the CLI demo is deterministic
+  across runs and the invalid-fixture path still exits `2` with a structured
+  error and no downstream artifacts.
+- **Replay hashes / UWR unchanged.** The replay anchors are stable across the
+  merge: `inputHash`
+  (`92258c5bea8c613238c1f2f7f746c99084251510195682cbaf4cf39884e2422d`),
+  `outputHash`
+  (`4b6dd610cba2b64831b0aa2a9e27707908affdf8134ca77d1083535de78ad8dc`),
+  `uwrScore` (`0.1875`), and the UWR axes
+  (structure `0.15` / execution `0` / risk `0.2` / insight `0.4`) are all
+  **unchanged**. The intentionally re-pinned `bundleHash`
+  (`6e2c91560da14bfca98bb49d83581db9519bd15962b80cf7142b65d1255da948`) recorded
+  in the preceding addendum remains the committed replay anchor.
+- **Guardrails intact.** All scored output, receipts, and audit records remain
+  demo-only / provisional; scoring stays 100% afi-core; afi-core, afi-math, and
+  afi-config source remain untouched (afi-config consumed read-only as a schema
+  dependency). This is still a non-production POC — nothing is canonical
+  protocol truth.
