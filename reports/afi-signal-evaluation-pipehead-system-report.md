@@ -252,3 +252,67 @@ Further follow-on work (separate missions, all still governance-bound): wire the
 ---
 
 *This report describes a non-production POC. It records the actual implemented code and the real gate/demo outcomes captured on 2026-06-30. No part of the system is presented as production-ready or as canonical protocol truth.*
+
+---
+
+## Addendum — Mission 1.5-B: District One Hardening (2026-07-02)
+
+*Append-only addendum. Nothing above this line has been modified. This mission
+executed the hardening follow-up authorized by §10 of this report ("Restore
+canonical USS validation and the canonical indicator kernel").*
+
+Mission 1.5-B (`dr001-canonical-validation` + `dr002-canonical-indicators-docs`)
+was completed in **afi-reactor** on branch
+`mission/district-one-hardening-dr001-dr002` (commits `226cdd1` and `a4b1cbc`),
+resolving both Decision Records recorded in §8 of this report:
+
+- **DR-001 resolved.** `src/pipeheads/schemaValidationPipehead.ts` now delegates
+  to the canonical **`validateUsignalV11`** — ajv (`ajv@^8.17.1`) +
+  `ajv-formats@^3.0.1` compiled over the canonical **afi-config**
+  `schemas/usignal/v1_1/{core,index}.schema.json` (afi-config installed as
+  `file:../afi-config`) — at the clean seam DR-001 reserved. The
+  `{ ok, errors: [{ field, message }] }` caller contract is unchanged; `errors`
+  is always an array, and required-property errors map `field` to the missing
+  key (e.g. `provenance.signalId`). Tests prove canonical-only constraints
+  (date-time format, `providerType` / `facts.direction` enums) are now enforced.
+- **DR-002 resolved.** The WIRED `technical-indicators` lane now defaults to a
+  canonical engine wrapping **`computeTechnicalEnrichment`**
+  (`src/enrichment/technicalIndicators.ts` → `src/indicator/*` →
+  **`trading-signals` v7**), swapped in **through the existing injectable
+  technical-lane engine seam** (`runTechnicalLane(candles, engine)`). Lane
+  contract, payload field names/types, and >=50-candle semantics are unchanged;
+  the payload self-labels honestly (`canonicalIndicatorKernel: true`,
+  `indicatorSource: "canonical-kernel-trading-signals"`).
+- **Architecture unchanged.** The five-lane pipeline
+  (validate → fan-out → normalize → score → receipt → audit) is untouched;
+  `technical-indicators` and `pattern-recognition` remain wired; `news`,
+  `social`, and `ai-ml` remain provisional committed fixtures.
+- **Non-production POC guardrail unchanged.** All scored output, receipts, and
+  audit records remain demo-only / provisional; nothing is canonical protocol
+  truth.
+- **Scoring remains 100% afi-core.** The deterministic Froggy trend-pullback
+  scorer and `defaultUwrConfig` are invoked unchanged; no scoring/UWR/reputation
+  math was touched.
+- **afi-core, afi-math, and afi-config source untouched.** All changes live in
+  afi-reactor; afi-config is consumed read-only as a schema dependency.
+- **Replay anchors.** `inputHash`
+  (`92258c5bea8c613238c1f2f7f746c99084251510195682cbaf4cf39884e2422d`),
+  `outputHash`
+  (`4b6dd610cba2b64831b0aa2a9e27707908affdf8134ca77d1083535de78ad8dc`),
+  `uwrScore` (`0.1875`), and the UWR axes
+  (structure `0.15` / execution `0` / risk `0.2` / insight `0.4`) are
+  **unchanged**. The golden `bundleHash` was **intentionally re-pinned** from
+  `c75a1860df037619f257af024f8b0a3fc3ef057950bf9e36477c3c6a1d1add31` to
+  `6e2c91560da14bfca98bb49d83581db9519bd15962b80cf7142b65d1255da948` because the
+  canonical kernel's Wilder-smoothed RSI-14/ATR-14 and streaming EMA differ
+  numerically from the former offline helper (canonical fixture values:
+  ema20 ≈ 157.8544, ema50 ≈ 143.9512, rsi14 ≈ 74.6908, atr14 ≈ 3.4792,
+  emaDistancePct ≈ 4.3113, trendBias bullish).
+- **Final gates passed.** `npm test -- --maxWorkers=2` (25 suites / 650 tests),
+  `npx tsc -p tsconfig.pipeheads.json`, and
+  `bash scripts/esm-check-pipeheads.sh` all green; the CLI demo is
+  deterministic across runs and the invalid-fixture path exits `2` with a
+  structured error and no downstream artifacts.
+- **PRs opened, not merged.** The afi-reactor mission PR and this afi-docs
+  addendum PR were opened for review only; nothing was merged and no protected
+  branch was pushed.
