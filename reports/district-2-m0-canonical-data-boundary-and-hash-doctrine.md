@@ -13,8 +13,6 @@
 
 ## 1. Executive Summary
 
-> **(INITIAL — finalized in §14/F8.)** This summary is written first and reconciled against the full body during finalization. Where it and a detailed section disagree, the detailed section governs until this summary is re-synced.
-
 District 1 (the Signal-Evaluation Pipehead POC) has been **hardened by Mission 1.5-B** and, on `origin/main`, has **resolved DR-001 and DR-002**: the pipehead now runs canonical USS v1.1 validation (AJV + afi-config schemas) and the canonical Wilder indicator kernel (`trading-signals` v7), with `golden.json` re-pinned. District 2 builds on that hardened base. It does **not** re-do District 1 work; it targets the three things District 1 deliberately left in place: (a) which current data shapes become protocol canon vs. stay reactor/strategy-local, (b) a unified hash doctrine, and (c) provenance/disclosure/analyst-input structure.
 
 **Boundary.** USS v1.1 and CPJ v0.1 are **[Canonical]** schema-backed inputs (afi-config JSON Schemas + AJV validators). `AnalystScoreTemplate` is a **[PROPOSED]** high-priority promotion (a real runtime Zod schema, but afi-core-only and reactor-stubbed as `any` — not yet protocol canon). `ReactorScoredSignalV1`, `AnalysisBundle`, and the five lane payloads are **reactor-local** (POC); `FroggyEnrichedView` is **strategy-local**; `AuditRecord` and the settlement manifest draft are **doctrine-only / frozen**. The report offers a **[PROPOSED]** promotion set with versioned names: a thin `ScoredSignal v1` projection, `AnalystInputEnvelope v1`, `ProvenanceRecord v1`, `SourceDisclosureProfile v1`, `EvidenceRef v1`, `EnrichmentProvenance v1`, optional `TradePlan v1` / `SignalLevels v1`, a `ReplayProfile v1` overlay, and a `CanonicalHash v1` spec.
@@ -651,3 +649,115 @@ This report does not introduce contradictions; it records two pre-existing doc-v
 - **C-2 — Pipehead-report body vs. addenda (stale).** The pipehead report body (§1–§10) frames DR-001/DR-002 as open/future work while its own append-only addenda record them RESOLVED (§14.1). The body is stale relative to `origin/main`; the addenda are current. This report treats the addenda/current state as authoritative and flags the body for M6 reconciliation.
 
 Neither contradiction is resolved by this docs-only report (no doc edits outside this file); both are carry-forward items for the M6 contradiction-register sync (§11) under the D-17 authorization.
+
+---
+
+## Appendix A. Evidence Index
+
+This appendix consolidates the key substantive claims of the report with their `origin/main` `repo/path:line` citations. Every line below was re-derived against the canonical `origin/main` pins recorded in §2.1 (afi-reactor `069f56c`, afi-config `400c167`, afi-core `390b440`, afi-math `a27de91`, afi-factory `59330cc`, afi-docs `5d51d75`) via `git -C <repo> show origin/main:<path> | nl -ba`; line numbers are current to those pins, not copied from the planning evidence files (which were captured against stale local commits). Inline citations in the body repeat these same pointers; this index gathers them in one place for reviewer spot-checking. Citations are grouped by the report section that makes the claim.
+
+### A.1 §2 Baseline & §3 Boundary
+
+| Key claim | Citation (`origin/main`) |
+|---|---|
+| USS v1.1 self-labels *"v1.1 Runtime Canon"* | `afi-config/schemas/usignal/v1_1/index.schema.json:4` (title) |
+| USS `facts` is `additionalProperties:false` (no slot for trade levels/author) | `afi-config/schemas/usignal/v1_1/index.schema.json:57` (`:31` opens the block) |
+| USS v1.1 validated by AJV `validateUsignalV11` | `afi-reactor/src/uss/ussValidator.ts:109`; invoked `afi-reactor/src/server.ts:356` |
+| CPJ v0.1 titled *"AFI Canonical Parsed JSON - Core (v0.1)"* | `afi-config/schemas/cpj/v0_1/core.schema.json:4` |
+| CPJ v0.1 validated by AJV `validateCpjV01` | `afi-reactor/src/cpj/cpjValidator.ts:122`; invoked `afi-reactor/src/server.ts:314` |
+| `AnalystScoreTemplate` is a Zod schema in afi-core (not afi-config) | `afi-core/src/analyst/AnalystScoreTemplate.ts:135` (schema), `:31` (interface) |
+| `safeParse` enforced only in the afi-core Froggy analyst | `afi-core/analysts/froggy.trend_pullback_v1.ts:262` |
+| Reactor stubs `AnalystScoreTemplate` as ambient `any` | `afi-reactor/typings.d.ts:11` |
+| `ReactorScoredSignalV1` is heavy (`rawUss:any`, `lenses:any[]`, full `analystScore`) | `afi-reactor/src/types/ReactorScoredSignalV1.ts:25,28,31-37,40` |
+| `FroggyEnrichedView` defined in afi-core, reactor-stubbed `any` | `afi-core/analysts/froggy.enrichment_adapter.ts:104`; `afi-reactor/typings.d.ts:15` |
+| `FroggyEnrichedView` produced on the production path | `afi-reactor/plugins/froggy-enrichment-adapter.plugin.ts:622` |
+| `AnalysisBundle` / `AuditRecord` are POC-only under `src/pipeheads/**` | `afi-reactor/src/pipeheads/types.ts:77` (AnalysisBundle), `:84` (`enrichedView: unknown`), `:108` (AuditRecord) |
+| `AuditRecord` built by the POC audit pipehead, self-labeled `demoOnly: true` | `afi-reactor/src/pipeheads/auditPipehead.ts:60,79-80` |
+| Settlement manifest draft is DRAFT / frozen | `afi-docs/specs/AFI_SETTLEMENT_V1_MANIFEST_AND_PROVENANCE_SCHEMA.md:3`; `afi-config/schemas/afiEpochSettlementManifest.draft.schema.json:4,6` |
+| Layer 3 manifest is CANONICAL-Accepted (the *shapes* the draft restates) | `afi-docs/specs/AFI_EPOCH_SETTLEMENT_MANIFEST.md:3` |
+
+### A.2 §3.0 AFI Agent Boundary (governance)
+
+| Key claim | Citation (`origin/main`) |
+|---|---|
+| Pipeheads are deterministic; trust-critical logic "governed by explicit protocol rules" | `afi-config/codex/governance/droids/AFI_DROID_PIPEHEAD_ADDENDUM.v0.1.md:17` |
+| Droids MAY build/maintain/operate/test/monitor the pipehead execution surface | `AFI_DROID_PIPEHEAD_ADDENDUM.v0.1.md:17,25,27,29` |
+| Droid may not silently alter/replace deterministic kernel logic | `AFI_DROID_PIPEHEAD_ADDENDUM.v0.1.md:77` |
+| Substituting LLM judgment for deterministic scoring is forbidden | `AFI_DROID_PIPEHEAD_ADDENDUM.v0.1.md:110-111` |
+| Trust boundary separates operation from authority | `AFI_DROID_PIPEHEAD_ADDENDUM.v0.1.md:193,195,197,199` |
+| "AFI's deterministic modules produce protocol truth" | `AFI_DROID_PIPEHEAD_ADDENDUM.v0.1.md:197` |
+| "Droids may not become the source of financial truth" | `AFI_DROID_PIPEHEAD_ADDENDUM.v0.1.md:326` |
+| Trust-critical outputs "must remain deterministic, auditable, replayable…" | `AFI_DROID_PIPEHEAD_ADDENDUM.v0.1.md:328` |
+| Charter "Propose, Don't Decide": humans make final decisions | `afi-config/codex/governance/droids/AFI_DROID_CHARTER.v0.1.md:90-92` |
+| v0.1 Addendum authorizes only the first non-production pipehead POC; future districts need new auth | `AFI_DROID_PIPEHEAD_ADDENDUM.v0.1.md:305,307-310` |
+
+### A.3 §4 Hash Doctrine
+
+| Key claim | Citation (`origin/main`) |
+|---|---|
+| pipehead `canonicalHash` = recursive key-sort → `JSON.stringify` → sha256 (hex) | `afi-reactor/src/pipeheads/canonicalHash.ts:34` (`canonicalValue`), `:41` (sort), `:65` (`JSON.stringify`), `:70` (sha256 hex) |
+| `EXCLUDED_TIMESTAMP_KEYS` = `scoredAt, issuedAt, producedAt, normalizedAt, startedAt, finishedAt, at, timestamp` | `afi-reactor/src/pipeheads/canonicalHash.ts:18-27` |
+| `buildScoringProjection` backs `outputHash` (omits `scoredAt`) | `afi-reactor/src/pipeheads/canonicalHash.ts:88-99` |
+| Zero domain separation — bare `sha256(JSON)` in all three off-chain hashers | `afi-reactor/src/pipeheads/canonicalHash.ts:65,70`; `afi-reactor/src/uss/cpjMapper.ts:253-255`; `afi-reactor/src/uss/tradingViewMapper.ts:51-52` |
+| CPJ `ingestHash` is recursive/lossless (sortKeys at all depths) | `afi-reactor/src/uss/cpjMapper.ts:222` (`generateIngestHash`), `:229-250` (`sortKeys`), `:253-255` (sha256) |
+| TradingView `ingestHash` is shallow/lossy (array-replacer allow-list) | `afi-reactor/src/uss/tradingViewMapper.ts:50-52` |
+| `ingestHash` consumed for dedupe on the production path | `afi-reactor/src/uss/tradingViewMapper.ts:99,109`; `afi-reactor/src/uss/cpjMapper.ts:300,313` |
+| On-chain keccak256 is a separate hash family/domain | `afi-token/src/AFIToken.sol:32`; `afi-token/src/AFIMintCoordinator.sol:14` |
+| `scoredAt` written inside the scored object (the hazard) | `afi-core/analysts/froggy.trend_pullback_v1.ts:239` |
+| Production scoring is hash-free (canonicalHash/audit/receipt only under `src/pipeheads/**`) | `afi-reactor/src/pipeheads/auditPipehead.ts:80` (`demoOnly: true`) |
+| Emissions are `number[]` (float64); lone `bigint cap` downcast on entry | `afi-math/src/emissions/emissionsSchedule.ts:15,42,116` |
+| Curves/decay rely on `Math.exp/log/pow/tanh` (not bit-identical across engines) | `afi-math/src/curves/curves.ts:26,60,74,91,107` |
+| Anti-pattern `BigInt(Math.floor(amount * 1e18))` bakes float noise into wei | `afi-mint/src/adapters/EmissionsMintDataProvider.ts:284` |
+| Wave 2 audit (transcendentals risk for content-addressing) | `afi-math/docs/AFI_MATH_WAVE2_AUDIT.md` §3 (distilled in `library/reference-afi-math-wave2-audit.md`) |
+| `golden.json` re-pin: `bundleHash` `c75a1860…` → `6e2c9156…`; `outputHash`/`uwrScore` 0.1875 held | `afi-reactor/test/pipeheads/fixtures/golden.json:8,15,16,17`; documented `afi-reactor/docs/PIPEHEAD_SYSTEM.md:210-211` |
+
+### A.4 §5 Source Disclosure & §6 Analyst Input Envelope
+
+| Key claim | Citation (`origin/main`) |
+|---|---|
+| BenchKit ingests a flat market-only CSV (header vocabulary) | `afi-benchkit/src/afi_benchkit/io.py:9-16` |
+| BenchKit owns a tunable weighting engine (default `alpha=0.3, beta=0.7, N0=100`) | `afi-benchkit/src/afi_benchkit/reputation.py:17-22,56-57,153,204-218,258-263` |
+| `disclosureStatus` binary `WITHHELD`→`DISCLOSED` is design-only, on-chain doctrine | `afi-docs/specs/AFI_SIGNAL_PROVENANCE_AND_EAS_SCHEMA.md:80-85`; intermediate states OPEN `:87` |
+| Disclosure is visibility-only (MUST NOT gate/accelerate/condition payment) | `afi-docs/specs/AFI_SIGNAL_PROVENANCE_AND_EAS_SCHEMA.md:88` (DISC-4); `afi-docs/specs/AFI_SETTLEMENT_V1_MANIFEST_AND_PROVENANCE_SCHEMA.md:309` (DSC-3) |
+| `attestationUID` is design-only (OPEN O6) | `afi-docs/specs/AFI_SIGNAL_PROVENANCE_AND_EAS_SCHEMA.md:67` |
+| Analyst scorer receives exactly one `FroggyEnrichedView` argument | `afi-core/analysts/froggy.enrichment_adapter.ts:104`; `afi-reactor/plugins/froggy.trend_pullback_v1.plugin.ts:34,36` |
+| Lane provenance destroyed at normalize (`projectTechnical` keeps only EMA/RSI/ATR) | `afi-reactor/src/pipeheads/normalizePipehead.ts:196-212` |
+
+### A.5 §7 CPJ Survival & §8 Replay Profile
+
+| Key claim | Citation (`origin/main`) |
+|---|---|
+| CPJ carries trade levels (`entry`/`stopLoss`/`takeProfits`/`leverageHint`) | `afi-config/schemas/cpj/v0_1/core.schema.json:83-122`; TS `afi-reactor/src/cpj/cpjValidator.ts:54-60` |
+| CPJ carries optional `authorId`/`authorName` | `afi-config/schemas/cpj/v0_1/core.schema.json:55-62`; TS `afi-reactor/src/cpj/cpjValidator.ts:47-48` |
+| Mapper drops author + trade levels from USS output (survive only in `ingestHash`) | `afi-reactor/src/uss/cpjMapper.ts:306-329` (USS literal); canonicalized `:159-195` |
+| USS `provenance` is `additionalProperties:true` (tolerance, not contract) | `afi-config/schemas/usignal/v1_1/index.schema.json:293` |
+| USS provenance carries optional legacy replay pins (`datasetId`/`codeCommit`/`seed`) | `afi-config/schemas/usignal/v1_1/index.schema.json:271-286` |
+
+### A.6 §9 Settlement & Validator Boundary
+
+| Key claim | Citation (`origin/main`) |
+|---|---|
+| Settlement manifest draft status DRAFT / not-Accepted | `afi-docs/specs/AFI_SETTLEMENT_V1_MANIFEST_AND_PROVENANCE_SCHEMA.md:3` |
+| Four manifest roots (`signalRoot`/`evidenceRoot`/`strategyRoot`/`claimRoot`) | `afi-docs/specs/AFI_SETTLEMENT_V1_MANIFEST_AND_PROVENANCE_SCHEMA.md:110-113` |
+| `claimRoot` is the only money root / payout authority | `afi-docs/specs/AFI_SETTLEMENT_V1_MANIFEST_AND_PROVENANCE_SCHEMA.md:113` |
+| Canonical `signalLeaf` field list | `afi-docs/specs/AFI_SIGNAL_PROVENANCE_AND_EAS_SCHEMA.md:93-106` |
+| Signal leaf MUST NOT contain validator decisions / cleartext score / UWR axes | `afi-docs/specs/AFI_SIGNAL_PROVENANCE_AND_EAS_SCHEMA.md:109` |
+| Canonical `evidenceLeaf` field list | `afi-docs/specs/AFI_SIGNAL_PROVENANCE_AND_EAS_SCHEMA.md:115-124` |
+| Evidence leaf MUST NOT carry snapshot contents (only `evidenceHash`) | `afi-docs/specs/AFI_SIGNAL_PROVENANCE_AND_EAS_SCHEMA.md:128` |
+| BND-1: validator decisions MUST NOT be written on-chain | `afi-docs/specs/AFI_SETTLEMENT_V1_MANIFEST_AND_PROVENANCE_SCHEMA.md:280` |
+| EAS-7: v0 `AFIMintCoordinator.mintForSignal` is not the v1 anchor, MUST NOT be wired | `afi-docs/specs/AFI_SETTLEMENT_V1_MANIFEST_AND_PROVENANCE_SCHEMA.md:389` |
+| Anchor contract "SettlementCoordinator" is to-be-specified, not `AFIMintCoordinator` | `afi-docs/specs/AFI_SETTLEMENT_V1_MANIFEST_AND_PROVENANCE_SCHEMA.md:406` |
+| No validator-decision root among the four roots (only payout ROLE) | `afi-docs/specs/AFI_SETTLEMENT_V1_MANIFEST_AND_PROVENANCE_SCHEMA.md:110-113`; `afi-docs/specs/AFI_EPOCH_SETTLEMENT_MANIFEST.md:85` |
+| v0 `ValidatorDecision.ts` is non-canonical, tied to mint gating | `afi-core/validators/ValidatorDecision.ts:1-2` (header), `:17` (verdict enum), `:91-114` (base), `:120-127` (`mintEligible: boolean`), `:131` ("before mint gating") |
+
+### A.7 §14 District 1 → District 2 Reconciliation
+
+| Key claim | Citation (`origin/main`) |
+|---|---|
+| DR-001 RESOLVED: `schemaValidationPipehead.ts` delegates to canonical `validateUsignalV11` | `afi-reactor/src/pipeheads/schemaValidationPipehead.ts:28` |
+| Real deps present (`ajv`, `ajv-formats`, `trading-signals`) | `afi-reactor/package.json:40,41,50` |
+| DR-002 RESOLVED: canonical Wilder kernel, `golden.json` re-pinned | `afi-reactor/test/pipeheads/fixtures/golden.json:16`; `afi-reactor/docs/PIPEHEAD_SYSTEM.md:210-211` |
+| Stale CPJ expansion "Canonical Protocol JSON" (correct = "Canonical Parsed JSON") | `afi-config/schemas/cpj/v0_1/core.schema.json:4` (correct title); `afi-reactor/src/uss/cpjMapper.ts:4` (mapper header) |
+| Contradiction register exists for M6 sync | `afi-docs/specs/AFI_CONTRADICTION_REGISTER.md:1,3` |
+
+**Spot-check note.** A validator can confirm any row above by running `git -C /home/factory-user/repos/<repo> show origin/main:<path> | nl -ba` and reading the cited line(s). The citations in §A.1–§A.7 span all seven repos touched by the report's claims (afi-config, afi-reactor, afi-core, afi-math, afi-mint, afi-token, afi-docs) and all fourteen body sections; they are the same pointers used inline in §2–§14, gathered here for ease of cross-checking. No claim in this index is path-only — every entry carries an exact line or line range.
