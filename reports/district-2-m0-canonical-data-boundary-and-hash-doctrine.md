@@ -107,3 +107,85 @@ The following promotions are offered as firm defaults for owner review. Each is 
 - **[PROPOSED] `ReplayProfile v1`** — a stricter overlay on top of broad/optional USS for D2-conformant provenance records (facts, datasetId, codeCommit, seed, evidence hashes, source refs). (Replay policy in §8.)
 
 All ten items above are **[PROPOSED]** — new defaults offered for owner decision (§10). Nothing in this section is adopted; USS v1.1 and CPJ v0.1 remain the only **[Canonical]** shapes, and every reactor-local / strategy-local / demo-only / frozen shape retains its classification until the owner approves a promotion.
+
+---
+
+## 4. Hash Doctrine
+
+Hashing in the current org is **fragmented and undisciplined**: off-chain there are three distinct JSON canonicalizers (one recursive POC, one recursive-lossless production, one shallow-lossy production), on-chain there is a separate `keccak256` domain, there is **no domain separation** anywhere, and the production scoring path computes no content hash at all. This section proposes a single canonical off-chain hash, a domain/version discipline, a domain-aware timestamp policy, a field-specific number policy, and names the object set District 2 should hash-commit. Every claim is verified on `origin/main`; nothing here is adopted — all recommendations are **[PROPOSED]** unless labeled **[Canonical]**.
+
+### 4.1 One canonical off-chain hash — [PROPOSED] `CanonicalHash v1`
+
+**[PROPOSED] `CanonicalHash v1`** — adopt the pipehead recursive canonicalizer as the single off-chain canonical hash function: **recursive key-sort → `JSON.stringify` → sha256**, emitted as a **64-char lowercase hex** digest. This formalizes the existing `afi-reactor/src/pipeheads/canonicalHash.ts`, whose `canonicalValue` recurses arrays element-wise and sorts object keys at every depth (`Object.keys(source).sort()`, `canonicalHash.ts:41`), serializes via `JSON.stringify` (`canonicalize`, `:65`), and hashes with `crypto.createHash("sha256")…digest("hex")` (`canonicalHash`, `:70`). Its own module docstring (`canonicalHash.ts:1-9`) already names itself the generalization of the TradingView `generateIngestHash` "precedent" into "a recursive, key-SORTED canonicalizer" — i.e. the intended single discipline already exists in POC form and merely needs promotion, versioning, and domain separation.
+
+**On-chain `keccak256` is a separate, explicitly-labeled domain [Canonical].** The only domain-tag-like hashing in the tree today is on-chain Solidity `keccak256` over role/identifier constants — `keccak256("EMISSIONS_ROLE")` (`afi-token/src/AFIToken.sol:32`, `afi-token/src/AFIMintCoordinator.sol:14`), `keccak256("MINT_COORDINATOR_ROLE")` (`afi-token/src/AFISignalReceipt.sol:13`). This is a **different hash family** (keccak256, not sha256) serving the on-chain domain. `CanonicalHash v1` (off-chain sha256 content addressing) and on-chain `keccak256` MUST stay **distinct, explicitly-labeled domains** and must never be conflated or treated as interchangeable.
+
+### 4.2 Canonicalization version + domain separation — [PROPOSED]
+
+**Zero domain separation today (verified).** None of the three off-chain JSON hashers prefixes, tags, or salts its input: `canonicalHash` hashes the bare canonical JSON (`canonicalHash.ts:65,70`), the TradingView `ingestHash` hashes `JSON.stringify(payload, …)` directly (`tradingViewMapper.ts:51-52`), and the CPJ `ingestHash` hashes `JSON.stringify(normalized)` directly (`cpjMapper.ts:253-255`). A raw USS, an `AnalysisBundle`, and a scoring projection are therefore all fed through the **same bare `sha256(JSON)`** with no type discriminator — so a cross-type collision is structurally possible (only incidental field-shape differences prevent it today).
+
+**[PROPOSED] Bind an explicit `canonicalizationVersion` into a per-object type+version domain tag.** `CanonicalHash v1` MUST prepend a type+version **domain tag** to the canonical bytes before hashing — e.g. `AFI:signal:v1`, `AFI:evidence:v1`, `AFI:scored:v1` — and carry an explicit `canonicalizationVersion` (e.g. `afi.canon.v1`) that is **bound into** that tag. This makes a hash depend on *what* is being hashed (preventing cross-type collision) and makes any future change to the canonicalization rules **detectable** (a version bump changes every digest by construction), rather than silently re-pinning hashes as happens today.
+
+### 4.3 Timestamp policy — [PROPOSED] (domain-aware, not blanket exclusion)
+
+The policy distinguishes **two classes** of timestamp rather than excluding all of them:
+
+- **(a) Volatile runtime/processing timestamps — EXCLUDED by default.** These are the current `EXCLUDED_TIMESTAMP_KEYS` constant, stripped recursively at every depth before hashing (`canonicalHash.ts:18-27,42-44`): **`scoredAt`, `issuedAt`, `producedAt`, `normalizedAt`, `startedAt`, `finishedAt`, `at`, `timestamp`**. These are human/processing artifacts and must never influence a content hash.
+- **(b) Normalized evidence/source timestamps — MAY be INCLUDED when domain-declared.** Timestamps such as **`asOf`, `fetchedAt`, `postedAt`, `observationTime`** are part of a signal's evidentiary identity/provenance (when a fact was true / observed / fetched) and MAY be **included** in the hashed form when the object's domain tag (§4.2) explicitly declares them. Blanket exclusion would erase legitimate provenance; hence the policy is **domain-aware**, not a uniform strip.
+
+**[PROPOSED] `scoredAt`-inside-the-scored-object hazard — flag & fix.** The afi-core scorer writes a wall-clock stamp **inside** the scored object: `buildAnalystScoreTemplate` sets `scoredAt: new Date().toISOString()` (`afi-core/analysts/froggy.trend_pullback_v1.ts:239`). Today the POC is insulated only because `outputHash` hashes an explicit projection that omits `scoredAt` (`buildScoringProjection`, `canonicalHash.ts:88-100`) and `scoredAt` is in the excluded set; the audit record self-labels `scoredAtExcluded: true` (`afi-reactor/src/pipeheads/auditPipehead.ts:78`). But **any future production hash taken over the raw `AnalystScoreTemplate` would be non-deterministic** unless `scoredAt` (and peers) are stripped or injected out-of-band. Doctrine: volatile stamps like `scoredAt` MUST live **outside** the hashed canonical form (or be excluded by `CanonicalHash v1`), never embedded in the object being content-addressed.
+
+### 4.4 Number policy — [PROPOSED] field-specific (the crux)
+
+**[PROPOSED] Ban raw IEEE-754 floats (and transcendentals) in any hashed canonical form.** Today every off-chain hasher relies on default `JSON.stringify` number serialization, so any float drift propagates directly into the digest. The policy is **field-specific**:
+
+- **(i) Money / emissions → integer base units.** Represent monetary and emission quantities as **integer base units** (e.g. wei) using integer/decimal math — **never** `float × 1e18` then floor. The concrete anti-pattern to ban: `EmissionsMintDataProvider.calculateTokenAmount` computes `const amountWei = BigInt(Math.floor(adjustedAmount * 10 ** this.config.decimals))` (`afi-mint/src/adapters/EmissionsMintDataProvider.ts:284`, `decimals = 18`), i.e. multiplies a float by `1e18` in double precision (≈15–16 significant digits) before flooring — so the low ~3 digits of an 18-decimal wei value are quantization noise.
+- **(ii) Prices / levels → fixed-precision decimal strings.** CPJ trade levels and any price/level fields MUST be canonicalized to **decimal strings at a fixed, declared precision** (canonical quantization), not floats.
+- **(iii) Scores / indicators → fixed-precision decimal strings or documented bucketed integers.** UWR scores and indicator values MUST be emitted at fixed precision or as explicitly documented bucketed integers.
+
+**Backed by the afi-math Wave 2 audit.** Emissions are `number[]` (float64) throughout — the lone `bigint cap` is downcast on entry (`const cap = Number(p.cap)`, `afi-math/src/emissions/emissionsSchedule.ts:15,42,116`) — and the curves/decay modules rely on `Math.exp/log/pow/tanh` (`afi-math/src/curves/curves.ts:26,60,74,91,107`). The Wave 2 audit (`afi-math/docs/AFI_MATH_WAVE2_AUDIT.md`, §3; distilled in `library/reference-afi-math-wave2-audit.md`) finds these transcendentals are **not guaranteed bit-identical across JS engines/libm versions** and states this is **"a significant technical risk for any scheme that hashes or content-addresses emitted values."** Hence: keep transcendental/float math out of anything hashed, and content-address only quantized integer/fixed-precision representations.
+
+### 4.5 The four current hash paths — [PROPOSED] deprecate only the shallow TradingView `ingestHash`
+
+There are **four** distinct hash paths today; they are materially different and must be described distinctly. Critically, the two production `ingestHash` functions are **not** the same discipline — the CPJ one is recursive/lossless, the TradingView one is shallow/lossy — so the deprecation applies to **only** the TradingView variant.
+
+| Path | Location (`origin/main`) | Discipline | Prod? |
+|---|---|---|---|
+| pipehead `canonicalHash` | `afi-reactor/src/pipeheads/canonicalHash.ts:34-70` | recursive key-sort + sha256; strips `EXCLUDED_TIMESTAMP_KEYS` recursively; `buildScoringProjection` backs `outputHash` | **POC only** |
+| CPJ `ingestHash` | `afi-reactor/src/uss/cpjMapper.ts:222-257` | **recursive / lossless** — `canonicalizeCpjForHashing` normalizes entry `{min,max}` + sorts TP/SL, then `sortKeys` recurses at all depths + sha256 | **production** ingest |
+| TradingView `ingestHash` | `afi-reactor/src/uss/tradingViewMapper.ts:50-53` | **shallow / lossy** — `JSON.stringify(payload, Object.keys(payload).sort())` array-**replacer** allow-list: only top-level keys govern, nested keys not in that set are silently dropped → collision risk | **production** ingest |
+| on-chain role/leaf hashing | `afi-token/src/AFIToken.sol:32`, `AFIMintCoordinator.sol:14`, `AFISignalReceipt.sol:13` | **keccak256** — different hash family/domain | on-chain |
+
+**[PROPOSED] Deprecate the shallow/lossy TradingView `ingestHash`.** Its second `JSON.stringify` argument is an **array replacer** (an allow-list of property names) built from `Object.keys(payload).sort()` — only the **top-level** keys. That allow-list is applied at every nesting level, so any nested property whose name is not also a top-level key is **silently erased** from the hash (two different nested `enrichmentProfile` objects can hash equal). Migrate all ingest hashing to `CanonicalHash v1`; keep `ingestHash` only as a clearly-labeled **non-canonical dedupe/integrity aid** (`ingestHash?: string` on USS provenance, `afi-reactor/src/uss/ussValidator.ts:42`; consumed for dedupe by the webhook server) until migration completes.
+
+**[PROPOSED] Do NOT generalize the criticism to the CPJ `ingestHash`.** The CPJ path is a **different, stronger** discipline: `canonicalizeCpjForHashing` normalizes field semantics (entry range → `{min,max}` with `min ≤ max`, TP/SL arrays sorted, `cpjMapper.ts:159-193`) and `sortKeys` **recursively** sorts object keys at all depths (`cpjMapper.ts:229-250`) before `sha256` (`:253-255`). It is recursive and lossless; the "shallow/lossy" critique is **specific to TradingView** and must not be applied to CPJ. (The CPJ `ingestHash` still lacks domain separation and the number policy, so it too should eventually adopt `CanonicalHash v1`, but it is **not** deprecated for losing data.)
+
+### 4.6 Production scoring is hash-free (accurate posture) — [Canonical] observation
+
+Production **scoring** computes **no content hash at all**. The canonical-hashing machinery — `canonicalHash`, the audit record, and the reputation receipt — lives **only** under `afi-reactor/src/pipeheads/**` (POC), and every consuming record self-labels `demoOnly: true` (`afi-reactor/src/pipeheads/auditPipehead.ts:79`). The only hash on the production path is `ingestHash` (dedupe/integrity), computed at ingest by the two mappers (`tradingViewMapper.ts:99,109`; `cpjMapper.ts:300,313`) and consumed by the webhook server for duplicate detection — never for scoring or commitment. Any D2 provenance/commitment work is therefore **greenfield on the production path**, not a modification of an existing production hash.
+
+### 4.7 Objects to hash-commit in D2 — [PROPOSED] inside `ProvenanceRecord v1`, no anchoring
+
+**[PROPOSED]** District 2 should compute and carry the following hash commitments as **computable commitments inside `ProvenanceRecord v1`** (§3.3, §9), each produced by `CanonicalHash v1` under its own domain tag (§4.2):
+
+- **signal (USS) `contentHash`** — a `CanonicalHash v1` over the canonical USS content (domain `AFI:signal:v1`);
+- **evidence hashes (`EvidenceRef v1`)** — payload/evidence hashes for each referenced piece of evidence (domain `AFI:evidence:v1`);
+- **`ScoredSignal v1` projection hash** — over the thin scored projection (domain `AFI:scored:v1`), formalizing today's `outputHash`-over-`buildScoringProjection` pattern (`canonicalHash.ts:88-100`);
+- **`EnrichmentProvenance v1` hash** — over the lane-provenance carrier that preserves the per-lane attribution normalize currently destroys.
+
+**[Canonical] No on-chain anchoring in D2.** These are **off-chain computable commitments only**. District 2 introduces **no** Layer-1 anchoring, Merkle aggregation, or on-chain publication of these hashes (there is no Merkle/`evidenceHash` aggregation structure in the org today, and none is added here). Alignment of `ProvenanceRecord v1` to the canonical `signalLeaf`/`evidenceLeaf` so a *future* settlement layer could consume them is covered in §9; the actual anchoring remains out of scope.
+
+### 4.8 Concrete illustration — the `golden.json` re-pin
+
+The DR-002 canonical-indicator-kernel switch (Mission 1.5-B) re-pinned the pipehead golden fixture's **`bundleHash`** while the scoring outputs held steady, which is exactly why *what* you hash and the number policy both matter:
+
+| Field in `test/pipeheads/fixtures/golden.json` | Value (`origin/main`) |
+|---|---|
+| `bundleHash` (before, simple kernel) | `c75a1860df037619f257af024f8b0a3fc3ef057950bf9e36477c3c6a1d1add31` |
+| **`bundleHash` (after, canonical Wilder kernel — RE-PINNED)** | **`6e2c91560da14bfca98bb49d83581db9519bd15962b80cf7142b65d1255da948`** |
+| `inputHash` (unchanged) | `92258c5bea8c613238c1f2f7f746c99084251510195682cbaf4cf39884e2422d` |
+| `outputHash` (unchanged) | `4b6dd610cba2b64831b0aa2a9e27707908affdf8134ca77d1083535de78ad8dc` |
+| `uwrScore` (unchanged) | **`0.1875`** |
+| `uwrAxes` (unchanged) | `structure 0.15 / execution 0 / risk 0.2 / insight 0.4` |
+
+The change is documented at `afi-reactor/docs/PIPEHEAD_SYSTEM.md:210-211` (`c75a1860…` → `6e2c9156…`) and the fixture is at `afi-reactor/test/pipeheads/fixtures/golden.json`. The **`bundleHash` moved** (it commits the full enriched bundle, whose EMA/RSI/ATR numbers changed when the canonical Wilder kernel replaced the simple-average helper), while **`outputHash` and `uwrScore` (0.1875) held steady** because the scoring projection is insulated: the UWR landed on the same discrete value over the canonical indicators for that fixture. Lesson: a content hash is only as deterministic as the numbers it covers — the bundle hash is **kernel/number-sensitive**, so `CanonicalHash v1` (what you hash) and the field-specific number policy (§4.4) are both prerequisites for stable content addressing.
