@@ -6,16 +6,17 @@
 
 Read this document first when resuming the portable-protocol audit.
 
-> **Post-audit delta (2026-07-16) — LangChain/LangGraph elimination.** The
-> `archive/langgraph-migration-2025/` set was deleted from the current tree, so
-> the forensic artifacts that described it were updated in lockstep: two Info
-> findings were **retired** (`themes/J-docs-drift.json`, `recon/` records[7] +
-> `per-repo/afi-docs.json`), as was one `reference_only_assumptions` entry
-> (records[18] + `per-repo/afi-protocol.json`) that quoted a since-rewritten
-> line verbatim. Findings were retired, never rewritten, and no replacement
-> quote was invented. All substantive P2/P3 findings, severities, and remaining
-> citations are intact; git history retains the deleted material in full. This
-> is the documented change required by `README.md:57` in lieu of re-running
+> **Post-audit delta (2026-07-16) — orchestration-terminology elimination.**
+> The superseded pre-beta planning archive under `archive/` (introduced at
+> `875fe34`) was deleted from the current tree, so the forensic artifacts that
+> described it were updated in lockstep: two Info findings were **retired**
+> (`themes/J-docs-drift.json`, `recon/` records[7] + `per-repo/afi-docs.json`),
+> as was one `reference_only_assumptions` entry (records[18] +
+> `per-repo/afi-protocol.json`) that quoted a since-rewritten line verbatim.
+> Findings were retired, never rewritten, and no replacement quote was
+> invented. All substantive P2/P3 findings, severities, and remaining citations
+> are intact; git history retains the deleted material in full. This is the
+> documented change required by `README.md:57` in lieu of re-running
 > extraction. See [`README.md`](./README.md) → *Org delta (2026-07-16)*.
 
 ---
