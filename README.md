@@ -41,9 +41,6 @@ gitbook serve            # open http://localhost:4000
 | Goal | Read |
 |------|------|
 | Portable protocol direction (normative vs reference) | [`specs/AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md`](specs/AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md) |
-| Audit checkpoint (Phase 1 done; resume here) | [`specs/audit/AFI_AUDIT_CHECKPOINT.md`](specs/audit/AFI_AUDIT_CHECKPOINT.md) |
-| Resume protocol audit (Phases 2–4 agent prompt) | [`specs/audit/AFI_AUDIT_RESUME_PROMPT.md`](specs/audit/AFI_AUDIT_RESUME_PROMPT.md) |
-| Full-org protocol investigation (all phases) | [`specs/AFI_PROTOCOL_INVESTIGATION_PROMPT.md`](specs/AFI_PROTOCOL_INVESTIGATION_PROMPT.md) |
 | Understand agent lifecycle & mentors | [`specs/mentor_protocol.md`](specs/mentor_protocol.md) |
 | Explore the Modal (PoInt testbed) | [`specs/modal.md`](specs/modal.md) |
 | Onboard as a validator | [`guides/validator.md`](guides/validator.md) |

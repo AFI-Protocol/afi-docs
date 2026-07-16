@@ -16,3 +16,11 @@ jobs:
         with:
           node-version: '18'
       - run: echo "CI workflow initialized"
+
+  stale-refs:
+    name: No references to removed machinery
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Check the tracked tree for removed implementation machinery
+        run: python3 scripts/check_stale_refs.py

@@ -483,7 +483,7 @@ Carried verbatim from the constitution ([§6](./AFI_SETTLEMENT_V1_DOCTRINE.md#6-
 These are **recommendations** for the owner/maintainer. This document does **not** mass-edit the canonical specs; applying them is a separate, reviewed step.
 
 - **XL-1 (recommend):** Add this document to the "Related Documents" list of Layer 1 and Layer 3 as the *consolidated manifest/provenance schema reference* (one line each), once it is reviewed and its status is raised from DRAFT.
-- **XL-2 (recommend):** Add a row to [AFI_NORMATIVE_REGISTER.md](./AFI_NORMATIVE_REGISTER.md) for the companion draft schema (`afiEpochSettlementManifest.draft.schema.json`) once adopted, marking it **draft / non-implementation**.
+- **XL-2 (recommend):** Record the companion draft schema in the governed schema catalog (`afi-config`) (`afiEpochSettlementManifest.draft.schema.json`) once adopted, marking it **draft / non-implementation**.
 - **XL-3 (recommend):** If the strategy-leaf shape (§5.3) is adopted, fold it into [AFI_ERC6909_STRATEGY_EPOCH_RECEIPTS.md](./AFI_ERC6909_STRATEGY_EPOCH_RECEIPTS.md) (or Layer 3) as the canonical leaf under `strategyRoot`, and resolve S-A.
 - **XL-4 (recommend):** Record the `disclosureWindow` vs. "delayedDisclosureWindow" naming note (§4) wherever the prose term appears, to keep one canonical field name.
 - **XL-5 (do NOT):** Do **not** add this draft to any contract, deployment manifest, runtime config, or registry that would imply implementation; it is specification only.

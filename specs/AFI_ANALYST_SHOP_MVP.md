@@ -7,7 +7,7 @@
 **Audience:** Product, protocol architects, analyst onboarding  
 **Context:** afi-reactor + Mongo reference implementation; Ably optional for live proof
 
-**Related:** [`AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md`](./AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md) · [`audit/AFI_TESTNET_E2E_CHECKLIST.md`](./audit/AFI_TESTNET_E2E_CHECKLIST.md) · [`audit/AFI_HUMAN_REVIEW_WORKSHEET.md`](./audit/AFI_HUMAN_REVIEW_WORKSHEET.md)
+**Related:** [`AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md`](./AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md)
 
 ---
 
@@ -41,8 +41,8 @@ flowchart TB
   subgraph required["Required — Analyst Shop back office"]
     ID[Provider onboarding\nproviderId + beneficiary]
     ING[Ingest\nTelegram / TV / API → USS/CPJ]
-    RX[afi-reactor\nenrich → UWR score → qualify]
-    TSSD[(Mongo TSSD\nreactor_scored_signals_v1)]
+    RX[afi-reactor\nenrich → UWR score → qualify\n→ submit evidence]
+    TSSD[(afi-infra canonical store\nafi.scored-signal-evidence.v1)]
     MINT[afi-mint → Base Sepolia]
   end
   subgraph optional["Optional — Storefront & visibility"]
@@ -79,7 +79,7 @@ flowchart TB
 | A1 | Register as provider | `providerId`, API key, beneficiary address form | No |
 | A2 | Choose ingest source | Template: TradingView webhook URL, Telegram bot token, or REST | No |
 | A3 | Send test signal | USS/CPJ validation errors surfaced clearly | No |
-| A4 | Confirm scored | Scored signal record in Mongo TSSD (`reactor_scored_signals_v1`) stage=SCORED | No |
+| A4 | Confirm scored | Canonical scored-signal evidence record (`afi.scored-signal-evidence.v1`) persisted by afi-infra, lifecycleState=SCORED | No |
 | A5 | Confirm mint (testnet) | `MintCoordinated` on Base Sepolia + stage=MINTED in TSSD record | No |
 
 **Done = shop is operational.** Analyst can mint-attributed signals on testnet.
@@ -236,5 +236,4 @@ afi-mint minted event → tiny fan-out service → Ably REST publish
 
 ---
 
-*Next: wire this into [`AFI_TESTNET_E2E_CHECKLIST.md`](./audit/AFI_TESTNET_E2E_CHECKLIST.md) Phase B (§1B) when Phase A is green.*
 
