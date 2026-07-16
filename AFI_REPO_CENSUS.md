@@ -6,7 +6,6 @@
 | Spartan_reference | unknown | 2025-12-04 | No README found (reference materials) |
 | _archived | unknown | 2025-12-04 | No README found (archived content) |
 | afi-artifacts | node/ts | 2025-11-26 | AFI Artifacts — Paper Reproducibility Bundle (snapshot: paper-2025-v2.2) |
-| afi-assets | node/ts | 2025-11-24 | afi-assets |
 | afi-benchkit | python | 2025-11-20 | AFI BenchKit |
 | afi-config | node/ts | 2025-12-16 | afi-config |
 | afi-core | node/ts | 2025-12-16 | 🧠 AFI Core |
@@ -20,7 +19,6 @@
 | afi-math | node/ts | 2025-12-16 | AFI Math |
 | afi-mint | node/ts/solidity | 2025-12-07 | AFI Mint – Signal-Driven Token Minting Pipeline |
 | afi-ops | node/ts | 2025-11-28 | 🛠️ AFI Ops |
-| afi-plugins | node/ts | 2025-12-06 | afi-plugins |
 | afi-protocol | node/ts | 2025-11-24 | AFI Protocol (Meta‑Repo) |
 | afi-reactor | node/ts | 2025-12-17 | AFI-Reactor ⚡ |
 | afi-research-site | node/ts | 2025-11-24 | AFI Research Site |

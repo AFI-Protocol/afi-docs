@@ -120,7 +120,7 @@ Convenience defaults for the AFI org’s first end-to-end path—not binding on 
 |-----------|------|-------|
 | Ingest gateway | `afi-gateway` | Webhooks, tenant routing |
 | Orchestrator / DAG | `afi-reactor` | Froggy pipeline, `pipelineRunner.ts` |
-| Runtime agents/tools | `afi-core`, `afi-plugins` | Nodes invoked by DAG |
+| Runtime agents/tools | `afi-core` | Nodes invoked by DAG |
 | Vault adapter | `afi-infra` | Mongo-oriented examples; multi-engine in schema |
 | Mint pipeline | `afi-mint` | Off-chain FSM → on-chain `mintForSignal` |
 | Contracts | `afi-token` | Emissions, coordinator, ERC-1155 receipts |
@@ -175,7 +175,7 @@ Audit **all repositories** in the AFI-Protocol GitHub organization—public **an
 
 **Known local workspace repos (non-exhaustive):**
 
-`afi-artifacts`, `afi-assets`, `afi-benchkit`, `afi-cli-framework`, `afi-config`, `afi-core`, `afi-docs`, `afi-econ`, `afi-factory`, `afi-gateway`, `afi-governance`, `afi-infra`, `afi-labs`, `afi-math`, `afi-mint`, `afi-ops`, `afi-plugins`, `afi-protocol`, `afi-reactor`, `afi-research-site`, `afi-skills`, `afi-tiny-brains`, `afi-token`, `afi-xerc20`
+`afi-artifacts`, `afi-benchkit`, `afi-cli-framework`, `afi-config`, `afi-core`, `afi-docs`, `afi-econ`, `afi-factory`, `afi-gateway`, `afi-governance`, `afi-infra`, `afi-labs`, `afi-math`, `afi-mint`, `afi-ops`, `afi-protocol`, `afi-reactor`, `afi-research-site`, `afi-skills`, `afi-tiny-brains`, `afi-token`, `afi-xerc20`
 
 Also check for renamed, archived, or external-reference repos (e.g. historical `afi-pipeline` references in older docs).
 

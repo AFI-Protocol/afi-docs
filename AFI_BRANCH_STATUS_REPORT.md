@@ -19,7 +19,7 @@ You are actively developing on **feature/migration branches** across multiple re
 - ⚠️ **15+ commits in afi-reactor** not in main (TSSD Vault, Replay, Test fixes)
 - ⚠️ **20+ commits in afi-core** not in main (UWR scoring, Math integration, ESM migration)
 - ⚠️ **20+ commits in afi-token** not in main (Foundry v2, Pattern A role wiring)
-- ✅ **3 repos on main** and in sync (afi-plugins, afi-math, afi-skills)
+- ✅ **2 repos on main** and in sync (afi-math, afi-skills)
 
 **Critical Decision Point:**
 
@@ -244,27 +244,7 @@ git push origin main
 
 ---
 
-### 6. afi-plugins
-
-**Path:** `/Users/secretservice/AFI_Modular_Repos/afi-plugins`
-**Current Branch:** `main`
-**Canonical Branch:** `main` (origin HEAD)
-**Working Tree:** Clean
-**Status:** ✅ **OK**
-
-**Branch Breakdown:**
-
-- `main` (current)
-  - **Tracking:** `origin/main` (up to date)
-  - **Last Commit:** `372fd17` - docs(governance): add AGENTS.md with repo scope
-
-**Commentary:**
-
-Clean and in sync. No action needed.
-
----
-
-### 7. afi-math
+### 6. afi-math
 
 **Path:** `/Users/secretservice/AFI_Modular_Repos/afi-math`
 **Canonical Branch:** `main` (origin HEAD)
