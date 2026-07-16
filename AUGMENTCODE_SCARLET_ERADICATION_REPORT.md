@@ -35,7 +35,6 @@ This report documents all occurrences of "augmentcode" and "Scarlet" references 
 **Repositories affected**:
 - afi-reactor (6 files)
 - afi-infra (8 files)
-- afi-plugins (1 file)
 
 ### Detailed Findings
 
@@ -75,28 +74,15 @@ This report documents all occurrences of "augmentcode" and "Scarlet" references 
 
 ---
 
-#### 3. afi-plugins Repository (1 occurrence)
-
-| File | Line | Context | Field | Action Required |
-|------|------|---------|-------|-----------------|
-| `afi-plugins/.afi-codex.json` | 4 | `"trackedBy": "augmentcode"` | Metadata | Replace with AFI team |
-
-**Impact**: MEDIUM - Single metadata file.
-
-**Recommended Replacement**: Replace with "AFI Team" or remove the field if not required.
-
----
-
 ## Part 2: Scarlet References
 
 ### Overview
 
-**Total Scarlet references**: 175 occurrences across 10 repositories
+**Total Scarlet references**: 174 occurrences across 9 repositories
 
 **Repositories affected**:
 - afi-reactor (1 file)
 - afi-infra (1 file)
-- afi-plugins (1 file)
 - afi-factory (1 file)
 - afi-governance (1 file)
 - afi-labs (160+ files)
@@ -131,19 +117,7 @@ This report documents all occurrences of "augmentcode" and "Scarlet" references 
 
 ---
 
-#### 3. afi-plugins Repository (1 occurrence)
-
-| File | Line | Context | Field | Action Required |
-|------|------|---------|-------|-----------------|
-| `afi-plugins/AGENTS.md` | 4 | `Maintained by: Scarlet` | Documentation | Replace with AFI team |
-
-**Impact**: HIGH - Core documentation file.
-
-**Recommended Replacement**: Replace with "AFI Team" or remove the maintainer line.
-
----
-
-#### 4. afi-factory Repository (1 occurrence)
+#### 3. afi-factory Repository (1 occurrence)
 
 | File | Line | Context | Field | Action Required |
 |------|------|---------|-------|-----------------|
@@ -155,7 +129,7 @@ This report documents all occurrences of "augmentcode" and "Scarlet" references 
 
 ---
 
-#### 5. afi-governance Repository (1 occurrence)
+#### 4. afi-governance Repository (1 occurrence)
 
 | File | Line | Context | Field | Action Required |
 |------|------|---------|-------|-----------------|
@@ -167,7 +141,7 @@ This report documents all occurrences of "augmentcode" and "Scarlet" references 
 
 ---
 
-#### 6. afi-labs Repository (160+ occurrences)
+#### 5. afi-labs Repository (160+ occurrences)
 
 **Note**: afi-labs contains the majority of Scarlet references, primarily in scarlett configuration files.
 
@@ -191,7 +165,7 @@ This report documents all occurrences of "augmentcode" and "Scarlet" references 
 
 ---
 
-#### 7. afi-docs Repository (1 occurrence)
+#### 6. afi-docs Repository (1 occurrence)
 
 | File | Line | Context | Field | Action Required |
 |------|------|---------|-------|-----------------|
@@ -215,7 +189,7 @@ This report documents all occurrences of "augmentcode" and "Scarlet" references 
 
 ---
 
-#### 9. afi-core Repository (1 occurrence)
+#### 8. afi-core Repository (1 occurrence)
 
 | File | Line | Context | Field | Action Required |
 |------|------|---------|-------|-----------------|
@@ -243,16 +217,15 @@ This report documents all occurrences of "augmentcode" and "Scarlet" references 
 
 ### Priority 1: CRITICAL (Fix Immediately)
 
-#### Task 1: Update AGENTS.md Files (8 files)
+#### Task 1: Update AGENTS.md Files (6 files)
 
 **Files to update**:
 1. `afi-reactor/AGENTS.md` - Line 4
 2. `afi-infra/AGENTS.md` - Line 4
-3. `afi-plugins/AGENTS.md` - Line 4
-4. `afi-factory/AGENTS.md` - Line 4
-5. `afi-governance/AGENTS.md` - Line 4
-6. `afi-core/AGENTS.md` - Line 4
-7. `afi-artifacts/AGENTS.md` - Line 4
+3. `afi-factory/AGENTS.md` - Line 4
+4. `afi-governance/AGENTS.md` - Line 4
+5. `afi-core/AGENTS.md` - Line 4
+6. `afi-artifacts/AGENTS.md` - Line 4
 
 **Action**: Replace maintainer line with AFI team reference or remove entirely.
 
@@ -270,12 +243,11 @@ Maintained by: AFI Team
 
 ---
 
-#### Task 2: Update .afi-codex.json Files (3 files)
+#### Task 2: Update .afi-codex.json Files (2 files)
 
 **Files to update**:
 1. `afi-reactor/codex/.afi-codex.json` - Line 4
 2. `afi-infra/.afi-codex.json` - Line 4
-3. `afi-plugins/.afi-codex.json` - Line 4
 
 **Action**: Replace trackedBy field with AFI team reference.
 
@@ -629,7 +601,6 @@ afi-infra/afi-codex/signal_scoring_schema.afi-codex.json
 afi-infra/afi-codex/signal_transmission_schema.afi-codex.json
 afi-infra/afi-codex/validator_metadata_schema.afi-codex.json
 afi-infra/.afi-codex.json
-afi-plugins/.afi-codex.json
 ```
 
 ### Scarlet References (175 files)
@@ -637,7 +608,6 @@ afi-plugins/.afi-codex.json
 ```
 afi-reactor/AGENTS.md
 afi-infra/AGENTS.md
-afi-plugins/AGENTS.md
 afi-factory/AGENTS.md
 afi-governance/AGENTS.md
 afi-core/AGENTS.md

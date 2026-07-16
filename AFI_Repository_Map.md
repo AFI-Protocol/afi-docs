@@ -113,15 +113,6 @@
   - Architecture documentation
   - Tutorials
 
-### afi-assets
-- **Purpose**: Digital assets and media
-- **Language**: N/A
-- **Key Components**:
-  - Logos
-  - Media kits
-  - Token graphics
-  - Brand assets
-
 ### afi-artifacts
 - **Purpose**: Research artifacts and reproducibility
 - **Language**: Various
@@ -157,7 +148,7 @@ afi-econ → afi-governance
     ↓
 afi-benchkit → afi-tiny-brains
     ↓
-afi-docs ← afi-assets ← afi-artifacts
+afi-docs ← afi-artifacts
     ↑
 afi-config (all repos)
 ```
@@ -182,6 +173,5 @@ afi-config (all repos)
 6. **Economic Modeling**: Update afi-econ and afi-governance for economic changes
 7. **Testing**: Use afi-benchkit and afi-tiny-brains for testing
 8. **Documentation**: Update afi-docs with changes
-9. **Assets**: Update afi-assets for new media
-10. **Artifacts**: Add research artifacts to afi-artifacts
-11. **Configuration**: Update afi-config for new configurations
+9. **Artifacts**: Add research artifacts to afi-artifacts
+10. **Configuration**: Update afi-config for new configurations

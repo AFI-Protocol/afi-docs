@@ -70,15 +70,15 @@
 │                    │  (DAG Orch.)   │                        │
 │                    │  15-Node       │                        │
 │                    │  Pipeline      │                        │
-│                    └───┬───────┬────┘                        │
-│                        │       │                             │
-│         ┌──────────────┘       └──────────────┐              │
-│         │                                     │              │
-│   ┌─────▼─────┐                       ┌──────▼──────┐       │
-│   │ afi-core  │                       │ afi-plugins │       │
-│   │ (Runtime) │                       │ (Extensions)│       │
-│   │ Validators│                       │             │       │
-│   │ Scorers   │                       └─────────────┘       │
+│                    └───┬────────────┘                        │
+│                        │                                     │
+│         ┌──────────────┘                                     │
+│         │                                                    │
+│   ┌─────▼─────┐                                             │
+│   │ afi-core  │                                             │
+│   │ (Runtime) │                                             │
+│   │ Validators│                                             │
+│   │ Scorers   │                                             │
 │   └─────┬─────┘                                             │
 │         │                                                    │
 │   ┌─────▼─────┐       ┌─────────────┐                      │
@@ -130,8 +130,7 @@ AFI Protocol is organized into **23 repositories**, each with specific responsib
 - `afi-infra` - TSSD vault, templates, schemas
 - `afi-ops` - Deployment, health checks, runbooks
 
-**Extension Layer (3 repos):**
-- `afi-plugins` - Plugin registry and templates
+**Extension Layer (2 repos):**
 - `afi-skills` - Versioned skill library
 - `afi-factory` - Agent templates and spawning
 
@@ -144,10 +143,9 @@ AFI Protocol is organized into **23 repositories**, each with specific responsib
 - `afi-artifacts` - Reproducibility bundle (paper-2025-v2.2)
 - `afi-benchkit` - Validator benchmarking
 
-**Other (5 repos):**
+**Other (4 repos):**
 - `afi-protocol` - Meta-repo (contributor manifest)
 - `afi-labs` - Experimental playground
-- `afi-assets` - Brand assets
 - `afi-research-site` - Research website
 
 ---
@@ -186,7 +184,6 @@ The AFI Orchestrator Doctrine defines the core architectural principles:
 │  afi-infra = templates, TSSD vault, agent stubs                │
 │  afi-ops = deployment automation and monitoring                │
 │                                                                 │
-│  afi-plugins = extension surface (plugin definitions)          │
 │  afi-skills = agent capabilities (skill library)               │
 │  afi-factory = agent templates (spawning logic)                │
 │                                                                 │
@@ -816,56 +813,6 @@ tags:
 
 ## Integration & Extensions
 
-### Plugin System (afi-plugins)
-
-**Plugin Architecture:**
-```typescript
-interface Plugin {
-  id: PluginId;
-  name: string;
-  version: string;
-  kind: PluginKind; // signal-generator, analyzer, scorer, validator, executor, observer
-  description: string;
-  inputs: PluginInput[];
-  outputs: PluginOutput[];
-  config?: PluginConfig;
-  execute: (context: PluginContext) => Promise<PluginResult>;
-}
-```
-
-**Plugin Kinds:**
-1. **signal-generator** - Generate raw signals from data sources
-2. **analyzer** - Analyze and enrich signals in DAG pipeline
-3. **scorer** - Produce scored signals with breakdowns
-4. **validator** - Validate signals and strategies
-5. **executor** - Execute trading strategies
-6. **observer** - Observe and log system behavior
-
-**Seeded Plugins (Phase 1 - STUBS):**
-```
-afi.blofin.trendPullback      - Blofin perp trend/pullback signal generator
-afi.core.greeksDecayAnalyzer  - Options Greeks decay analyzer
-afi.scorer.signalScorer       - Signal scorer (composite score + breakdowns)
-afi.validator.halfDecayReplay - Half-decay replay validator
-afi.observer.signalTelemetry  - Signal lifecycle telemetry observer
-afi.executor.gridTrading      - Grid trading strategy executor
-```
-
-**Plugin Registration:**
-```typescript
-import { getAllPlugins, getPluginById, filterPluginsByKind } from "afi-plugins";
-
-// Get all plugins
-const plugins = getAllPlugins();
-
-// Get specific plugin
-const plugin = getPluginById("afi.blofin.trendPullback");
-
-// Filter by category
-const generators = filterPluginsByKind("signal-generator");
-const analyzers = filterPluginsByKind("analyzer");
-```
-
 ### ElizaOS Integration (afi-gateway)
 
 **Integration Model:**
@@ -1038,7 +985,6 @@ Response:
 - `afi-reactor`: Jest (DAG nodes, plugins)
 - `afi-token`: Foundry (58 tests - roles, cap, core, receipts, coordinator, integration)
 - `afi-infra`: Vitest (TSSD clients, DAG determinism)
-- `afi-plugins`: Vitest (plugin interfaces)
 - `afi-skills`: Vitest (skill linter, manifest builder)
 - `afi-tiny-brains`: pytest (model tests, API tests)
 
@@ -1163,7 +1109,7 @@ npm run validate
 - **Platform:** Railway, Render, or dedicated server
 - **Port:** 8080 (configurable via `AFI_REACTOR_PORT`)
 - **Endpoints:** `/api/signals`, `/api/replay`, `/health`
-- **Dependencies:** afi-core, afi-plugins, MongoDB (TSSD)
+- **Dependencies:** afi-core, MongoDB (TSSD)
 
 **afi-gateway (Agent Runtime):**
 - **Platform:** Railway, Render, or dedicated server
@@ -1264,7 +1210,6 @@ UFBE_ENABLE_DEBUG=false
 - `afi-token` - Smart contracts (permanent loss of funds)
 - `afi-mint` - Minting coordination (affects token supply)
 - `afi-governance` - Governance contracts (systemic impact)
-- `afi-plugins` - Plugins execute in signal pipeline (security-critical)
 
 **MEDIUM RISK (PROTOCOL-WIDE IMPACT):**
 - `afi-math` - Pure math functions (changes affect all consumers)
@@ -1483,7 +1428,7 @@ UFBE_ENABLE_DEBUG=false
 - **Core Repos** - afi-config, afi-core, afi-reactor
 - **Token Repos** - afi-token, afi-mint, afi-governance, afi-math, afi-econ
 - **Infra Repos** - afi-infra, afi-ops
-- **Extension Repos** - afi-plugins, afi-skills, afi-factory
+- **Extension Repos** - afi-skills, afi-factory
 - **Integration Repos** - afi-gateway, afi-tiny-brains
 - **Doc Repos** - afi-docs, afi-artifacts, afi-benchkit
 
@@ -1542,7 +1487,6 @@ UFBE_ENABLE_DEBUG=false
 - https://github.com/AFI-Protocol/afi-ops
 
 **Extensions:**
-- https://github.com/AFI-Protocol/afi-plugins
 - https://github.com/AFI-Protocol/afi-skills
 - https://github.com/AFI-Protocol/afi-factory
 
@@ -1558,7 +1502,6 @@ UFBE_ENABLE_DEBUG=false
 **Other:**
 - https://github.com/AFI-Protocol/afi-protocol
 - https://github.com/AFI-Protocol/afi-labs
-- https://github.com/AFI-Protocol/afi-assets
 - https://github.com/AFI-Protocol/afi-research-site
 
 ### Key Commands

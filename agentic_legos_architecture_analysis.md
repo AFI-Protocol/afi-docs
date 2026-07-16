@@ -21,7 +21,6 @@ graph TD
     B --> G[afi-benchkit]
 
     C --> B
-    C --> H[afi-plugins]
 
     D --> I[afi-factory]
 
@@ -65,7 +64,7 @@ graph TD
 ### afi-reactor (DAG Orchestrator)
 - **Purpose**: 15-node signal processing pipeline orchestration
 - **Architecture**: DAG-based with generators → analyzers → scorers → validators → executors
-- **Dependencies**: afi-core (validators), afi-config (schemas), afi-plugins (extensions)
+- **Dependencies**: afi-core (validators), afi-config (schemas)
 - **Current Status**: Active development with branch divergence; validators incorrectly placed in DAG (should be external)
 
 ### afi-skills (Skill Library)
