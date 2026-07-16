@@ -15,7 +15,7 @@
     {
       "question": "Do any wired code paths let reputation or governance override deterministic scores, mint amounts, or finality?",
       "answer": "Two paths let governance/reputation influence outcomes after deterministic scoring. (1) Allocation: afi-mint's emissions formula computes signalWeight = Q × N × R where R = metadata.reputationWeight ('validator reputation weight'), and then scales by a governance-controlled epochPulseFactor — so reputation and governance shape the minted token AMOUNT. The invariant doc explicitly permits reputation to influence allocation weights and reward distribution, so this is within the stated boundary, but reputationWeight is unpinned (default 1.0, no concrete metadata fetcher implements ISignalMetadataFetcher) and is not recorded in the on-chain receipt, so the influence is neither deterministic nor auditable from the artifact. (2) Finality: a Snapshot governance challenge can OVERTURN a validator's decision — recordDisputeOutcome flips qualified→reject or rejected→mint when challengeSucceeded. This is the doc-sanctioned 'challenge window' exception and is evaluated deterministically (quorum + approval threshold over vote tallies), not by reputation, so it does not violate the boundary — but it does mean a recorded mint/reject decision is contestable by token-weighted vote.",
-      "evidence": "afi-mint/src/adapters/EmissionsMintDataProvider.ts:272-273; afi-mint/src/adapters/EmissionsMintDataProvider.ts:245; afi-mint/src/orchestrator/SignalStateManager.ts:282-289; afi-mint/src/orchestrator/DisputeResolver.ts:105-122; afi-config/docs/REGISTRIES_AND_REPUTATION.v0.1.md:112"
+      "evidence": "afi-mint/src/adapters/EmissionsMintDataProvider.ts:151-152; afi-mint/src/adapters/EmissionsMintDataProvider.ts:124; afi-mint/src/orchestrator/SignalStateManager.ts:282-289; afi-mint/src/orchestrator/DisputeResolver.ts:105-122; afi-config/docs/REGISTRIES_AND_REPUTATION.v0.1.md:112"
     },
     {
       "question": "Do validators (DMVs) remain dumb/deterministic and rule-bound with respect to reputation?",
@@ -40,7 +40,7 @@
       "title": "Emissions mint amount is scaled by an unpinned reputationWeight and governance-controlled epochPulseFactor, making allocation non-replayable",
       "severity": "P1",
       "theme": "H-governance",
-      "evidence": "afi-mint/src/adapters/EmissionsMintDataProvider.ts:272-273 'const R = metadata.reputationWeight; ... const signalWeight = Q * N * R;'; afi-mint/src/adapters/EmissionsMintDataProvider.ts:245 'R_val,i = validator reputation weight'; reputationWeight source unwired — no class implements ISignalMetadataFetcher (afi-mint/src/adapters/EmissionsMintDataProvider.ts:164-165)",
+      "evidence": "afi-mint/src/adapters/EmissionsMintDataProvider.ts:151-152 'const R = metadata.reputationWeight; ... const signalWeight = Q * N * R;'; afi-mint/src/adapters/EmissionsMintDataProvider.ts:124 'R_val,i = validator reputation weight'; reputationWeight source unwired — no class implements ISignalMetadataFetcher (afi-mint/src/adapters/EmissionsMintDataProvider.ts:43-44)",
       "recommendation": "Pin reputationWeight and epochPulseFactor (with versions) into the mint receipt/evidence record so the reputation/governance contribution to allocation is deterministic and auditable; cross-link Theme G mint-model finding."
     },
     {

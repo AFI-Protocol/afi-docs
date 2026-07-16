@@ -20,7 +20,7 @@
     {
       "question": "I5: How does the gateway frame the protocol surface relative to the portable (normative-vs-reference) direction?",
       "answer": "The gateway presents the REFERENCE stack (afi-reactor + Mongo) as if it were the protocol, contradicting the portable framing that these are non-binding reference implementations (afi-docs/specs/AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md:115 'not binding on external validators'; :147 Reference Implementation Index 'explicitly non-mandatory'). The gateway's own AGENTS.md declares it a pure HTTP/WS client with 'No direct DB access' (afi-gateway/AGENTS.md security section) yet the live ingest route writes the canonical record straight to Mongo (afi-gateway/src/http/app.ts:133-134) via a Mongo-only factory (afi-gateway/src/services/vaultFactory.ts:7-22, throws if no Mongo URI). So a new external builder targeting the gateway is steered toward reactor-as-the-API and Mongo-as-the-vault rather than the canonical USS/CPJ dialect + multi-engine vault schema.",
-      "evidence": "afi-docs/specs/AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md:115; afi-docs/specs/AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md:147; afi-gateway/src/http/app.ts:133-134; afi-gateway/src/services/vaultFactory.ts:7-22"
+      "evidence": "afi-docs/specs/AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md:115; afi-docs/specs/AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md:147; afi-gateway/src/http/app.ts:118; afi-gateway/src/services/reactorSubmitter.ts:4-10"
     }
   ],
   "findings": [

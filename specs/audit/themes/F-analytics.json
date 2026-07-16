@@ -5,7 +5,7 @@
     {
       "question": "F.20 — Are there any warehouse, stream, or analytics-feature-plane integrations?",
       "answer": "No. There are no implemented warehouse, data-lake, stream, or feature-plane integrations in any focus repo. A workspace search for analytics/warehouse/stream egress across afi-benchkit, afi-econ, afi-reactor and afi-ops finds none in code: the reactor's only egress hook, ObserverNode.publishSignal(), is an explicit no-op placeholder (its body only console.logs; the real publish call is commented out). The only persistence that exists is the per-signal MongoDB TSSD evidence store (afi-reactor writes scored signals via tssdVaultService.insertSignalDocument -> collection.insertOne; afi-gateway upserts via afi-infra MongoTSSDVaultClient). The portable spec lists warehouse/stream engines only as NON-NORMATIVE, other-operator options in the Market/analytics plane row, and afi-labs' MVP plan explicitly says NOT to build streaming (use polling or a simple cron to simulate). No separate warehouse plane is planned for the reference implementation.",
-      "evidence": "afi-reactor/src/dag/nodes/ObserverNode.ts:248-250; afi-reactor/src/dag/nodes/ObserverNode.ts:260-275; afi-reactor/src/services/tssdVaultService.ts:112; afi-docs/specs/AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md:54; afi-labs/docs/plans/afi_mvp_what_to_stub_vs_build.md:14"
+      "evidence": "afi-reactor/src/dag/nodes/ObserverNode.ts:248-250; afi-reactor/src/dag/nodes/ObserverNode.ts:260-275; afi-infra/src/evidence/MongoScoredSignalEvidenceStore.ts:177; afi-docs/specs/AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md:54; afi-labs/docs/plans/afi_mvp_what_to_stub_vs_build.md:14"
     },
     {
       "question": "F.21 — Where would a non-reactor (custom) analytics orchestrator fit without violating the orchestration doctrine?",
@@ -28,7 +28,7 @@
       "title": "Market/analytics plane is entirely unimplemented; only the per-signal MongoDB TSSD evidence store exists",
       "severity": "Info",
       "theme": "F-analytics",
-      "evidence": "afi-docs/specs/AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md:54 'Market / analytics ... warehouses/streams chosen per operator ... non-normative, never AFI's evidence store'; the only persistence in code is Mongo TSSD (afi-reactor/src/services/tssdVaultService.ts:112 collection.insertOne; afi-infra/src/tssd/MongoTSSDVaultClient.ts:120 upsert)",
+      "evidence": "afi-docs/specs/AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md:54 'Market / analytics ... warehouses/streams chosen per operator ... non-normative, never AFI's evidence store'; the only persistence in code is MongoDB (afi-infra/src/evidence/MongoScoredSignalEvidenceStore.ts:177 collection.insertOne, the canonical scored-signal evidence store the Reactor submits through; afi-infra/src/tssd/MongoTSSDVaultClient.ts:120 upsert)",
       "recommendation": "Document the analytics plane explicitly as optional/non-normative in the normative register; do not present any warehouse/stream engine as an available AFI integration. Carry into AFI_PROTOCOL_SURFACE_AUDIT.md per-plane coverage (analytics plane = 0% implemented; evidence plane = Mongo TSSD)."
     },
     {

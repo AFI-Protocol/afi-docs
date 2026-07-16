@@ -77,7 +77,7 @@
       "title": "Reactor's scoring output bypasses the canonical vault: tssdVaultService writes a divergent ReactorScoredSignalDocument to a separate collection, never stages.scored",
       "original_severity": "P1",
       "confirmed": true,
-      "corrected_evidence": "afi-reactor/src/services/tssdVaultService.ts:6 'ISOLATION: This service uses Reactor-owned collections, isolated from afi-infra TSSD vault.'; afi-reactor/src/services/tssdVaultService.ts:59 'const collectionName = process.env.AFI_MONGO_COLLECTION_SCORED || \"reactor_scored_signals_v1\"'; afi-reactor/src/types/ReactorScoredSignalV1.ts:67 'export interface ReactorScoredSignalDocument' (analystScore at :98, rawUss at :117) is a different shape than afi-infra/src/tssd/types.ts:331 VaultedSignalRecord",
+      "corrected_evidence": "CONFIRMED AT AUDIT TIME (Phase 3); the condition has since been RESOLVED by merged work. The Reactor-owned writer (tssdVaultService, collection reactor_scored_signals_v1) was deleted in afi-reactor ce4c178 and the canonical submit path landed in 19a5a0c (PR #42), so the divergent-write evidence is no longer citable in the current tree. Current state: the Reactor submits a governed afi.scored-signal-evidence.v1 record (afi-reactor/src/evidence/reactorEvidenceRecord.ts:34) through the afi-infra store (afi-infra/src/evidence/MongoScoredSignalEvidenceStore.ts:177). The narrower residual — VaultedSignalRecord.stages.scored (afi-infra/src/tssd/types.ts:331) populated by no code — remains open.",
       "revised_severity": "P1",
       "note": "Confirmed. The reactor explicitly isolates its scored output into reactor_scored_signals_v1 with a divergent document type; the canonical VaultedSignalRecord.stages.scored is never populated by reactor. Two parallel vaults. P1 stands."
     },
@@ -95,7 +95,7 @@
       "title": "Two divergent DAG definitions: the 'canonical' codex DAG lists nodes the runtime Froggy pipeline explicitly marks REMOVED",
       "original_severity": "P1",
       "confirmed": true,
-      "corrected_evidence": "afi-reactor/config/dag.codex.json:1-127 (8-node Scarlet chain; legacy alpha-scout/structurer/execution-sim purged 2026-06 per PR #29) vs afi-reactor/src/config/froggyPipeline.ts:96-151 (6-stage FROGGY_TREND_PULLBACK_PIPELINE); README.md:122 still calls dag.codex.json 'canonical orchestrator config'",
+      "corrected_evidence": "afi-reactor/config/dag.codex.json:1-127 (8-node Scarlet chain; legacy alpha-scout/structurer/execution-sim purged 2026-06 per PR #29) vs afi-reactor/src/config/froggyPipeline.ts:99-147 (5-stage FROGGY_TREND_PULLBACK_PIPELINE; the vault-write/echo sinks were removed in afi-reactor ce4c178); afi-reactor/README.md:185 still calls dag.codex.json 'canonical orchestrator config'",
       "revised_severity": "P2",
       "note": "Partially resolved by 2026-06 legacy purge: dead nodes no longer appear in dag.codex.json. Remaining drift is two unrelated graphs (8-node codex vs 6-stage runtime Froggy). Downgraded P1→P2; citation ranges updated post-purge (file now 127 lines)."
     },
@@ -122,7 +122,7 @@
       "title": "Documented goldpaper mint formula is not the implemented formula (B(t) clamp model replaced by proportional epoch-budget allocation)",
       "original_severity": "P1",
       "confirmed": true,
-      "corrected_evidence": "afi-mint/src/adapters/EmissionsMintDataProvider.ts:11 'ΔAFIᵢ = clamp(B(t) × Qᵢ × Nᵢ × R_val,i × E_epoch, 0.5×B(t), 2.0×B(t))' (docstring) vs afi-mint/src/adapters/EmissionsMintDataProvider.ts:277-281 'const proportionalShare = signalWeight / totalWeight; const baseAmount = remainingBudget * proportionalShare; ... const adjustedAmount = baseAmount * this.config.epochPulseFactor;' (the documented B(t) constant is set at :202 'baseMultiplier: 8.0' but unused in the amount path)",
+      "corrected_evidence": "afi-mint/src/adapters/EmissionsMintDataProvider.ts:11 'ΔAFIᵢ = clamp(B(t) × Qᵢ × Nᵢ × R_val,i × E_epoch, 0.5×B(t), 2.0×B(t))' (docstring) vs afi-mint/src/adapters/EmissionsMintDataProvider.ts:156-160 'const proportionalShare = signalWeight / totalWeight; const baseAmount = remainingBudget * proportionalShare; ... const adjustedAmount = baseAmount * this.config.epochPulseFactor;' (the documented B(t) constant is set at :81 'baseMultiplier: 8.0' but unused in the amount path)",
       "revised_severity": "P1",
       "note": "Confirmed. The implemented amount path is proportional epoch-budget allocation, not the documented clamp(B(t)*...) model; baseMultiplier B(t)=8 (:202) never enters the amount calculation. Doc/code formula contradiction. P1 stands."
     },
@@ -131,7 +131,7 @@
       "title": "Snapshot governance vote and reputation/epoch-pulse multipliers can override the deterministic validator decision and mint amount",
       "original_severity": "P1",
       "confirmed": true,
-      "corrected_evidence": "afi-mint/src/orchestrator/SignalStateManager.ts:284-286 'if (challengeSucceeded) { ... finalDecision = state.validatorDecision === \\'qualified\\' ? \\'reject\\' : \\'mint\\'; }'; afi-mint/src/adapters/EmissionsMintDataProvider.ts:272-273 'const R = metadata.reputationWeight; const signalWeight = Q * N * R;' and :281 'const adjustedAmount = baseAmount * this.config.epochPulseFactor;'",
+      "corrected_evidence": "afi-mint/src/orchestrator/SignalStateManager.ts:284-286 'if (challengeSucceeded) { ... finalDecision = state.validatorDecision === \\'qualified\\' ? \\'reject\\' : \\'mint\\'; }'; afi-mint/src/adapters/EmissionsMintDataProvider.ts:151-152 'const R = metadata.reputationWeight; const signalWeight = Q * N * R;' and :160 'const adjustedAmount = baseAmount * this.config.epochPulseFactor;'",
       "revised_severity": "P1",
       "note": "Confirmed. A successful challenge flips the finalDecision (mint<->reject) and the mint amount is scaled by reputationWeight R and the governance epochPulseFactor. Governance/reputation can override the deterministic outcome and amount. P1 stands (shared with draft:66 and theme:H-governance#1)."
     },
@@ -158,7 +158,7 @@
       "title": "Emissions mint amount is scaled by an unpinned reputationWeight and governance-controlled epochPulseFactor, making allocation non-replayable",
       "original_severity": "P1",
       "confirmed": true,
-      "corrected_evidence": "afi-mint/src/adapters/EmissionsMintDataProvider.ts:272-273 'const R = metadata.reputationWeight; const signalWeight = Q * N * R;' and :281 'const adjustedAmount = baseAmount * this.config.epochPulseFactor;'; R source unwired ('rg -nc \"implements ISignalMetadataFetcher\" afi-mint/src' => 0 hits; interface declared at afi-mint/src/adapters/EmissionsMintDataProvider.ts:164). Neither value is anchored in the on-chain receipt: AFISignalReceipt event afi-token/src/AFISignalReceipt.sol:15 'event ReceiptMinted(address indexed to, uint256 indexed id, uint256 amount, bytes data)' and afi-token/src/AFIMintCoordinator.sol:19-26 MintRequest carry no reputation/epochPulse field",
+      "corrected_evidence": "afi-mint/src/adapters/EmissionsMintDataProvider.ts:151-152 'const R = metadata.reputationWeight; const signalWeight = Q * N * R;' and :160 'const adjustedAmount = baseAmount * this.config.epochPulseFactor;'; R source unwired ('rg -nc \"implements ISignalMetadataFetcher\" afi-mint/src' => 0 hits; interface declared at afi-mint/src/adapters/EmissionsMintDataProvider.ts:43). Neither value is anchored in the on-chain receipt: AFISignalReceipt event afi-token/src/AFISignalReceipt.sol:15 'event ReceiptMinted(address indexed to, uint256 indexed id, uint256 amount, bytes data)' and afi-token/src/AFIMintCoordinator.sol:19-26 MintRequest carry no reputation/epochPulse field",
       "revised_severity": "P1",
       "note": "Confirmed with field-level cites (citation-precision nit #4). The mint amount is scaled by reputationWeight R and epochPulseFactor; the R provider has no implementation (collision-safe scoped grep 'implements ISignalMetadataFetcher' over afi-mint/src returns 0 hits, default 1.0). Re-opened both on-chain receipt surfaces (AFISignalReceipt.sol:15 ReceiptMinted, AFIMintCoordinator.sol:19-26 MintRequest) — neither pins reputation or epochPulse, so the allocation is non-replayable. P1 stands."
     },
@@ -185,7 +185,7 @@
       "title": "'Validator certification moved to external certification layer' but no external-validator service, endpoint, or interface exists",
       "original_severity": "P1",
       "confirmed": true,
-      "corrected_evidence": "afi-gateway/src/afiClient.ts:46 '- Validator certification (moved to external certification layer)'; afi-reactor/src/config/froggyPipeline.ts:93 '- validator-decision: Moved to external certification layer (not Reactor's responsibility)'; afi-reactor/src/types/ReactorScoredSignalV1.ts:8 'Validator certification, execution, and minting are NOT Reactor's responsibility.' Reproducible negative search (from /home/user/AFI-Protocol): 'rg -ni \"external certification layer|certification service|certificationEndpoint\" afi-gateway/src afi-reactor/src afi-config/schemas' => only 4 doc-comment hits (afi-gateway/src/afiClient.ts:46, afi-reactor/src/server.ts:15, afi-reactor/src/config/froggyPipeline.ts:93, afi-reactor/src/services/froggyDemoService.ts:16), zero service/endpoint definitions",
+      "corrected_evidence": "afi-gateway/src/afiClient.ts:46 '- Validator certification (moved to external certification layer)'; afi-reactor/src/config/froggyPipeline.ts:96 '- validator-decision: Moved to external certification layer (not Reactor's responsibility)'; afi-reactor/src/types/ReactorScoredSignalV1.ts:8 'Validator certification, execution, and minting are NOT Reactor's responsibility.' Reproducible negative search (from /home/user/AFI-Protocol): 'rg -ni \"external certification layer|certification service|certificationEndpoint\" afi-gateway/src afi-reactor/src afi-config/schemas' => only 4 doc-comment hits (afi-gateway/src/afiClient.ts:46, afi-reactor/src/server.ts:15, afi-reactor/src/config/froggyPipeline.ts:96, afi-reactor/src/services/froggyScoringService.ts:15), zero service/endpoint definitions",
       "revised_severity": "P1",
       "note": "Confirmed (citation-precision nit #3). Three sites declare certification 'moved to an external layer', but a scoped collision-safe grep over afi-gateway/src, afi-reactor/src and afi-config/schemas finds only comments referencing the moved-away layer and the INTERNAL validatorConfig.schema.json — no external-validator service, endpoint, or interop schema. The portable spec's promised third-party Replay Contract is undelivered. P1 stands (borderline P0 for third-party interop, but kept at P1 as a missing-feature/contradiction gap)."
     },
@@ -266,7 +266,7 @@
       "title": "Reputation/governance can override deterministic mint outcome and amount",
       "original_severity": "P1",
       "confirmed": true,
-      "corrected_evidence": "afi-mint/src/orchestrator/SignalStateManager.ts:284-286 'if (challengeSucceeded) { ... finalDecision = state.validatorDecision === \\'qualified\\' ? \\'reject\\' : \\'mint\\'; }' and afi-mint/src/adapters/EmissionsMintDataProvider.ts:272-273,281 (reputationWeight R into signalWeight; baseAmount * epochPulseFactor)",
+      "corrected_evidence": "afi-mint/src/orchestrator/SignalStateManager.ts:284-286 'if (challengeSucceeded) { ... finalDecision = state.validatorDecision === \\'qualified\\' ? \\'reject\\' : \\'mint\\'; }' and afi-mint/src/adapters/EmissionsMintDataProvider.ts:151-152,160 (reputationWeight R into signalWeight; baseAmount * epochPulseFactor)",
       "revised_severity": "P1",
       "note": "Confirmed (same mechanism as theme:G-emissions-mint#2 / theme:H-governance#1). A successful Snapshot challenge flips the mint/reject outcome and reputation/epochPulse scale the amount. P1 stands."
     },
@@ -284,7 +284,7 @@
       "title": "Vault layer hard-bound to MongoDB; no multi-engine seam at the persistence layer",
       "original_severity": "P1",
       "confirmed": true,
-      "corrected_evidence": "afi-reactor/src/services/tssdVaultService.ts:4-17 '* Provides MongoDB persistence for scored signals ... * - AFI_MONGO_URI: MongoDB connection string (required)' (Mongo client created at :57 'const uri = process.env.AFI_MONGO_URI'); afi-infra production hard-fail at afi-infra/src/tssd/TSSDVaultClient.ts:200 vs the four-engine enum afi-config/schemas/vault.schema.json:13-22",
+      "corrected_evidence": "the Reactor's canonical evidence store resolves MongoDB from the environment and fails honestly when unconfigured (afi-reactor/src/evidence/evidenceStore.ts:10-15, store constructed at afi-reactor/src/evidence/evidenceStore.ts:44); the Reactor-owned tssdVaultService that previously carried this AFI_MONGO_URI requirement was removed in afi-reactor ce4c178 (PR #42); afi-infra production hard-fail at afi-infra/src/tssd/TSSDVaultClient.ts:200 vs the four-engine enum afi-config/schemas/vault.schema.json:13-22",
       "revised_severity": "P1",
       "note": "Confirmed. The reactor vault service is MongoDB-only (AFI_MONGO_URI required) with no engine abstraction; corroborates the infra Mongo-only hard-fail (TSSDVaultClient.ts:200) against the schema's four-engine enum. P1 stands (shared Mongo-only tension with draft:52 and theme:B/D)."
     }
