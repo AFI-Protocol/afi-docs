@@ -18,8 +18,6 @@ Implementation lives under:
 - `afi-reactor/src/dag/` — `DAGBuilder`, `DAGExecutor`, `PluginRegistry`, core nodes, plugins
 - `afi-reactor/src/types/pipeline.ts`, `afi-reactor/src/types/dag.ts` — pipeline types
 
-AFI does **not** use **LangChain**, **LangGraph**, **LangSmith**, or **LangServe** for protocol orchestration. There is no `@langchain/langgraph` dependency in the reactor or core runtime.
-
 ---
 
 ## Related source of truth
@@ -37,28 +35,17 @@ AFI does **not** use **LangChain**, **LangGraph**, **LangSmith**, or **LangServe
 
 ## Optional gateway (not orchestration)
 
-**`afi-gateway`** is an optional **Eliza-based client** for character UX. It calls AFI HTTP APIs (`afi-reactor`, `afi-core`) and does **not** own signal scoring, validation, or minting logic.
-
-Installing gateway dependencies may pull **transitive** `langchain` / `langsmith` packages via `@elizaos/core`. Those are **gateway-only** and are not used by AFI Reactor DAG execution.
-
----
-
-## Historical LangGraph documentation
-
-Planning documents that reference `src/langgraph/`, `LangGraphOrchestrator`, `@langchain/langgraph`, `LangGraphNode`, or `LangGraphState` are **archived** and superseded:
-
-- [`afi-docs/archive/langgraph-migration-2025/`](archive/langgraph-migration-2025/)
-
-Do not treat archived files as current implementation guidance.
+**`afi-gateway`** is an optional **Eliza-based client** for character UX. It calls AFI HTTP APIs (`afi-reactor`, `afi-core`) and does **not** own signal scoring, validation, or minting logic. Its upstream ElizaOS dependency tree resolves third-party packages into the gateway's lockfile that AFI does not import or build on; see the gateway README's *Dependency provenance* note.
 
 ---
 
 ## Terminology (current)
 
-| Use | Avoid (legacy) |
-|-----|----------------|
-| AFI Reactor pipeline / DAG | LangGraph integration |
-| Pipehead | LangGraphNode |
-| PipelineState | LangGraphState |
-| DAG orchestrator / `DAGExecutor` | LangGraph orchestrator |
-| `src/dag/` | `src/langgraph/` |
+| Term | Meaning |
+|------|---------|
+| AFI Reactor pipeline / DAG | The deterministic execution graph built and run in `afi-reactor/src/dag/` |
+| Pipehead | A typed node contract (`afi-reactor/src/pipeheads/`) |
+| PipelineState | Explicit execution state threaded through the DAG (`afi-reactor/src/types/dag.ts`) |
+| `DAGBuilder` / `DAGExecutor` / `PluginRegistry` | DAG construction, deterministic execution, and plugin resolution (`afi-reactor/src/dag/`) |
+| Core nodes / plugin nodes | The two node categories composing a pipeline (`src/dag/nodes`, `src/dag/plugins`) |
+| Codex | Configuration and replay support for auditability and reproducibility |

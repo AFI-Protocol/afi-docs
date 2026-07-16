@@ -73,7 +73,7 @@
     },
     {
       "title": "ARCHITECTURE_STATUS.md claims reactor is the single source of truth for orchestration implemented today",
-      "detail": "ARCHITECTURE_STATUS.md (dated 2026-06-03, same day as the portable spec) positions afi-reactor as THE deterministic orchestrator and 'single source of truth for how AFI orchestration is implemented today,' without the reference-vs-normative caveat. It is more current/accurate than the doctrine (correctly notes custom TS DAG, not LangGraph) but still reinforces reactor-centric framing in a doc-hub status page.",
+      "detail": "ARCHITECTURE_STATUS.md (dated 2026-06-03, same day as the portable spec) positions afi-reactor as THE deterministic orchestrator and 'single source of truth for how AFI orchestration is implemented today,' without the reference-vs-normative caveat. It is more current/accurate than the doctrine (correctly notes the custom TS DAG) but still reinforces reactor-centric framing in a doc-hub status page.",
       "evidence": "ARCHITECTURE_STATUS.md:4,10 'Single source of truth for how AFI orchestration is implemented today.'; 'AFI Reactor (afi-reactor) is a custom, deterministic TypeScript DAG orchestrator.'",
       "severity": "P3"
     },
@@ -152,13 +152,6 @@
       "theme": "mintForSignal|coordinateMint|beneficiary|epoch",
       "evidence": "AFI_Full_Architecture.md:401,421 'mintEmissions(address beneficiary, uint256 amount)'; 'coordinateMint(beneficiary, amount, signalId, epochId, metadata)' — single beneficiary; grep for split|gauge|distribut in arch/audit docs = 0 hits",
       "recommendation": "None; econ-split tension lives in afi-econ, not documented here. Note absence so cross-repo synthesis flags afi-econ vs single-beneficiary mismatch."
-    },
-    {
-      "title": "LangGraph-era docs are correctly archived and clearly marked superseded",
-      "severity": "Info",
-      "theme": "stale naming",
-      "evidence": "archive/langgraph-migration-2025/README.md:1-9 'superseded planning ... AFI does not use LangChain, LangGraph...'; ARCHITECTURE_STATUS.md:46-52 'archived and superseded ... Do not treat archived files as current implementation guidance.'; git log 875fe34 'docs: archive superseded LangGraph architecture notes'",
-      "recommendation": "Good hygiene model; apply the same explicit-archive banner pattern to the orchestrator doctrine and repository map."
     },
     {
       "title": "Replay/determinism described as reactor-owned and Codex-based; no normative replay rules defined here",

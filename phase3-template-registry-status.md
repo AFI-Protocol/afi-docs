@@ -294,7 +294,7 @@ Use **Code mode** for implementing the changes, as this involves writing and mod
 - **JSON schemas**: Complete in [`afi-config/schemas/`](../afi-config/schemas/)
 
 ### Known Issues
-- The LangGraph-era implementation plan is archived at `archive/langgraph-migration-2025/AFI_REACTOR_LANGGRAPH_IMPLEMENTATION_PLAN.md` (superseded; reactor uses `src/dag/`)
+- The reactor's implementation lives in `afi-reactor/src/dag/`
 - afi-factory currently has no test infrastructure - needs to be set up
 
 ### Success Criteria Verification
