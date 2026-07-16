@@ -1017,7 +1017,7 @@
         },
         {
           "title": "ARCHITECTURE_STATUS.md claims reactor is the single source of truth for orchestration implemented today",
-          "detail": "ARCHITECTURE_STATUS.md (dated 2026-06-03, same day as the portable spec) positions afi-reactor as THE deterministic orchestrator and 'single source of truth for how AFI orchestration is implemented today,' without the reference-vs-normative caveat. It is more current/accurate than the doctrine (correctly notes custom TS DAG, not LangGraph) but still reinforces reactor-centric framing in a doc-hub status page.",
+          "detail": "ARCHITECTURE_STATUS.md (dated 2026-06-03, same day as the portable spec) positions afi-reactor as THE deterministic orchestrator and 'single source of truth for how AFI orchestration is implemented today,' without the reference-vs-normative caveat. It is more current/accurate than the doctrine (correctly notes the custom TS DAG) but still reinforces reactor-centric framing in a doc-hub status page.",
           "evidence": "ARCHITECTURE_STATUS.md:4,10 'Single source of truth for how AFI orchestration is implemented today.'; 'AFI Reactor (afi-reactor) is a custom, deterministic TypeScript DAG orchestrator.'",
           "severity": "P3"
         },
@@ -1096,13 +1096,6 @@
           "theme": "mintForSignal|coordinateMint|beneficiary|epoch",
           "evidence": "AFI_Full_Architecture.md:401,421 'mintEmissions(address beneficiary, uint256 amount)'; 'coordinateMint(beneficiary, amount, signalId, epochId, metadata)' — single beneficiary; grep for split|gauge|distribut in arch/audit docs = 0 hits",
           "recommendation": "None; econ-split tension lives in afi-econ, not documented here. Note absence so cross-repo synthesis flags afi-econ vs single-beneficiary mismatch."
-        },
-        {
-          "title": "LangGraph-era docs are correctly archived and clearly marked superseded",
-          "severity": "Info",
-          "theme": "stale naming",
-          "evidence": "archive/langgraph-migration-2025/README.md:1-9 'superseded planning ... AFI does not use LangChain, LangGraph...'; ARCHITECTURE_STATUS.md:46-52 'archived and superseded ... Do not treat archived files as current implementation guidance.'; git log 875fe34 'docs: archive superseded LangGraph architecture notes'",
-          "recommendation": "Good hygiene model; apply the same explicit-archive banner pattern to the orchestrator doctrine and repository map."
         },
         {
           "title": "Replay/determinism described as reactor-owned and Codex-based; no normative replay rules defined here",
@@ -2622,10 +2615,6 @@
           "quote": "| **Reactor**    | DAG orchestration (source of truth)       | `afi-reactor` |"
         },
         {
-          "path": "architecture_overview.md:6",
-          "quote": "**Canonical orchestration status:** AFI Reactor uses a **custom deterministic TypeScript DAG** (`afi-reactor/src/dag/`), not LangChain/LangGraph."
-        },
-        {
           "path": "architecture_overview.md:22",
           "quote": "| **Gateway**    | Optional Eliza client (not orchestrator)  | `afi-gateway` |"
         }
@@ -2633,7 +2622,7 @@
       "contradictions": [
         {
           "title": "Reactor framed as the single 'source of truth' orchestrator, not a reference implementation",
-          "detail": "The architecture table elevates afi-reactor's DAG to 'source of truth' / 'Canonical orchestration status' for the whole ecosystem. Under the portable-protocol north star, the reactor is ONE reference spine; the canonical surface is the schemas/lifecycle/determinism rules. Calling reactor 'source of truth' / 'canonical' in the org's top-level meta-repo entrenches a specific stack as protocol law. Note: line 6 does scope 'Canonical' to orchestration-engine choice (custom DAG vs LangGraph), which softens but does not remove the framing.",
+          "detail": "The architecture table elevates afi-reactor's DAG to 'source of truth' / 'Canonical orchestration status' for the whole ecosystem. Under the portable-protocol north star, the reactor is ONE reference spine; the canonical surface is the schemas/lifecycle/determinism rules. Calling reactor 'source of truth' / 'canonical' in the org's top-level meta-repo entrenches a specific stack as protocol law.",
           "evidence": "architecture_overview.md:23 '| **Reactor** | DAG orchestration (source of truth) | `afi-reactor` |'; architecture_overview.md:6 '**Canonical orchestration status:** AFI Reactor uses a **custom deterministic TypeScript DAG**'",
           "severity": "P2"
         },
@@ -2659,7 +2648,7 @@
           "afi-infra (signal templates/simulators; agent_manifest entry)",
           "afi-config (codex/persona schemas)",
           "afi-ops (deployment/health)",
-          "afi-docs (documentation; ARCHITECTURE_STATUS.md, droid_contributor_guide.md, archive/langgraph-migration-2025)",
+          "afi-docs (documentation; ARCHITECTURE_STATUS.md, droid_contributor_guide.md)",
           "afi-gateway (optional Eliza client)",
           "afi-agents (stale, onboarding only)",
           "afi-labs (private, onboarding only)"
@@ -2706,7 +2695,7 @@
           "title": "Pattern searches found no mongodb/TSSD/vault/USS/CPJ/mint/replay/kafka/warehouse/postgres references",
           "severity": "Info",
           "theme": "schemas/contracts/vault/mint/replay",
-          "evidence": "grep -rinE across *.md/*.json/*.ts/*.sol/*.yml for the full audit pattern set returned only incidental hits: 'Codex definitions' (architecture_overview.md:26), 'pipelines' (pathways.md:8, working-groups.md:5), 'LangGraph/DAG' (architecture_overview.md:6)",
+          "evidence": "grep -rinE across *.md/*.json/*.ts/*.sol/*.yml for the full audit pattern set returned only incidental hits: 'Codex definitions' (architecture_overview.md:26), 'pipelines' (pathways.md:8, working-groups.md:5)",
           "recommendation": "Confirms zero replay/determinism/vault/mint surface in this repo. No follow-up needed beyond the reference-vs-normative clarification for reactor."
         }
       ]

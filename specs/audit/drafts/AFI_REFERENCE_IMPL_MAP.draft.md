@@ -272,7 +272,7 @@ normative surface: afi-config + afi-infra (TSSD types/spec)
 - **Classification:** DOCS
 - **Rationale:** This is a thin meta-repo containing ONLY documentation, governance, and agent-orchestration manifests — zero code, schemas, contracts, or canonical type definitions. package.json self-describes it: "description": "AFI Protocol documentation and specifications" with stub scripts ("build": "echo 'Buil…
 - **Touchpoints:** DAG/pipeline (described only, in architecture_overview.md — reactor as 'source of truth'), validators/scoring (described only, afi-core), registries/reputation (mentioned in faq/announcement: reputation, DAO votes, mentor registry), schemas (referenced only as 'persona schemas'/'Codex definitions' pointing at afi-config; none present)
-- **Dependencies:** upstream=[]; downstream=['afi-reactor (referenced as DAG source of truth)', 'afi-core (validators/mentors/scoring; agent_manifest entries)', 'afi-infra (signal templates/simulators; agent_manifest entry)', 'afi-config (codex/persona schemas)', 'afi-ops (deployment/health)', 'afi-docs (documentation; ARCHITECTURE_STATUS.md, droid_contributor_guide.md, archive/langgraph-migration-2025)', 'afi-gateway (optional Eliza client)', 'afi-labs (private, onboarding only)']
+- **Dependencies:** upstream=[]; downstream=['afi-reactor (referenced as DAG source of truth)', 'afi-core (validators/mentors/scoring; agent_manifest entries)', 'afi-infra (signal templates/simulators; agent_manifest entry)', 'afi-config (codex/persona schemas)', 'afi-ops (deployment/health)', 'afi-docs (documentation; ARCHITECTURE_STATUS.md, droid_contributor_guide.md)', 'afi-gateway (optional Eliza client)', 'afi-labs (private, onboarding only)']
 
 ### `afi-reactor`
 
@@ -388,7 +388,6 @@ Code/docs implying Mongo, reactor, or org infra is **mandatory** (not merely def
 | `afi-plugins` | `afi-plugins/src/types/plugin.ts:22-26` | export type RuntimeTarget = / "afi-reactor" / "afi-core" / "eliza-tool" / "hybrid"; |
 | `afi-plugins` | `afi-plugins/AGENTS.md:144-145` | afi-plugins MUST NOT modify DAG structure or orchestration logic. Dependency direction: afi-reactor -> afi-plugins (reactor consumes plugins) |
 | `afi-protocol` | `architecture_overview.md:23` | / **Reactor**    / DAG orchestration (source of truth)       / `afi-reactor` / |
-| `afi-protocol` | `architecture_overview.md:6` | **Canonical orchestration status:** AFI Reactor uses a **custom deterministic TypeScript DAG** (`afi-reactor/src/dag/`), not LangChain/LangGraph. |
 | `afi-reactor` | `/home/user/AFI-Protocol/afi-reactor/README.md` | **afi-reactor is the ONLY orchestrator in AFI Protocol.** All canonical pipelines, DAGs, and routing logic live here. |
 | `afi-reactor` | `/home/user/AFI-Protocol/afi-reactor/docs/AFI_ORCHESTRATOR_DOCTRINE.md` | ### 3. The DAG is law Every signal path (ingest → enrich → score → mint/review) must be expressible as a Reactor DAG; ad-hoc flows are anti-patterns. |
 | `afi-reactor` | `/home/user/AFI-Protocol/afi-reactor/AGENTS.md` | **afi-reactor** is the canonical DAG orchestrator for AFI Protocol... This is the **ONLY orchestrator** in the AFI ecosystem—agents are nodes, not orchestrators. |

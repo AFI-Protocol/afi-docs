@@ -18,10 +18,6 @@
       "quote": "| **Reactor**    | DAG orchestration (source of truth)       | `afi-reactor` |"
     },
     {
-      "path": "architecture_overview.md:6",
-      "quote": "**Canonical orchestration status:** AFI Reactor uses a **custom deterministic TypeScript DAG** (`afi-reactor/src/dag/`), not LangChain/LangGraph."
-    },
-    {
       "path": "architecture_overview.md:22",
       "quote": "| **Gateway**    | Optional Eliza client (not orchestrator)  | `afi-gateway` |"
     }
@@ -29,7 +25,7 @@
   "contradictions": [
     {
       "title": "Reactor framed as the single 'source of truth' orchestrator, not a reference implementation",
-      "detail": "The architecture table elevates afi-reactor's DAG to 'source of truth' / 'Canonical orchestration status' for the whole ecosystem. Under the portable-protocol north star, the reactor is ONE reference spine; the canonical surface is the schemas/lifecycle/determinism rules. Calling reactor 'source of truth' / 'canonical' in the org's top-level meta-repo entrenches a specific stack as protocol law. Note: line 6 does scope 'Canonical' to orchestration-engine choice (custom DAG vs LangGraph), which softens but does not remove the framing.",
+      "detail": "The architecture table elevates afi-reactor's DAG to 'source of truth' / 'Canonical orchestration status' for the whole ecosystem. Under the portable-protocol north star, the reactor is ONE reference spine; the canonical surface is the schemas/lifecycle/determinism rules. Calling reactor 'source of truth' / 'canonical' in the org's top-level meta-repo entrenches a specific stack as protocol law.",
       "evidence": "architecture_overview.md:23 '| **Reactor** | DAG orchestration (source of truth) | `afi-reactor` |'; architecture_overview.md:6 '**Canonical orchestration status:** AFI Reactor uses a **custom deterministic TypeScript DAG**'",
       "severity": "P2"
     },
@@ -55,7 +51,7 @@
       "afi-infra (signal templates/simulators; agent_manifest entry)",
       "afi-config (codex/persona schemas)",
       "afi-ops (deployment/health)",
-      "afi-docs (documentation; ARCHITECTURE_STATUS.md, droid_contributor_guide.md, archive/langgraph-migration-2025)",
+      "afi-docs (documentation; ARCHITECTURE_STATUS.md, droid_contributor_guide.md)",
       "afi-gateway (optional Eliza client)",
       "afi-agents (stale, onboarding only)",
       "afi-labs (private, onboarding only)"
@@ -102,7 +98,7 @@
       "title": "Pattern searches found no mongodb/TSSD/vault/USS/CPJ/mint/replay/kafka/snowflake/postgres references",
       "severity": "Info",
       "theme": "schemas/contracts/vault/mint/replay",
-      "evidence": "grep -rinE across *.md/*.json/*.ts/*.sol/*.yml for the full audit pattern set returned only incidental hits: 'Codex definitions' (architecture_overview.md:26), 'pipelines' (pathways.md:8, working-groups.md:5), 'LangGraph/DAG' (architecture_overview.md:6)",
+      "evidence": "grep -rinE across *.md/*.json/*.ts/*.sol/*.yml for the full audit pattern set returned only incidental hits: 'Codex definitions' (architecture_overview.md:26), 'pipelines' (pathways.md:8, working-groups.md:5)",
       "recommendation": "Confirms zero replay/determinism/vault/mint surface in this repo. No follow-up needed beyond the reference-vs-normative clarification for reactor."
     }
   ]
