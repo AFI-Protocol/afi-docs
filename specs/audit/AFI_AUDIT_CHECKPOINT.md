@@ -14,8 +14,9 @@ Read this document first when resuming the portable-protocol audit.
 > as was one `reference_only_assumptions` entry (records[18] +
 > `per-repo/afi-protocol.json`) that quoted a since-rewritten line verbatim.
 > Findings were retired, never rewritten, and no replacement quote was
-> invented. All substantive P2/P3 findings, severities, and remaining citations
-> are intact; git history retains the deleted material in full. This is the
+> invented. All substantive P2/P3 findings and severities are intact; citations
+> that this pass invalidated were pruned rather than left dangling (answers[2]
+> 12 → 9); git history retains the deleted material in full. This is the
 > documented change required by `README.md:57` in lieu of re-running
 > extraction. See [`README.md`](./README.md) → *Org delta (2026-07-16)*.
 
