@@ -20,7 +20,7 @@ It does **not** answer who gets paid, how much, or when. Those are Layers 3 (Epo
 | 3 — Epoch settlement manifest | [AFI_EPOCH_SETTLEMENT_MANIFEST.md](./AFI_EPOCH_SETTLEMENT_MANIFEST.md) | The manifest **carries** `signalRoot` / `evidenceRoot` as proof inputs (doctrine §15.3). |
 | 4 — Vault / claims | [AFI_REWARDS_VAULT_AND_CLAIMS.md](./AFI_REWARDS_VAULT_AND_CLAIMS.md) | MUST NOT read provenance leaves to decide payment. |
 
-Background (descriptive, still accurate): [AFI_ONCHAIN_ANCHOR_GAP_ANALYSIS.md](./AFI_ONCHAIN_ANCHOR_GAP_ANALYSIS.md) (the v0 "breadcrumb-only" `MintCoordinated` anchor and its gaps — a sibling spec carried here as background; its v1-conformance is **not** verified by this document), and `../../reports/afi-signal-provenance-vs-reward-settlement-recon.md`.
+Background (descriptive, still accurate): the v0 anchor is "breadcrumb-only" — `MintCoordinated` carries no content/payload hash, ruleset version, or merkle commitment (verifiable directly against `afi-token/src/AFIMintCoordinator.sol`); its v1-conformance is **not** verified by this document. See also `../../reports/afi-signal-provenance-vs-reward-settlement-recon.md`.
 
 ---
 
@@ -212,7 +212,7 @@ A document, schema, or contract conforms to this spec iff:
 - Layer 4: [AFI_REWARDS_VAULT_AND_CLAIMS.md](./AFI_REWARDS_VAULT_AND_CLAIMS.md).
 - Addresses/ENS/Safe source of truth: [AFI_ENS_SAFE_ADDRESS_REGISTRY_DOCTRINE.md](./AFI_ENS_SAFE_ADDRESS_REGISTRY_DOCTRINE.md).
 - v0 posture: [AFI_V0_DEPRECATION_AND_MIGRATION.md](./AFI_V0_DEPRECATION_AND_MIGRATION.md).
-- Background (descriptive): [AFI_ONCHAIN_ANCHOR_GAP_ANALYSIS.md](./AFI_ONCHAIN_ANCHOR_GAP_ANALYSIS.md) (sibling spec; carried as background only, v1-conformance **unverified** here — not one of the Layer 1–4 docs under review); `../../reports/afi-signal-provenance-vs-reward-settlement-recon.md`.
+- Background (descriptive): the v0 "breadcrumb-only" `MintCoordinated` anchor and its gaps, verifiable against `afi-token/src/AFIMintCoordinator.sol` (carried as background only, v1-conformance **unverified** here — not one of the Layer 1–4 docs under review); `../../reports/afi-signal-provenance-vs-reward-settlement-recon.md`.
 
 ---
 

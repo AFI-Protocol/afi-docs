@@ -20,7 +20,7 @@ The correct mental model is closer to **HTTP** than to “everyone runs our Mong
 - **Reference:** one working spine (gateway → reactor DAG → vault → mint on BASE) that demonstrates the rules in code.
 - **Pluggable:** databases, DAG frameworks, analytics warehouses, and ingest pipelines—chosen per operator.
 
-This document records that direction, names the layers, and lists known gaps between vision and encoded reality. The **agent investigation prompt** lives in a standalone companion doc: [`AFI_PROTOCOL_INVESTIGATION_PROMPT.md`](./AFI_PROTOCOL_INVESTIGATION_PROMPT.md) (see Section 8).
+This document records that direction, names the layers, and lists known gaps between vision and encoded reality.
 
 ---
 
@@ -154,21 +154,18 @@ The investigation and follow-on work should move AFI toward:
 
 ---
 
-## 6. Investigation Outputs (Expected Artifacts)
+## 6. Investigation Outputs
 
-The agent team should produce:
+The portable-protocol-surface investigation this section scoped has **run to completion**. Its
+findings were carried into the accepted governance decisions in `afi-governance/decisions/` —
+object identity (`object-identity-v0.1.md`), lifecycle (`lifecycle-v0.1.md`), persistence
+(`persistence-v0.1.md` and its staged `persistence-impl-v0.1.md`), and authority/districts
+(`authority-districts-v0.1.md`) — which are the durable, governed record.
 
-| Deliverable | Description |
-|-------------|-------------|
-| `AFI_PROTOCOL_SURFACE_AUDIT.md` | Master report with executive summary, findings, severity |
-| `AFI_NORMATIVE_REGISTER.md` | Every normative schema, invariant, and contract with file paths |
-| `AFI_REFERENCE_IMPL_MAP.md` | Per-repo: reference vs normative vs research vs stale |
-| `AFI_CONTRADICTION_REGISTER.md` | Doc/code conflicts with portable-protocol direction |
-| `AFI_REPLAY_READINESS_MATRIX.md` | Per lifecycle stage: what is stored, where, replayable? |
-| `AFI_ONCHAIN_ANCHOR_GAP_ANALYSIS.md` | Current vs intended BASE commitment layer |
-| Per-repo addenda | Short `PROTOCOL_CLASSIFICATION.md` stub or section in each repo (optional follow-up) |
-
-Store master reports in **`afi-docs/specs/`** (or `afi-config/docs/` for normative register if appropriate after review).
+The investigation's own working corpus (recon, themes, drafts, and the six master reports) was a
+pre-beta evidence set describing an implementation that has since been superseded, so it is no
+longer carried in the working tree. It remains addressable in git history at the commit pins the
+decisions cite (`afi-docs` @ `1f3f959`, `afi-docs` @ `c666224`).
 
 ---
 
@@ -184,48 +181,25 @@ Also check for renamed, archived, or external-reference repos (e.g. historical `
 
 ---
 
-## 8. Agent Investigation Prompt
+## 8. Next Steps (Human)
 
-The full copy-paste prompt for the in-house coding agent team lives in a **standalone document** for easy distribution:
-
-**→ [`AFI_PROTOCOL_INVESTIGATION_PROMPT.md`](./AFI_PROTOCOL_INVESTIGATION_PROMPT.md)**
-
-That file contains:
-
-- Usage instructions (read companion spec first, grant org-wide read access)
-- The complete investigation mission, constraints, and 30 core questions (A–J)
-- Per-repo checklist template, search patterns, deliverables, severity rubric, and definition of done
-
-**Quick start for maintainers:**
-
-1. Open [`AFI_PROTOCOL_INVESTIGATION_PROMPT.md`](./AFI_PROTOCOL_INVESTIGATION_PROMPT.md).
-2. Copy everything below the horizontal rule into the agent system or task prompt.
-3. Grant read access to all AFI-Protocol org repos (public and private).
+1. **Resolve** the remaining open questions through the governance slots that own them — the
+   on-chain anchor/commitment surface is reserved to `CHAIN-GOV`, and the read/endpoint surface to
+   `ATLAS-GOV`; neither has started.
+2. **Promote** v0.1 → v1.0 once those slots are decided.
 
 ---
 
-## 9. Next Steps (Human)
-
-1. **Resume in-progress audit** — Phase 1 recon is complete; use [`audit/AFI_AUDIT_CHECKPOINT.md`](./audit/AFI_AUDIT_CHECKPOINT.md) and [`audit/AFI_AUDIT_RESUME_PROMPT.md`](./audit/AFI_AUDIT_RESUME_PROMPT.md) for Phases 2–4.
-2. **Distribute** [`AFI_PROTOCOL_INVESTIGATION_PROMPT.md`](./AFI_PROTOCOL_INVESTIGATION_PROMPT.md) only for a fresh full-org run (all phases).
-3. **Review** master reports when delivered; resolve open questions in Phase 2 (anchor spec).
-4. **Promote** v0.1 → v1.0 after audit findings are incorporated.
-
----
-
-## 10. Related Documents
+## 9. Related Documents
 
 | Document | Repo | Role |
 |----------|------|------|
-| Audit checkpoint (in progress) | `afi-docs` | [`audit/AFI_AUDIT_CHECKPOINT.md`](./audit/AFI_AUDIT_CHECKPOINT.md) |
-| Audit resume prompt (Phases 2–4) | `afi-docs` | [`audit/AFI_AUDIT_RESUME_PROMPT.md`](./audit/AFI_AUDIT_RESUME_PROMPT.md) |
-| Agent Investigation Prompt | `afi-docs` | [`AFI_PROTOCOL_INVESTIGATION_PROMPT.md`](./AFI_PROTOCOL_INVESTIGATION_PROMPT.md) |
+| Accepted governance decisions | `afi-governance` | `decisions/` — the governed record of this investigation's findings |
 | AFI Config Overview | `afi-config` | Schema catalog |
 | TSSD Vault Spec | `afi-infra` | Evidence layer |
 | Orchestrator Doctrine | `afi-reactor` | Reference orchestration (needs reframing) |
 | Validator Replay Spec v0.1 | `afi-reactor` | Replay invariants |
 | Registries & Reputation v0.1 | `afi-config` | Governance boundaries |
-| AFI Repo Census | `afi-docs` | Local repo inventory (may be stale) |
 
 ---
 
