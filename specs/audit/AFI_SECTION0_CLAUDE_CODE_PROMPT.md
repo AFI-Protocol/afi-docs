@@ -1,6 +1,6 @@
 # Claude Code Workflow — Section 0 Pre-flight (T1 Gate)
 
-**Target:** [`AFI_TESTNET_E2E_CHECKLIST.md`](./AFI_TESTNET_E2E_CHECKLIST.md) §0 + §0.1  
+**Target:** the AFI testnet E2E checklist §0 + §0.1, at the immutable pin `afi-docs` @ `1f3f959`, `specs/audit/AFI_TESTNET_E2E_CHECKLIST.md`  
 **Repo:** `/home/user/AFI-Protocol/afi-token` (Foundry)  
 **Chain:** Base Sepolia (`84532`)  
 **Mode:** Ultracode xhigh + workflows — sequential gates, no skip on failure
@@ -179,4 +179,4 @@ User can tick T1 in the checklist.
 
 ---
 
-*Parent checklist: [`AFI_TESTNET_E2E_CHECKLIST.md`](./AFI_TESTNET_E2E_CHECKLIST.md) §0*
+*Parent checklist: the AFI testnet E2E checklist §0, at the immutable pin `afi-docs` @ `1f3f959`, `specs/audit/AFI_TESTNET_E2E_CHECKLIST.md`*

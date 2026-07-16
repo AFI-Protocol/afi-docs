@@ -7,7 +7,7 @@
 **Audience:** Product, protocol architects, analyst onboarding  
 **Context:** afi-reactor + Mongo reference implementation; Ably optional for live proof
 
-**Related:** [`AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md`](./AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md) · [`audit/AFI_TESTNET_E2E_CHECKLIST.md`](./audit/AFI_TESTNET_E2E_CHECKLIST.md) · [`audit/AFI_HUMAN_REVIEW_WORKSHEET.md`](./audit/AFI_HUMAN_REVIEW_WORKSHEET.md)
+**Related:** [`AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md`](./AFI_PORTABLE_PROTOCOL_SURFACE.v0.1.md)
 
 ---
 
@@ -236,5 +236,4 @@ afi-mint minted event → tiny fan-out service → Ably REST publish
 
 ---
 
-*Next: wire this into [`AFI_TESTNET_E2E_CHECKLIST.md`](./audit/AFI_TESTNET_E2E_CHECKLIST.md) Phase B (§1B) when Phase A is green.*
 
