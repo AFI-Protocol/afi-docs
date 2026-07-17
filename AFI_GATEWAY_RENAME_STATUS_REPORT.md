@@ -74,7 +74,6 @@ The repository rename from `afi-eliza-gateway` to `afi-gateway` has been **parti
   - `afi-tiny-brains`
   - `afi-econ`
   - `afi-infra`
-  - `afi-ops`
   - `afi-docs`
   - `afi-artifacts`
   - `afi-benchkit`
@@ -342,7 +341,6 @@ The repository rename from `afi-eliza-gateway` to `afi-gateway` has been **parti
      - `afi-tiny-brains`
      - `afi-econ`
      - `afi-infra`
-     - `afi-ops`
      - `afi-docs`
      - `afi-artifacts`
      - `afi-benchkit`

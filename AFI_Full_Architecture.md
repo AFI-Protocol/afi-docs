@@ -101,10 +101,10 @@
 │                                                              │
 │  ┌──────────────────────────────────────────────────────┐  │
 │  │           Operations & Deployment                    │  │
-│  │  ┌──────────────┐              ┌──────────────┐     │  │
-│  │  │  afi-ops     │              │  afi-infra   │     │  │
-│  │  │  (Deploy)    │              │  (Infra)     │     │  │
-│  │  └──────────────┘              └──────────────┘     │  │
+│  │                   ┌──────────────┐                   │  │
+│  │                   │  afi-infra   │                   │  │
+│  │                   │  (Infra)     │                   │  │
+│  │                   └──────────────┘                   │  │
 │  └──────────────────────────────────────────────────────┘  │
 │                                                              │
 └──────────────────────────────────────────────────────────────┘
@@ -112,7 +112,7 @@
 
 ### Repository Organization
 
-AFI Protocol is organized into **22 repositories**, each with specific responsibilities:
+AFI Protocol is organized into **21 repositories**, each with specific responsibilities:
 
 **Core Layer (3 repos):**
 - `afi-config` - Global configuration and schemas
@@ -126,9 +126,8 @@ AFI Protocol is organized into **22 repositories**, each with specific responsib
 - `afi-math` - Pure math primitives
 - `afi-econ` - Economic modeling and simulation
 
-**Infrastructure Layer (2 repos):**
+**Infrastructure Layer (1 repo):**
 - `afi-infra` - TSSD vault, templates, schemas
-- `afi-ops` - Deployment, health checks, runbooks
 
 **Extension Layer (1 repo):**
 - `afi-factory` - Agent templates and spawning
@@ -162,7 +161,7 @@ The AFI Orchestrator Doctrine defines the core architectural principles:
 6. **State & replay belong here** - Pipeline state, Codex replay, audits owned by afi-reactor
 7. **Configuration is externalized** - Reactor reads from afi-config and registries
 8. **No token/econ logic in afi-reactor** - Emissions and rewards live in afi-token
-9. **No infra glue in afi-reactor** - Deployment lives in afi-infra/afi-ops
+9. **No infra glue in afi-reactor** - Deployment lives in afi-infra
 10. **If orchestration logic doesn't fit this doctrine, it's in the wrong repo**
 
 ### Repository Boundaries
@@ -180,7 +179,6 @@ The AFI Orchestrator Doctrine defines the core architectural principles:
 │                                                                 │
 │  afi-config = global schemas and governance                    │
 │  afi-infra = templates, TSSD vault, agent stubs                │
-│  afi-ops = deployment automation and monitoring                │
 │                                                                 │
 │  afi-factory = agent templates (spawning logic)                │
 │                                                                 │
@@ -198,7 +196,7 @@ afi-core (depends on afi-config)
     ↓
 afi-reactor (depends on afi-core, afi-config)
     ↓
-Consumers (afi-gateway, afi-ops)
+Consumers (afi-gateway)
 ```
 
 **Forbidden Patterns:**
@@ -577,7 +575,7 @@ cd afi-tiny-brains
 uvicorn tiny_brains_service.service:app --port 8090
 ```
 
-**Health Checks (afi-ops):**
+**Health Checks (service-local):**
 ```bash
 # Check all services
 npm run health
@@ -603,7 +601,7 @@ npm run deploy:local
 
 ### Service Level Objectives (SLO)
 
-**Availability Targets (afi-ops):**
+**Availability Targets:**
 - afi-reactor: 99.5% uptime
 - afi-core: 99.5% uptime
 - afi-gateway: 99.0% uptime
@@ -931,7 +929,6 @@ Response:
 **Smoke Tests:**
 - `afi-artifacts`: Replay smoke tests
 - `afi-gateway`: AFIScout smoke test
-- `afi-ops`: Health check smoke tests
 
 ### CI/CD Pipelines
 
@@ -1357,7 +1354,7 @@ UFBE_ENABLE_DEBUG=false
 ### Repositories
 - **Core Repos** - afi-config, afi-core, afi-reactor
 - **Token Repos** - afi-token, afi-mint, afi-governance, afi-math, afi-econ
-- **Infra Repos** - afi-infra, afi-ops
+- **Infra Repos** - afi-infra
 - **Extension Repos** - afi-factory
 - **Integration Repos** - afi-gateway, afi-tiny-brains
 - **Doc Repos** - afi-docs, afi-artifacts, afi-benchkit
@@ -1414,7 +1411,6 @@ UFBE_ENABLE_DEBUG=false
 
 **Infra:**
 - https://github.com/AFI-Protocol/afi-infra
-- https://github.com/AFI-Protocol/afi-ops
 
 **Extensions:**
 - https://github.com/AFI-Protocol/afi-factory
