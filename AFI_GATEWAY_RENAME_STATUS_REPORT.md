@@ -79,7 +79,6 @@ The repository rename from `afi-eliza-gateway` to `afi-gateway` has been **parti
   - `afi-docs`
   - `afi-artifacts`
   - `afi-benchkit`
-  - `afi-cli-framework`
 
 ---
 
