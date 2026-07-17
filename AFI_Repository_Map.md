@@ -43,13 +43,13 @@
 ## Agent Repositories
 
 ### afi-factory
-- **Purpose**: Agent factory for creating and managing AFI agents
+- **Purpose**: Pipeline authoring system (afi-governance `decisions/factory-configurable-pipelines-v1.md`)
 - **Language**: TypeScript
 - **Key Components**:
-  - Agent templates
-  - Agent registry
-  - Agent lifecycle management
-  - Agent configuration
+  - Pipeline template authoring (`afi.pipeline-template.v1`)
+  - Template instantiation to `afi.pipeline.v1` manifests
+  - Manifest validation against the governed afi-config contracts
+  - Canonical (timestamp-free) hashing
 
 ## CLI Repositories
 
@@ -156,7 +156,7 @@ afi-config (all repos)
 ## Key Integration Points
 
 1. **Gateway to Reactor**: afi-gateway forwards USS v1.1 signals to afi-reactor for Froggy scoring (canonical spine — the legacy `afi-pipeline` hop no longer exists)
-2. **Factory**: afi-factory provides agent/factory tooling (the standalone agents repo no longer exists)
+2. **Factory**: afi-factory provides pipeline/template authoring, manifest validation, and canonical hashing (the standalone agents repo no longer exists)
 3. **Econ to Governance**: afi-econ provides economic data to afi-governance
 4. **Benchkit to Tiny Brains**: afi-benchkit tests models from afi-tiny-brains
 5. **Config to All**: afi-config provides configuration to all repositories
@@ -168,7 +168,7 @@ afi-config (all repos)
 1. **Core Development**: Start with afi-core for protocol changes
 2. **Gateway Integration**: Update afi-gateway for new endpoints
 3. **Reactor Updates**: Modify afi-reactor for new scoring/pipeline stages
-4. **Agent Development**: Use afi-factory for agent tooling
+4. **Pipeline Authoring**: Use afi-factory to author and validate pipeline manifests
 5. **CLI Tools**: Build TS CLI tools on afi-cli-framework
 6. **Economic Modeling**: Update afi-econ and afi-governance for economic changes
 7. **Testing**: Use afi-benchkit and afi-tiny-brains for testing

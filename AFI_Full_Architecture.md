@@ -656,7 +656,7 @@ npm run deploy:local
 - The former signal-structuring persona - removed.
 - The former execution simulation agent - removed; execution is now an external concern, not the reactor's responsibility.
 
-> The legacy Froggy demo chain (scout, structurer, validator, execution simulation) is gone. The reactor is scored-only; canonical pipeline: `afi-reactor/src/config/froggyPipeline.ts`.
+> The legacy Froggy demo chain (scout, structurer, validator, execution simulation) is gone. The reactor is scored-only; pipelines are analyst-configurable `afi.pipeline.v1` manifests executed from the governed afi-config registries (see `ARCHITECTURE_STATUS.md`; decision: afi-governance `decisions/factory-configurable-pipelines-v1.md`).
 
 **Agent Lifecycle:**
 1. **Initialization:** Load character config from afi-gateway
