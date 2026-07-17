@@ -24,3 +24,11 @@ jobs:
       - uses: actions/checkout@v3
       - name: Check the tracked tree for removed implementation machinery
         run: python3 scripts/check_stale_refs.py
+
+  architecture-doc:
+    name: Full-architecture doc is current
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Check AFI_Full_Architecture.md is present-tense and current
+        run: python3 scripts/check_architecture_doc.py
