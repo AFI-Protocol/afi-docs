@@ -71,7 +71,6 @@ The repository rename from `afi-eliza-gateway` to `afi-gateway` has been **parti
 - **Status**: NOT CHECKED
 - **Repositories to verify**:
   - `afi-core`
-  - `afi-skills`
   - `afi-tiny-brains`
   - `afi-econ`
   - `afi-infra`
@@ -340,7 +339,6 @@ The repository rename from `afi-eliza-gateway` to `afi-gateway` has been **parti
 5. **Search and Update Other Repositories**
    - Search for references in:
      - `afi-core`
-     - `afi-skills`
      - `afi-tiny-brains`
      - `afi-econ`
      - `afi-infra`
