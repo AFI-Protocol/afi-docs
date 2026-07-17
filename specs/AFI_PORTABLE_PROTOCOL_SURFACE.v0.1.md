@@ -136,7 +136,7 @@ These are **starting hypotheses** for the agent team to verify and expand:
 | Mongo tunnel vision | TSSD spec, gateway, reactor defaults | Docs/code should say “default reference vault”; schema already allows PG/Timescale/Influx |
 | BASE = full signal ledger | User vision vs receipt-only contracts | Spec what **must** be on-chain vs hash-anchored vs off-chain only |
 | Econ splits vs on-chain settlement | `afi-econ` gauge vs single `beneficiary` mint | Classify econ as research/simulation unless wired to production |
-| Stale architecture docs | `afi-docs/AFI_Full_Architecture.md`, `AFI_Repository_Map.md` | Mark stale sections; align to portable protocol surface |
+| Stale architecture docs | `AFI_Repository_Map.md` | Mark stale sections; align to portable protocol surface |
 | Analytics/warehouse plane absent from normative layer | Considered, never built | Optional, non-normative; Mongo TSSD is the reference evidence store, warehouses pluggable per operator |
 
 ---
