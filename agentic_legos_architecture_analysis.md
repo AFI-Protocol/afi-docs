@@ -4,7 +4,7 @@
 
 ## Executive Summary
 
-The AFI Protocol implements an "agentic legos" architecture where modular components (skills, agents, droids) can be assembled into intelligent systems. This analysis clarifies the relationships between afi-skills, afi-math, afi-benchkit, afi-core, and afi-reactor, along with the broader agent universe, agent playbook, and current implementation status.
+The AFI Protocol implements an "agentic legos" architecture where modular components (skills, agents, droids) can be assembled into intelligent systems. This analysis clarifies the relationships between afi-math, afi-benchkit, afi-core, and afi-reactor, along with the broader agent universe, agent playbook, and current implementation status.
 
 ## Core Relationships
 
@@ -14,15 +14,12 @@ The AFI Protocol implements an "agentic legos" architecture where modular compon
 graph TD
     A[afi-config] --> B[afi-core]
     A --> C[afi-reactor]
-    A --> D[afi-skills]
     A --> E[afi-factory]
 
     B --> F[afi-math]
     B --> G[afi-benchkit]
 
     C --> B
-
-    D --> I[afi-factory]
 
     J[afi-gateway] --> C
     J --> B
@@ -34,7 +31,7 @@ graph TD
 ### Agentic Legos Concept
 
 **Agentic Legos** refers to the modular assembly of:
-- **Skills** (afi-skills): Reusable capabilities with typed I/O
+- **Skills**: Reusable capabilities with typed I/O
 - **Agents**: ElizaOS personas that execute skills
 - **Droids**: Automated workers that maintain the system
 - **Orchestration** (afi-reactor): DAG-based pipeline coordination
@@ -52,7 +49,7 @@ graph TD
 ### afi-math (Pure Mathematics)
 - **Purpose**: Mathematical primitives for AFI Protocol
 - **Provides**: Decay curves, UWR calculations, time-value functions
-- **Consumed by**: afi-core (validator scoring), afi-skills (skill implementations)
+- **Consumed by**: afi-core (validator scoring)
 - **Current Status**: TypeScript implementation with comprehensive tests
 
 ### afi-benchkit (Benchmarking Toolkit)
@@ -66,13 +63,6 @@ graph TD
 - **Architecture**: DAG-based with generators → analyzers → scorers → validators → executors
 - **Dependencies**: afi-core (validators), afi-config (schemas)
 - **Current Status**: Active development with branch divergence; validators incorrectly placed in DAG (should be external)
-
-### afi-skills (Skill Library)
-- **Purpose**: Canonical library of agent skills and capabilities
-- **Structure**: Markdown skills with YAML front-matter, evaluation golden cases
-- **Domains**: market-structure, scoring, news-sentiment, provenance, etc.
-- **Consumed by**: afi-core, afi-reactor, afi-factory
-- **Current Status**: Skill definitions with linter, manifest builder, evaluation framework
 
 ## Agent Universe Architecture
 
@@ -93,7 +83,6 @@ graph TD
     K[Agentic Legos Assembly]
     K --> A
     K --> G
-    K --> L[Skills from afi-skills]
     K --> M[Orchestration via afi-reactor]
 ```
 
@@ -136,7 +125,6 @@ The **Agent Playbook** governs ElizaOS agents that interact with AFI:
 | afi-math | HIGH | Decay models, UWR calc | Performance optimization |
 | afi-benchkit | MEDIUM | PoI/PoInsight benchmarks | Integration with afi-core |
 | afi-reactor | MEDIUM | DAG orchestration | Validator externalization, branch merge |
-| afi-skills | MEDIUM | Skill definitions, evals | Runtime integration |
 | afi-config | HIGH | Schemas, governance | Complete coverage |
 | afi-factory | LOW | Templates, manifests | Implementation |
 | afi-gateway | MEDIUM | Agent runtime | Full AFI integration |
@@ -145,15 +133,14 @@ The **Agent Playbook** governs ElizaOS agents that interact with AFI:
 
 1. **Validator Architecture Violation**: afi-reactor places validators as DAG nodes instead of external services
 2. **Branch Divergence**: afi-reactor has unmerged feature branches with TSSD, Provenance, Replay
-3. **Skill Runtime Gap**: afi-skills defines skills but runtime execution needs implementation
-4. **Agent Assembly**: Factory templates exist but agent spawning logic incomplete
+3. **Agent Assembly**: Factory templates exist but agent spawning logic incomplete
 
 ## Intended Design vs Current State
 
 ### Intended Agentic Legos Design
 
 ```
-Skills (afi-skills) → Factory Templates (afi-factory) → Agent Assembly → Orchestration (afi-reactor)
+Skills → Factory Templates (afi-factory) → Agent Assembly → Orchestration (afi-reactor)
                                       ↓
                                ElizaOS Runtime (afi-gateway)
                                       ↓
@@ -172,8 +159,7 @@ Skills (afi-skills) → Factory Templates (afi-factory) → Agent Assembly → O
 ### Immediate Actions
 1. **Fix Validator Architecture**: Remove validators from afi-reactor DAG, implement as external services
 2. **Merge afi-reactor Branches**: Consolidate TSSD, Provenance, Replay features into main
-3. **Skill Runtime Integration**: Connect afi-skills to afi-core execution engine
-4. **Factory Implementation**: Complete agent spawning logic in afi-factory
+3. **Factory Implementation**: Complete agent spawning logic in afi-factory
 
 ### Long-term Vision
 1. **Complete Agentic Legos**: Full skill → agent → orchestration pipeline

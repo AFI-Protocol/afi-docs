@@ -112,7 +112,7 @@
 
 ### Repository Organization
 
-AFI Protocol is organized into **23 repositories**, each with specific responsibilities:
+AFI Protocol is organized into **22 repositories**, each with specific responsibilities:
 
 **Core Layer (3 repos):**
 - `afi-config` - Global configuration and schemas
@@ -130,8 +130,7 @@ AFI Protocol is organized into **23 repositories**, each with specific responsib
 - `afi-infra` - TSSD vault, templates, schemas
 - `afi-ops` - Deployment, health checks, runbooks
 
-**Extension Layer (2 repos):**
-- `afi-skills` - Versioned skill library
+**Extension Layer (1 repo):**
 - `afi-factory` - Agent templates and spawning
 
 **Integration Layer (2 repos):**
@@ -184,7 +183,6 @@ The AFI Orchestrator Doctrine defines the core architectural principles:
 │  afi-infra = templates, TSSD vault, agent stubs                │
 │  afi-ops = deployment automation and monitoring                │
 │                                                                 │
-│  afi-skills = agent capabilities (skill library)               │
 │  afi-factory = agent templates (spawning logic)                │
 │                                                                 │
 └────────────────────────────────────────────────────────────────┘
@@ -702,71 +700,6 @@ npm run deploy:local
 - ❌ Execute transactions or sign contracts
 - ❌ Access user funds or wallet
 
-### Agent Skills (afi-skills)
-
-**Skill Structure:**
-```yaml
----
-id: market-sentiment-analysis
-name: Market Sentiment Analysis
-version: 1.0.0
-domain: news-sentiment
-description: Analyze market sentiment from social and news sources
-inputs:
-  - name: social_signals
-    type: array
-    description: Array of social media signals
-  - name: news_headlines
-    type: array
-    description: Array of news headlines
-outputs:
-  - name: sentiment_score
-    type: number
-    description: Sentiment score [-1, 1]
-  - name: confidence
-    type: number
-    description: Confidence level [0, 1]
-allowed_tools:
-  - tssd:read
-  - codex:replay
-risk_level: medium
-determinism_required: false
-evals:
-  golden_cases_path: evals/news-sentiment/market-sentiment-analysis/golden_cases.json
-  expected_properties:
-    - sentiment_score
-    - confidence
-owners:
-  - afi-skills-team
-last_updated: 2025-12-01
-tags:
-  - sentiment
-  - news
-  - social
----
-
-# Market Sentiment Analysis Skill
-
-[Skill body with detailed implementation notes]
-```
-
-**Skill Domains:**
-- `market-structure/` - Futures, perps, contract specs
-- `scoring/` - Signal scoring, epoch emissions
-- `news-sentiment/` - Source trust, headline analysis
-- `provenance/` - Receipt verification, vault replay
-- `technical/` - Technical analysis indicators
-- `pattern/` - Chart pattern recognition
-- `ml/` - Machine learning models
-- `ops/` - Operational utilities
-- `governance/` - Governance proposals
-
-**Skill Promotion Gates:**
-- ✅ Front-matter validates against schema
-- ✅ No security risk patterns detected
-- ✅ Golden cases pass (if determinism_required: true)
-- ✅ Code review by skill domain owner
-
 ### Agent Factory (afi-factory)
 
 **Purpose:** Agent templates and spawning logic
@@ -804,10 +737,9 @@ tags:
 
 **Agent Spawning:**
 1. Load template from afi-factory
-2. Inject skills from afi-skills
-3. Configure character from afi-config
-4. Deploy to afi-core runtime
-5. Register with afi-reactor DAG
+2. Configure character from afi-config
+3. Deploy to afi-core runtime
+4. Register with afi-reactor DAG
 
 ---
 
@@ -985,7 +917,6 @@ Response:
 - `afi-reactor`: Jest (DAG nodes, plugins)
 - `afi-token`: Foundry (58 tests - roles, cap, core, receipts, coordinator, integration)
 - `afi-infra`: Vitest (TSSD clients, DAG determinism)
-- `afi-skills`: Vitest (skill linter, manifest builder)
 - `afi-tiny-brains`: pytest (model tests, API tests)
 
 **Integration Tests:**
@@ -1428,7 +1359,7 @@ UFBE_ENABLE_DEBUG=false
 - **Core Repos** - afi-config, afi-core, afi-reactor
 - **Token Repos** - afi-token, afi-mint, afi-governance, afi-math, afi-econ
 - **Infra Repos** - afi-infra, afi-ops
-- **Extension Repos** - afi-skills, afi-factory
+- **Extension Repos** - afi-factory
 - **Integration Repos** - afi-gateway, afi-tiny-brains
 - **Doc Repos** - afi-docs, afi-artifacts, afi-benchkit
 
@@ -1487,7 +1418,6 @@ UFBE_ENABLE_DEBUG=false
 - https://github.com/AFI-Protocol/afi-ops
 
 **Extensions:**
-- https://github.com/AFI-Protocol/afi-skills
 - https://github.com/AFI-Protocol/afi-factory
 
 **Integration:**

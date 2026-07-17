@@ -19,7 +19,7 @@ You are actively developing on **feature/migration branches** across multiple re
 - ⚠️ **15+ commits in afi-reactor** not in main (TSSD Vault, Replay, Test fixes)
 - ⚠️ **20+ commits in afi-core** not in main (UWR scoring, Math integration, ESM migration)
 - ⚠️ **20+ commits in afi-token** not in main (Foundry v2, Pattern A role wiring)
-- ✅ **2 repos on main** and in sync (afi-math, afi-skills)
+- ✅ **1 repo on main** and in sync (afi-math)
 
 **Critical Decision Point:**
 
@@ -267,7 +267,6 @@ Clean and in sync. No action needed.
 
 **afi-config:** On `migration/multi-repo-reorg` (no remote tracking shown)
 **afi-ops:** On `migration/multi-repo-reorg` (up to date with remote)
-**afi-skills:** On `main` (up to date)
 **afi-factory:** On `migration/multi-repo-reorg` (no remote tracking shown)
 
 **Remaining 16 repos:** Not analyzed in detail (appear to be supporting repos: artifacts, assets, benchkit, docs, governance, infra, labs, protocol, research-site, sdk-python, sdk-ts, starters)
