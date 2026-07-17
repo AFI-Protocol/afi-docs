@@ -150,6 +150,7 @@ Factory is **not** the API Atlas, **not** the Gateway, **not** the Reactor runti
 - It stamps provenance (`providerId = gateway:<tenantId>` from the authenticated key) and returns the Reactor's answer verbatim. It never validates payload semantics, scores, resolves UWR, constructs evidence, or writes a store.
 - It **fails closed**: without a configured Reactor URL it refuses to start; an unreachable Reactor yields `503 persisted:false`, never a queued/accepted response.
 - The routes-not-writes boundary is enforced by executable guardrail tests (no import of the persistence layer, no canonical-evidence tokens, only operational collections).
+- **AFI Research Institute is designated to operate the official hosted Gateway reference instance (Reference).** This designation is **non-exclusive**: the MIT-licensed implementation stays usable by independent conforming operators, and any Institute instance policies (quotas, onboarding, tenant isolation) apply only to that hosted instance, not to protocol law. No Institute-hosted deployment is claimed (none exists). The Gateway's endpoint authority is reserved to `ATLAS-GOV`. See `research-institute-reference-services-v0.1` (INST-GOV) and [`specs/AFI_RESEARCH_INSTITUTE_REFERENCE_SERVICES.v0.1.md`](specs/AFI_RESEARCH_INSTITUTE_REFERENCE_SERVICES.v0.1.md).
 
 ### 5. Reactor execution plane **(Implemented)**
 
@@ -157,6 +158,7 @@ Factory is **not** the API Atlas, **not** the Gateway, **not** the Reactor runti
 
 - **Boot is a fail-closed gate**: it loads the afi-config registries (analysis plugins, pipelines, analyst strategies, provider bindings), schema-validates every active entry, recomputes and verifies the manifest / analyst-config / plugin-set hashes, and refuses to start on any invalid entry. There is no lazy request-time discovery.
 - **Two live ingress paths reach the executor.** Most submissions arrive routed from the Gateway (`POST /api/v1/signals` → the Reactor webhook). The Reactor also exposes **`POST /api/ingest/cpj`**, a direct community-provider-journal ingest (`afi.cpj.v0.1`, for Telegram/Discord oracle providers) that bypasses the Gateway under an optional shared secret, validates CPJ v0.1, and deduplicates by ingest hash (`409` on a duplicate). Both paths **resolve the provider → strategy binding** against the boot-validated provider-binding registry — an unbound provider is rejected with an honest `403`, never a silent default composition — then map to USS v1.1 and run the identical scoring path.
+- **The direct CPJ route is an internal trusted service boundary, not a public API (Reference/Reserved).** Its authentication is optional (a single shared secret) and provider identity is self-asserted, so any future public or partner CPJ access is designated to be mediated by a separate authenticated **Institute oracle-ingress reference service** — designated, **not implemented or deployed** — or another conforming external trust boundary; the route is neither renamed, moved, nor exposed. Provider binding, CPJ validation, and provenance stay mandatory regardless of exposure (ingest dedupe is opt-in, `AFI_INGEST_DEDUPE=1`) (INST-GOV; see [`specs/AFI_RESEARCH_INSTITUTE_REFERENCE_SERVICES.v0.1.md`](specs/AFI_RESEARCH_INSTITUTE_REFERENCE_SERVICES.v0.1.md)).
 - The **graph is manifest-driven**, not a hardcoded DAG. The executor runs topological waves (Kahn's algorithm) with bounded concurrency, deterministic ready-sets, per-node timeout and retry, conditional edges, and joins keyed by node id. Graph validation enforces unique ids, acyclicity, reachability, exactly one non-bypassable scorer sink, and declared joins.
 - The **five analysis categories** are ordinary registered plugins bound at build time, alongside a join plugin and the scorer. Any registered strategy (for example the "Froggy trend-pullback" scorer) is an ordinary registry entry, not a special path. The `aiMl` category is fed by the optional, fail-soft `afi-tiny-brains` sidecar (the Reactor's client returns nothing when the sidecar URL is unset); its output is read-only context and **does not affect UWR scoring**.
 - The scorer node wraps afi-core's analyst, resolves the UWR configuration fail-closed, and emits scores and their resolved source verbatim.
@@ -196,7 +198,7 @@ Every record persisted today carries `lifecycleState = SCORED` and `finalized = 
 - Its input is **static CSV fixtures**; it has **no live finalized-receipt feed and no production reputation or incentive integration**. Its composite reputation number (a weighted combination of PoI and PoInsight) is a local research computation over benchmark outputs, **not** the protocol's reputation or incentive law. Fixture-backed PoInsight is not PoInsight computed from finalized live receipts.
 - Current test state: outside the pinned container, exactly **two** golden-image plot tests fail (`test_calibration_plot_golden`, `test_poi_capability_golden`) as SHA-256 mismatches from a matplotlib version difference; the remaining benchmark tests pass.
 
-`afi-econ` is a non-canonical economic research kit (its models are self-declared placeholder/toy and are not protocol law unless promoted by governance). `afi-artifacts` is a frozen, DOI-minted paper reproducibility bundle (Zenodo). **AFI Research Institute** is AFI's sole research and legal identity — the copyright holder across the organization's licenses — reflecting an open-protocol, auditable, replayable research posture.
+`afi-econ` is a non-canonical economic research kit (its models are self-declared placeholder/toy and are not protocol law unless promoted by governance). `afi-artifacts` is a frozen, DOI-minted paper reproducibility bundle (Zenodo). **AFI Research Institute** is AFI's sole research and legal identity — the copyright holder across the organization's licenses — reflecting an open-protocol, auditable, replayable research posture. Committed to open research, it is **designated to operate AFI's official open reference services (Reference)**: a hosted **Gateway reference service** (§4) and a designated **oracle-ingress / CPJ-normalization reference service** (§5), governed by `research-institute-reference-services-v0.1` (INST-GOV) and specified in [`specs/AFI_RESEARCH_INSTITUTE_REFERENCE_SERVICES.v0.1.md`](specs/AFI_RESEARCH_INSTITUTE_REFERENCE_SERVICES.v0.1.md). These are **non-exclusive** reference instances — operating them confers no protocol authority, no economic or validator privilege, and no exclusive network role; independent conforming operators remain free to run their own ingress and collectors. No Institute-hosted deployment is claimed (none exists).
 
 ### 9. On-chain and economic plane
 
@@ -224,9 +226,12 @@ The implemented path from submission through persistence, proven by CI against r
 
 ```mermaid
 flowchart TD
+    RG["Institute Gateway reference service<br/>(designated · not deployed)"] -. "structured submissions" .-> A
+    IND["independent conforming ingress<br/>(architectural right)"] -. "conforming submissions" .-> A
+    RO["Institute oracle-ingress reference service<br/>(designated · not deployed)"] -. "authenticated collector CPJ" .-> A2
     A["Signal submission<br/>POST /api/v1/signals"] --> B["afi-gateway<br/>authenticate • resolve tenant • rate-limit • stamp provenance"]
     B -->|"route, never write"| C["afi-reactor webhook<br/>resolve provider → strategy binding (honest 403)"]
-    A2["Community provider journal<br/>POST /api/ingest/cpj (bypasses Gateway)"] --> C2["afi-reactor CPJ ingest<br/>validate CPJ v0.1 • dedupe • resolve binding (honest 403)"]
+    A2["Community provider journal<br/>POST /api/ingest/cpj (internal trusted boundary)"] --> C2["afi-reactor CPJ ingest<br/>validate CPJ v0.1 • dedupe • resolve binding (honest 403)"]
     C --> D["map to USS v1.1<br/>validate canonical signal"]
     C2 --> D
     D --> E["GraphExecutor<br/>manifest-driven topological waves"]
@@ -235,7 +240,12 @@ flowchart TD
     G --> H["Evidence V2 construction<br/>afi.scored-signal-evidence.v2 • composition ref • SCORED"]
     H --> I["afi-infra store.submit<br/>unique signalId • append-once • transactional"]
     I --> J(["Canonical record persisted<br/>lifecycleState = SCORED"])
+    style RG stroke-dasharray: 5 5
+    style RO stroke-dasharray: 5 5
+    style IND stroke-dasharray: 5 5
 ```
+
+The dotted entry lanes are the **designated** ways to reach the two implemented ingress points: the Institute Gateway and oracle-ingress reference services (designated, not deployed) and independent conforming ingress (an architectural right — independent operators submit to the same implemented boundaries directly). The solid path from the ingress points through persistence is the implemented runtime (INST-GOV; §4–§5).
 
 ```text
 ingest → USS v1.1 validation → scoring (governed UWR engine, pinned profile)
@@ -267,6 +277,8 @@ flowchart LR
 - **Live token minting** tied to the settlement design — governance-blocked on ungoverned role weights.
 - **Base mainnet settlement** — not yet governed.
 - **The API Atlas** — reserved, not started.
+- **The Institute Gateway hosted reference deployment** — designated for operation by AFI Research Institute (INST-GOV), not deployed.
+- **The Institute oracle-ingress reference service** and any public or partner CPJ API — designated as the authenticated external trust boundary in front of the internal Reactor CPJ route, not implemented or deployed. Reference source collectors beyond an in-repo, undeployed Telegram client are not implemented.
 - **A production or staging deployment** — the runtime is implemented and CI-proven against real infrastructure, but no deployment target (container, cloud, or Kubernetes manifest) exists in the runtime repositories, and there is no GCP staging or production deployment.
 
 ---
