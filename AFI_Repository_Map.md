@@ -51,17 +51,6 @@
   - Manifest validation against the governed afi-config contracts
   - Canonical (timestamp-free) hashing
 
-## CLI Repositories
-
-### afi-cli-framework
-- **Purpose**: Framework for building AFI CLI tools
-- **Language**: TypeScript
-- **Key Components**:
-  - CLI application framework
-  - Command registration
-  - Configuration management
-  - Extension points
-
 ## Economic System
 
 ### afi-econ
@@ -142,8 +131,6 @@ afi-gateway → afi-reactor
     ↓
 afi-factory
     ↓
-afi-cli-framework
-    ↓
 afi-econ → afi-governance
     ↓
 afi-benchkit → afi-tiny-brains
@@ -161,7 +148,7 @@ afi-config (all repos)
 4. **Benchkit to Tiny Brains**: afi-benchkit tests models from afi-tiny-brains
 5. **Config to All**: afi-config provides configuration to all repositories
 
-> Note: the deprecated Python CLI utilities repo was removed (2026-06-19) and its bash lib was rehomed to `afi-ops/scripts/lib/afi-shared.sh`; the remaining TS CLI library (`afi-cli-framework`) is unaffected.
+> Note: the deprecated Python CLI utilities repo was removed (2026-06-19) and its bash lib was rehomed to `afi-ops/scripts/lib/afi-shared.sh`.
 
 ## Development Workflow
 
@@ -169,9 +156,8 @@ afi-config (all repos)
 2. **Gateway Integration**: Update afi-gateway for new endpoints
 3. **Reactor Updates**: Modify afi-reactor for new scoring/pipeline stages
 4. **Pipeline Authoring**: Use afi-factory to author and validate pipeline manifests
-5. **CLI Tools**: Build TS CLI tools on afi-cli-framework
-6. **Economic Modeling**: Update afi-econ and afi-governance for economic changes
-7. **Testing**: Use afi-benchkit and afi-tiny-brains for testing
-8. **Documentation**: Update afi-docs with changes
-9. **Artifacts**: Add research artifacts to afi-artifacts
-10. **Configuration**: Update afi-config for new configurations
+5. **Economic Modeling**: Update afi-econ and afi-governance for economic changes
+6. **Testing**: Use afi-benchkit and afi-tiny-brains for testing
+7. **Documentation**: Update afi-docs with changes
+8. **Artifacts**: Add research artifacts to afi-artifacts
+9. **Configuration**: Update afi-config for new configurations
