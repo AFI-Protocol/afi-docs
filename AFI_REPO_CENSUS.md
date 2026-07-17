@@ -15,7 +15,6 @@
 | afi-factory | node/ts | 2025-11-26 | AFI‑Factory |
 | afi-governance | node/ts | 2025-11-26 | AFI Governance – Agentic Financial Intelligence |
 | afi-infra | node/ts | 2025-12-14 | afi-infra |
-| afi-labs | solidity | 2025-11-24 | AFI Labs |
 | afi-math | node/ts | 2025-12-16 | AFI Math |
 | afi-mint | node/ts/solidity | 2025-12-07 | AFI Mint – Signal-Driven Token Minting Pipeline |
 | afi-ops | node/ts | 2025-11-28 | 🛠️ AFI Ops |

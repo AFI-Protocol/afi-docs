@@ -18,7 +18,6 @@
   ],
   "linkedRepos": [
     "afi-core",
-    "afi-factory",
-    "afi-labs"
+    "afi-factory"
   ]
 }

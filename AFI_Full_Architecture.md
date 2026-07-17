@@ -144,7 +144,6 @@ AFI Protocol is organized into **22 repositories**, each with specific responsib
 
 **Other (4 repos):**
 - `afi-protocol` - Meta-repo (contributor manifest)
-- `afi-labs` - Experimental playground
 - `afi-research-site` - Research website
 
 ---
@@ -1431,7 +1430,6 @@ UFBE_ENABLE_DEBUG=false
 
 **Other:**
 - https://github.com/AFI-Protocol/afi-protocol
-- https://github.com/AFI-Protocol/afi-labs
 - https://github.com/AFI-Protocol/afi-research-site
 
 ### Key Commands

@@ -21,8 +21,8 @@ This report documents all occurrences of "augmentcode" and "Scarlet" references 
 | Reference Type | Total Occurrences | Repositories Affected | Files Affected |
 |----------------|-------------------|----------------------|----------------|
 | augmentcode | 15 | 3 | 15 |
-| Scarlet | 175 | 10 | 175 |
-| **Total** | **190** | **10** | **190** |
+| Scarlet | 8 | 8 | 8 |
+| **Total** | **23** | **8** | **23** |
 
 ---
 
@@ -78,14 +78,13 @@ This report documents all occurrences of "augmentcode" and "Scarlet" references 
 
 ### Overview
 
-**Total Scarlet references**: 174 occurrences across 9 repositories
+**Total Scarlet references**: 8 occurrences across 8 repositories
 
 **Repositories affected**:
 - afi-reactor (1 file)
 - afi-infra (1 file)
 - afi-factory (1 file)
 - afi-governance (1 file)
-- afi-labs (160+ files)
 - afi-docs (1 file)
 - _archived (1 file)
 - afi-core (1 file)
@@ -141,31 +140,7 @@ This report documents all occurrences of "augmentcode" and "Scarlet" references 
 
 ---
 
-#### 5. afi-labs Repository (160+ occurrences)
-
-**Note**: afi-labs contains the majority of Scarlet references, primarily in scarlett configuration files.
-
-**Key Files Affected**:
-
-| File Pattern | Estimated Occurrences | Context | Action Required |
-|--------------|----------------------|---------|-----------------|
-| `afi-labs/scarlett/*.json` | 100+ | Configuration files | Review and update |
-| `afi-labs/scarlett/*.md` | 20+ | Documentation files | Review and update |
-| `afi-labs/scarlett/*.ts` | 20+ | TypeScript files | Review and update |
-| `afi-labs/scarlett/*.js` | 10+ | JavaScript files | Review and update |
-| `afi-labs/scarlett/*.yaml` | 5+ | YAML configuration | Review and update |
-| `afi-labs/scarlett/*.yml` | 5+ | YAML configuration | Review and update |
-
-**Impact**: HIGH - Majority of references are in afi-labs/scarlett directory.
-
-**Recommended Action**: 
-- If scarlett is an internal AFI component, rename to align with AFI naming conventions
-- If scarlett is external, consider removing or replacing with AFI-native alternatives
-- Review all scarlett-related code to determine if it's essential to AFI operations
-
----
-
-#### 6. afi-docs Repository (1 occurrence)
+#### 5. afi-docs Repository (1 occurrence)
 
 | File | Line | Context | Field | Action Required |
 |------|------|---------|-------|-----------------|
@@ -177,7 +152,7 @@ This report documents all occurrences of "augmentcode" and "Scarlet" references 
 
 ---
 
-#### 8. _archived Repository (1 occurrence)
+#### 6. _archived Repository (1 occurrence)
 
 | File | Line | Context | Field | Action Required |
 |------|------|---------|-------|-----------------|
@@ -189,7 +164,7 @@ This report documents all occurrences of "augmentcode" and "Scarlet" references 
 
 ---
 
-#### 8. afi-core Repository (1 occurrence)
+#### 7. afi-core Repository (1 occurrence)
 
 | File | Line | Context | Field | Action Required |
 |------|------|---------|-------|-----------------|
@@ -201,7 +176,7 @@ This report documents all occurrences of "augmentcode" and "Scarlet" references 
 
 ---
 
-#### 10. afi-artifacts Repository (1 occurrence)
+#### 8. afi-artifacts Repository (1 occurrence)
 
 | File | Line | Context | Field | Action Required |
 |------|------|---------|-------|-----------------|
@@ -323,26 +298,7 @@ Maintained by: AFI Team
 
 ### Priority 3: MEDIUM (Review and Decide)
 
-#### Task 5: Review afi-labs/scarlett Directory
-
-**Scope**: 160+ files in `afi-labs/scarlett/` directory
-
-**Action Required**:
-1. Determine if scarlett is an internal AFI component or external dependency
-2. If internal: Rename to align with AFI naming conventions (e.g., `afi-scarlett` or `afi-labs-scarlett`)
-3. If external: Evaluate if it's essential to AFI operations
-4. If not essential: Plan removal or replacement with AFI-native alternatives
-5. If essential: Document the dependency and external relationship
-
-**Decision Points**:
-- Is scarlett actively maintained?
-- Does scarlett provide unique functionality not available elsewhere?
-- Are there licensing or IP concerns with scarlett?
-- Can scarlett be replaced with AFI-native code?
-
----
-
-#### Task 6: Update Documentation Examples
+#### Task 5: Update Documentation Examples
 
 **Files to update**:
 1. `afi-docs/cli_help.md` - Update CLI usage example
@@ -397,21 +353,7 @@ find afi-infra/afi-codex -name "*.afi-codex.json" -type f -exec sed -i '' 's/"cr
 
 ---
 
-### Phase 3: afi-labs Review (Requires Decision)
-
-**Timeline**: 2-4 hours (review) + TBD (implementation)
-
-**Tasks**:
-1. Review afi-labs/scarlett directory structure
-2. Determine scarlett's role in AFI architecture
-3. Make decision on rename, replace, or keep
-4. Implement decision
-
-**Total Files**: 160+ (depends on decision)
-
----
-
-### Phase 4: Documentation Updates (Low Priority)
+### Phase 3: Documentation Updates (Low Priority)
 
 **Timeline**: 30 minutes
 
@@ -433,16 +375,6 @@ find afi-infra/afi-codex -name "*.afi-codex.json" -type f -exec sed -i '' 's/"cr
 
 **Risk Level**: LOW
 **Impact**: None - These are metadata/documentation changes only
-
----
-
-### Medium Risk Changes
-
-- afi-labs/scarlett directory changes
-
-**Risk Level**: MEDIUM
-**Impact**: Depends on scarlett's role in the system
-**Mitigation**: Thorough review and testing before changes
 
 ---
 
@@ -493,17 +425,13 @@ If issues arise after changes:
 
 ### Short-Term Actions (This Week)
 
-1. 🔄 **Review afi-labs/scarlett** - Determine scarlett's role and future
-2. 🔄 **Make decision** - Decide on rename, replace, or keep
-3. 🔄 **Execute Phase 3** - Implement scarlett decision
-4. 🔄 **Update documentation** - Execute Phase 4
+1. 🔄 **Update documentation** - Execute Phase 3
 
 ### Long-Term Actions (Next Sprint)
 
 1. 📋 **Establish guidelines** - Create guidelines for external references
 2. 📋 **Add CI checks** - Add CI checks to prevent future external references
-3. 📋 **Document decisions** - Document scarlett decision and rationale
-4. 📋 **Review other references** - Check for other external references
+3. 📋 **Review other references** - Check for other external references
 
 ---
 
@@ -529,15 +457,6 @@ If issues arise after changes:
 
 ### Phase 3 Success Criteria
 
-- [ ] afi-labs/scarlett reviewed and documented
-- [ ] Decision made on scarlett's future
-- [ ] Implementation completed (rename, replace, or keep)
-- [ ] Documentation updated
-- [ ] Build process succeeds
-- [ ] All tests pass
-
-### Phase 4 Success Criteria
-
 - [ ] Documentation examples updated
 - [ ] No external references in documentation
 - [ ] Documentation is accurate
@@ -552,27 +471,21 @@ If issues arise after changes:
 |-------|-------|----------------|------------|
 | Phase 1 | 15 | 1-2 hours | LOW |
 | Phase 2 | 7 | 1-2 hours | LOW |
-| Phase 3 | 160+ | 2-4 hours (review) + TBD | MEDIUM |
-| Phase 4 | 1 | 30 minutes | LOW |
-| **Total** | **183+** | **4-8+ hours** | **LOW-MEDIUM** |
+| Phase 3 | 1 | 30 minutes | LOW |
+| **Total** | **23** | **2.5-4.5 hours** | **LOW** |
 
 ### Key Decisions Needed
 
-1. **Scarlett's Role**: Is scarlett internal or external?
-2. **Scarlett's Future**: Rename, replace, or keep?
-3. **Replacement Value**: If replacing, what's the alternative?
-4. **Timeline**: When should changes be completed?
+1. **Timeline**: When should changes be completed?
 
 ### Next Steps
 
 1. Review this eradication report with the AFI team
 2. Approve the eradication plan
 3. Execute Phase 1 and Phase 2 (low-risk changes)
-4. Review afi-labs/scarlett and make decision
-5. Execute Phase 3 based on decision
-6. Execute Phase 4 (documentation updates)
-7. Validate all changes
-8. Update documentation and guidelines
+4. Execute Phase 3 (documentation updates)
+5. Validate all changes
+6. Update documentation and guidelines
 
 ---
 
@@ -603,7 +516,7 @@ afi-infra/afi-codex/validator_metadata_schema.afi-codex.json
 afi-infra/.afi-codex.json
 ```
 
-### Scarlet References (175 files)
+### Scarlet References (8 files)
 
 ```
 afi-reactor/AGENTS.md
@@ -614,7 +527,6 @@ afi-core/AGENTS.md
 afi-artifacts/AGENTS.md
 afi-docs/cli_help.md
 _archived/DROID_OPTIMIZATION_SUMMARY.md
-afi-labs/scarlett/ (160+ files)
 ```
 
 ---
