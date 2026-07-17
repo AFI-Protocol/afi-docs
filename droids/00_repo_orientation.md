@@ -27,7 +27,7 @@ Official documentation for AFI Protocol including protocol specs, developer guid
 **This repo does NOT handle**:
 - ❌ Application code (that's afi-core, afi-reactor)
 - ❌ Infrastructure (that's afi-infra)
-- ❌ Deployment (that's afi-ops)
+- ❌ Deployment (that's afi-infra)
 
 ---
 

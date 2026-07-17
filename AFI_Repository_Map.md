@@ -148,8 +148,6 @@ afi-config (all repos)
 4. **Benchkit to Tiny Brains**: afi-benchkit tests models from afi-tiny-brains
 5. **Config to All**: afi-config provides configuration to all repositories
 
-> Note: the deprecated Python CLI utilities repo was removed (2026-06-19) and its bash lib was rehomed to `afi-ops/scripts/lib/afi-shared.sh`.
-
 ## Development Workflow
 
 1. **Core Development**: Start with afi-core for protocol changes

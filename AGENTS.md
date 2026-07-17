@@ -12,7 +12,7 @@ Documentation, contributor guides, specifications, and lore for AFI Protocol. Pr
 
 **What this repo is NOT for:**  
 - Code implementation (use afi-core, afi-reactor, etc.)
-- Deployment scripts (use afi-ops)
+- Deployment scripts (use afi-infra)
 - Infrastructure (use afi-infra)
 
 ---
