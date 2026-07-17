@@ -1,22 +1,41 @@
 # AFI Protocol — Architecture Status
 
-**Last updated:** 2026-06-03  
+**Last updated:** 2026-07-17  
 **Purpose:** Single source of truth for how AFI orchestration is implemented today.
 
 ---
 
 ## Orchestration model
 
-**AFI Reactor** (`afi-reactor`) is a **custom, deterministic TypeScript DAG orchestrator**.
+**AFI Reactor** (`afi-reactor`) is a **manifest-driven, analyst-configurable graph executor**
+(accepted decision: afi-governance `decisions/factory-configurable-pipelines-v1.md`).
 
-- Signals flow through configured **pipeheads** (required and enrichment nodes).
-- Execution uses explicit **pipeline state** (`PipelineState`), dependency ordering, and typed node contracts (`Pipehead`).
-- **Codex** configuration and replay support auditability and reproducibility.
+- Pipelines are **registered, never hardcoded**: at boot the runtime validates the
+  governed registries in `afi-config` (`registries/analysis-plugins`,
+  `registries/pipelines`, `registries/analyst-strategies`,
+  `registries/provider-bindings`) and refuses to start on any invalid active
+  entry — honest failure, no demo/mock/fallback path.
+- A pipeline graph is an **`afi.pipeline.v1` manifest** (governed contract home:
+  `afi-config/schemas/pipeline/v1/`) composing **registered strategy nodes**
+  across the five canonical analysis categories — `technical`, `pattern`,
+  `sentiment`, `news`, `aiMl` — with explicit dependencies, deterministic joins,
+  bounded declarative conditionals, and **exactly one scorer terminal** (the sole
+  `VALIDATED → SCORED` transition).
+- **Authoring lives in `afi-factory`**: pipeline/template authoring, template
+  instantiation, manifest validation, and canonical (timestamp-free) hashing.
+  Nothing the Factory emits is canonical until validated against the delegated
+  `afi-config` contracts.
+- **Evidence**: the Reactor constructs `afi.scored-signal-evidence.v2` records
+  carrying a thin `afi.composition-ref.v1` composition reference (pipeline
+  identity, analyst-config hash, scorer and plugin-set references, hash-addressed
+  execution summaries); `afi-infra` validates and persists them at the sole
+  canonical persistence interface.
 
 Implementation lives under:
 
-- `afi-reactor/src/dag/` — `DAGBuilder`, `DAGExecutor`, `PluginRegistry`, core nodes, plugins
-- `afi-reactor/src/types/pipeline.ts`, `afi-reactor/src/types/dag.ts` — pipeline types
+- `afi-reactor/src/pipeline/` — graph executor, plugin registry, registry loader,
+  the five category nodes and scorer terminal, canonical hashing, execution summaries
+- `afi-reactor/src/config/runtimeComposition.ts` — the boot-validated composition root
 
 ---
 
@@ -24,9 +43,11 @@ Implementation lives under:
 
 | Concern | Repo / path |
 |---------|-------------|
-| DAG orchestration | `afi-reactor/src/dag/` |
+| Graph orchestration | `afi-reactor/src/pipeline/` |
+| Pipeline authoring (templates, validation, hashing) | `afi-factory` |
 | Validators, scoring, decay | `afi-core` |
-| Schemas (USS, pipeline, analyst config) | `afi-config/schemas/` |
+| Schemas & registries (USS, `afi.pipeline.v1` family, evidence v2) | `afi-config/schemas/`, `afi-config/registries/` |
+| Canonical evidence store | `afi-infra` |
 | On-chain mint | `afi-token` |
 | Off-chain mint coordination | `afi-mint` |
 | Validator benchmarks | `afi-benchkit` |
@@ -43,9 +64,9 @@ Implementation lives under:
 
 | Term | Meaning |
 |------|---------|
-| AFI Reactor pipeline / DAG | The deterministic execution graph built and run in `afi-reactor/src/dag/` |
-| Pipehead | A typed node contract (`afi-reactor/src/pipeheads/`) |
-| PipelineState | Explicit execution state threaded through the DAG (`afi-reactor/src/types/dag.ts`) |
-| `DAGBuilder` / `DAGExecutor` / `PluginRegistry` | DAG construction, deterministic execution, and plugin resolution (`afi-reactor/src/dag/`) |
-| Core nodes / plugin nodes | The two node categories composing a pipeline (`src/dag/nodes`, `src/dag/plugins`) |
-| Codex | Configuration and replay support for auditability and reproducibility |
+| AFI Reactor pipeline | A registered `afi.pipeline.v1` manifest executed by the Reactor's graph executor (`afi-reactor/src/pipeline/`) |
+| Registered strategy | An analyst-strategy registry entry binding a pipeline, scorer, UWR profile, and decay configuration (`afi-config/registries/analyst-strategies/`) |
+| Analysis category | One of the five canonical categories: `technical`, `pattern`, `sentiment`, `news`, `aiMl` |
+| Scorer terminal | The exactly-one scoring node terminating a valid pipeline; performs the sole `VALIDATED → SCORED` transition |
+| Composition reference | The thin `afi.composition-ref.v1` object carried on `afi.scored-signal-evidence.v2`, binding evidence to the executed composition by canonical hashes |
+| Pipehead | A District-1 / District-2 M2 fenced reference surface (`afi-reactor/src/pipeheads/`) — non-production, not wired into the live executor |

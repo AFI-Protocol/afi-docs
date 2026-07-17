@@ -1,6 +1,6 @@
 # AFI Agentic Legos Architecture Analysis
 
-> ⚠️ Historical snapshot. The legacy Froggy demo chain (Alpha Scout → Pixel Rick → Val Dook → Execution Sim) was removed; the reactor is scored-only. Canonical pipeline: afi-reactor/src/config/froggyPipeline.ts.
+> ⚠️ Historical snapshot. The legacy Froggy demo chain (Alpha Scout → Pixel Rick → Val Dook → Execution Sim) was removed; the reactor is scored-only, executing analyst-configurable `afi.pipeline.v1` manifests from the governed afi-config registries (see `ARCHITECTURE_STATUS.md`; decision: afi-governance `decisions/factory-configurable-pipelines-v1.md`).
 
 ## Executive Summary
 
