@@ -269,7 +269,7 @@ Clean and in sync. No action needed.
 **afi-ops:** On `migration/multi-repo-reorg` (up to date with remote)
 **afi-factory:** On `migration/multi-repo-reorg` (no remote tracking shown)
 
-**Remaining 16 repos:** Not analyzed in detail (appear to be supporting repos: artifacts, assets, benchkit, docs, governance, infra, labs, protocol, research-site, sdk-python, sdk-ts, starters)
+**Remaining 16 repos:** Not analyzed in detail (appear to be supporting repos: artifacts, assets, benchkit, docs, governance, infra, protocol, research-site, sdk-python, sdk-ts, starters)
 
 ---
 
