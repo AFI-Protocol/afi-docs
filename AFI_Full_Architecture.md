@@ -114,6 +114,7 @@ AFI is organized by responsibility, not by repository alone. The planes below de
 - **uwr-profile-pin-v0.1** and **uwr-runtime-consumption-v0.1** — the pinned (testnet-provisional) UWR profile and the rules for consuming it at runtime.
 - **math-authority-v0.1** and **mint-formula-bt-86b-alignment-v0.1** — math ownership and the v1 mint-formula interpretation (epoch budget `E_t = B(t) · AIM_t`, with `AIM_t = 1` for v1).
 - **authority-districts-v0.1** and **district-2-m2-ratification-v0.1** — the two-District topology and the prospective ratification of District 2's runtime surface.
+- **district-surface-consolidation-v0.1** — the clean-cut District surface record (DSC-GOV): one live `GraphExecutor` as the sole signal-evaluation executor, the District-1 implementation record pointing at the live pipeline, the District-2 provenance law homed in `afi-reactor/src/evidence/provenance/`, exactly one provider framework (`afi-reactor/src/providers/`), and the five-category terminology rule.
 
 The lifecycle state machine is governed as `INGESTED → VALIDATED → SCORED → CERTIFIED → QUALIFIED → CHALLENGE_OPEN → [CONTESTED →] FINALIZED → EPOCH_ELIGIBLE`. **The implemented lifecycle currently reaches `SCORED`.**
 
@@ -288,10 +289,10 @@ flowchart LR
 
 ## Districts
 
-Exactly **two** Districts are formally registered (`authority-districts-v0.1`, Part D); **both are non-production**. No other District is created or implied.
+Exactly **two** Districts are formally registered (`authority-districts-v0.1`, Part D, with the District-1 implementation record and the District-2 location record amended by `district-surface-consolidation-v0.1`, DSC-GOV); **both are non-production**. No other District is created or implied.
 
-- **District 1 — Signal-Evaluation Pipehead (Reference).** A pipehead proof-of-concept in `afi-reactor/src/pipeheads/`. The pipehead execution system (scoring, normalize, and schema-validation heads plus a harness and demo CLI) is a fenced, offline reference implementation, self-labeled "not the canonical AFI pipeline", and **unwired from the live scoring runtime**. (The provenance type definitions and the canonical-hash module that physically live under this directory are imported by the live evidence-construction path — so the directory is not entirely isolated even though its demo execution flow is unwired.)
-- **District 2 — Canonical Data & Provenance Boundary.** Its M1 schema family is implemented in `afi-config/schemas/provenance/v1` with validation tests, authorized for **M1 only** ("no runtime wiring") by the D-17 instrument homed in afi-docs. Its M2 artifact surface in afi-reactor is **prospectively ratified** (bounded, non-production) by `district-2-m2-ratification-v0.1`.
+- **District 1 — Signal Evaluation.** Its governed scope is the bounded, staged evaluation discipline of the Pipehead Addendum (§12): one node → one validated category result → exactly one result per category at the merge → one scorer seam. Its current implementation is the live manifest-driven `GraphExecutor` pipeline in `afi-reactor/src/pipeline/` — the sole signal-evaluation executor (DSC-GOV D-DSC-1/D-DSC-2). Git history preserves the earlier proof-of-concept implementation record.
+- **District 2 — Canonical Data & Provenance Boundary.** Its M1 schema family is implemented in `afi-config/schemas/provenance/v1` with validation tests, authorized for **M1 only** ("no runtime wiring") by the D-17 instrument homed in afi-docs. Its live provenance law — CanonicalHash v1 (`afi.hash.v1`), the ScoredSignal v1 projection builders, and the D2 schema validators — is implemented in `afi-reactor/src/evidence/provenance/` and runs as a required step of every scoring run; the prospective, bounded, non-production ratification of `district-2-m2-ratification-v0.1` is recorded at that location by DSC-GOV D-DSC-3 (no canonical-object declaration is made).
 
 ---
 

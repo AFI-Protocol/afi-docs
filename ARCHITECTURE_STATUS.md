@@ -69,4 +69,4 @@ Implementation lives under:
 | Analysis category | One of the five canonical categories: `technical`, `pattern`, `sentiment`, `news`, `aiMl` |
 | Scorer terminal | The exactly-one scoring node terminating a valid pipeline; performs the sole `VALIDATED → SCORED` transition |
 | Composition reference | The thin `afi.composition-ref.v1` object carried on `afi.scored-signal-evidence.v2`, binding evidence to the executed composition by canonical hashes |
-| Pipehead | A District-1 / District-2 M2 fenced reference surface (`afi-reactor/src/pipeheads/`) — non-production, not wired into the live executor |
+| Pipehead | The bounded stage discipline of the Pipehead Addendum (one node → one validated category result → merge → one scorer seam), implemented today by the live pipeline nodes. The former District-1 pipehead POC implementation was retired by DSC-GOV (`afi-governance/decisions/district-surface-consolidation-v0.1.md`); its useful invariants were transferred to the current runtime, and git history preserves the former implementation. The live District-2 provenance law lives in `afi-reactor/src/evidence/provenance/` |
