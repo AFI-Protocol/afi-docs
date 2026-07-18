@@ -17,6 +17,7 @@
 * [Tokenomics](specs/tokenomics.md)
 * [Governance](specs/governance.md)
 * [Research Institute Reference Services v0.1](specs/AFI_RESEARCH_INSTITUTE_REFERENCE_SERVICES.v0.1.md)
+* [Provider Adapter and BYOK Foundations v0.1](specs/AFI_PROVIDER_BYOK_FOUNDATIONS.v0.1.md)
 
 ## 🧬 Lore Series
 * [Episode I – Ghost of DAO](lore/episode-1_ghost_of_dao.md)
