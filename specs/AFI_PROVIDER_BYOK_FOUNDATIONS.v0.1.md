@@ -1,6 +1,6 @@
 # AFI Provider Adapter and BYOK Foundations v0.1
 
-**Status:** Current specification of the implemented provider-neutral adapter socket and secure bring-your-own-key (BYOK) credential boundary. Governed by `afi-governance/decisions/provider-byok-foundations-v0.1.md` (PBF-GOV). Documents the Wave-1 foundation delivered across `afi-config`, `afi-factory`, and `afi-reactor` on the existing configurable executor and Evidence V2.
+**Status:** v0.1 foundation record of the provider-neutral adapter socket and secure bring-your-own-key (BYOK) credential boundary. Governed by `afi-governance/decisions/provider-byok-foundations-v0.1.md` (PBF-GOV). Documents the Wave-1 foundation delivered across `afi-config`, `afi-factory`, and `afi-reactor` on the existing configurable executor and Evidence V2. The activation of this foundation as the sole live enrichment-execution seam for all five categories is recorded by `afi-governance/decisions/five-lane-provider-runtime-v0.1.md` (FLPR-GOV) and reflected in `AFI_Full_Architecture.md`; this record intentionally describes the v0.1 foundation itself.
 
 This foundation establishes the provider **socket** and the credential **boundary**. It does not complete all commercial provider integrations, and it deploys nothing.
 

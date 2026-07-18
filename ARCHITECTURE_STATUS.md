@@ -13,7 +13,9 @@
 - Pipelines are **registered, never hardcoded**: at boot the runtime validates the
   governed registries in `afi-config` (`registries/analysis-plugins`,
   `registries/pipelines`, `registries/analyst-strategies`,
-  `registries/provider-bindings`) and refuses to start on any invalid active
+  `registries/provider-bindings`, and the FLPR-GOV enrichment-provider
+  registries `registries/providers`, `registries/provider-instances`,
+  `registries/credential-refs`) and refuses to start on any invalid active
   entry — honest failure, no demo/mock/fallback path.
 - A pipeline graph is an **`afi.pipeline.v1` manifest** (governed contract home:
   `afi-config/schemas/pipeline/v1/`) composing **registered strategy nodes**
@@ -34,7 +36,12 @@
 Implementation lives under:
 
 - `afi-reactor/src/pipeline/` — graph executor, plugin registry, registry loader,
-  the five category nodes and scorer terminal, canonical hashing, execution summaries
+  the five provider-backed lane bindings, the five-category join and scorer
+  terminal, canonical hashing, execution summaries
+- `afi-reactor/src/providers/` — the sole enrichment-execution seam (FLPR-GOV):
+  the static adapter registry, provider/instance/credential-ref resolution, the
+  least-privilege SecretResolver, canonical category-output validation, and the
+  trusted service clients
 - `afi-reactor/src/config/runtimeComposition.ts` — the boot-validated composition root
 
 ---
