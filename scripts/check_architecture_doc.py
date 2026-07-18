@@ -48,6 +48,23 @@ BANNED_VOCAB = [
 # Stale organization counts that must not appear.
 STALE_COUNTS = [r"\b19 repositor", r"\b20 repositor", r"\b21 repositor", r"\b22 repositor"]
 
+# District/Atlas anchors required by D1CAP-GOV D-D1CAP-8 item 3
+# (afi-governance decisions/district-one-signal-evaluation-capability-v0.1.md):
+# both Districts must be present by name, and the API-Atlas honesty pair must
+# hold. Matched as literal substrings against the raw document text.
+REQUIRED_PHRASES = [
+    "District 1 — Signal Evaluation",
+    "District 2 — Canonical Data",
+    "API Atlas",
+    "not started",
+]
+
+# Paths that must never reappear in the current-state map (D1CAP-GOV
+# D-D1CAP-8 item 3: District 1 must not be mapped to the removed POC tree).
+BANNED_PATHS = [
+    "src/pipeheads",
+]
+
 
 def main() -> int:
     here = os.path.dirname(os.path.abspath(__file__))
@@ -81,6 +98,15 @@ def main() -> int:
         if repo not in text:
             failures.append(f"current repository missing from document: {repo!r}")
 
+    for phrase in REQUIRED_PHRASES:
+        if phrase not in text:
+            failures.append(f"required District/Atlas anchor missing: {phrase!r}")
+
+    for banned_path in BANNED_PATHS:
+        for m in re.finditer(re.escape(banned_path), low):
+            line = low.count("\n", 0, m.start()) + 1
+            failures.append(f"banned path named: {banned_path!r} (line {line})")
+
     print()
     if failures:
         print(f"RESULT: FAIL ({len(failures)} problem(s) in {DOC})")
@@ -91,7 +117,8 @@ def main() -> int:
               "counts, and no historical-transition vocabulary.")
         return 1
     print(f"RESULT: PASS ({DOC}: 18 current repositories present; "
-          f"0 removed repositories; 0 stale counts; 0 historical vocabulary)")
+          f"0 removed repositories; 0 stale counts; 0 historical vocabulary; "
+          f"District/Atlas anchors present; 0 banned paths)")
     return 0
 
 
