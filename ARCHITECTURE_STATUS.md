@@ -1,7 +1,7 @@
 # AFI Protocol — Architecture Status
 
-**Last updated:** 2026-07-17  
-**Purpose:** Single source of truth for how AFI orchestration is implemented today.
+**Last updated:** 2026-07-18  
+**Purpose:** Orchestration-focused status snapshot of how AFI scoring is implemented today. The organization-wide current-state map is [AFI_Full_Architecture.md](AFI_Full_Architecture.md).
 
 ---
 
@@ -69,4 +69,6 @@ Implementation lives under:
 | Analysis category | One of the five canonical categories: `technical`, `pattern`, `sentiment`, `news`, `aiMl` |
 | Scorer terminal | The exactly-one scoring node terminating a valid pipeline; performs the sole `VALIDATED → SCORED` transition |
 | Composition reference | The thin `afi.composition-ref.v1` object carried on `afi.scored-signal-evidence.v2`, binding evidence to the executed composition by canonical hashes |
-| Pipehead | The bounded stage discipline of the Pipehead Addendum (one node → one validated category result → merge → one scorer seam), implemented today by the live pipeline nodes. The former District-1 pipehead POC implementation was retired by DSC-GOV (`afi-governance/decisions/district-surface-consolidation-v0.1.md`); its useful invariants were transferred to the current runtime, and git history preserves the former implementation. The live District-2 provenance law lives in `afi-reactor/src/evidence/provenance/` |
+| District 1 — Signal Evaluation | The **active** Signal Evaluation capability and authority domain (`district-one-signal-evaluation-capability-v0.1`, D1CAP-GOV): canonical input → five-category enrichment → deterministic join → analyst/scorer/UWR seam → District-2 handoff. Its current implementation is the live GraphExecutor pipeline (`afi-reactor/src/pipeline/`); implementations may be replaced through accepted authority without retiring the district |
+| District 2 — Evidence & Provenance | The active canonical data & provenance boundary: receives the scored evaluation result from District 1 and owns evidence construction, validation, and the canonical persistence handoff. Live law in `afi-reactor/src/evidence/provenance/` |
+| Pipehead | The bounded stage discipline of the Pipehead Addendum (one node → one validated category result → merge → one scorer seam), implemented today by the live pipeline nodes. District 1's former non-production Pipehead POC implementation was retired and deleted by Mission A (DSC-GOV) — an implementation retirement only, not a District retirement (D1CAP-GOV); git history preserves the former implementation |
