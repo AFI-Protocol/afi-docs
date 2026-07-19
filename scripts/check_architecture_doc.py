@@ -70,6 +70,13 @@ BANNED_PATHS = [
     "src/pipeheads",
 ]
 
+# Retired terminology that must not appear as current architecture in this
+# present-tense map (Mission R0 forward-only closure). Matched case-insensitively
+# as a substring. The Pipehead POC is retired; git history is the archive.
+BANNED_TERMS = [
+    "pipehead",
+]
+
 
 def main() -> int:
     here = os.path.dirname(os.path.abspath(__file__))
@@ -111,6 +118,11 @@ def main() -> int:
         for m in re.finditer(re.escape(banned_path), low):
             line = low.count("\n", 0, m.start()) + 1
             failures.append(f"banned path named: {banned_path!r} (line {line})")
+
+    for term in BANNED_TERMS:
+        for m in re.finditer(re.escape(term), low):
+            line = low.count("\n", 0, m.start()) + 1
+            failures.append(f"retired terminology named as current: {term!r} (line {line})")
 
     print()
     if failures:
