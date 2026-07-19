@@ -233,7 +233,7 @@ A Layer-2 receipt design **conforms** to AFI Settlement v1 iff all of the follow
 - [AFI_REWARDS_VAULT_AND_CLAIMS.md](./AFI_REWARDS_VAULT_AND_CLAIMS.md) — Layer 4 (vault pays only against the manifest).
 - [AFI_ENS_SAFE_ADDRESS_REGISTRY_DOCTRINE.md](./AFI_ENS_SAFE_ADDRESS_REGISTRY_DOCTRINE.md) — concrete-address source of truth for `owner`/authority.
 - [AFI_V0_DEPRECATION_AND_MIGRATION.md](./AFI_V0_DEPRECATION_AND_MIGRATION.md) — v0 posture for `AFISignalReceipt` (ERC-1155) and `AFIMintCoordinator`.
-- ADRs: [../adrs/ADR-002](../adrs/ADR-002) (ERC-6909 vs. ERC-1155), [../adrs/ADR-001](../adrs/ADR-001) (provenance ≠ payout, agent boundary).
+- ADRs: [../adrs/ADR-002-erc6909-strategy-epoch-receipts.md](../adrs/ADR-002-erc6909-strategy-epoch-receipts.md) (ERC-6909 vs. ERC-1155), [../adrs/ADR-001-four-layer-settlement-architecture.md](../adrs/ADR-001-four-layer-settlement-architecture.md) (provenance ≠ payout, agent boundary).
 
 ---
 
