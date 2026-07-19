@@ -48,14 +48,19 @@ BANNED_VOCAB = [
 # Stale organization counts that must not appear.
 STALE_COUNTS = [r"\b19 repositor", r"\b20 repositor", r"\b21 repositor", r"\b22 repositor"]
 
-# District/Atlas anchors required by D1CAP-GOV D-D1CAP-8 item 3
-# (afi-governance decisions/district-one-signal-evaluation-capability-v0.1.md):
-# both Districts must be present by name, and the API-Atlas honesty pair must
-# hold. Matched as literal substrings against the raw document text.
+# District/Atlas anchors. Originally mandated by D1CAP-GOV D-D1CAP-8 item 3;
+# AMENDED by ATLAS-GOV D-ATLAS-9(3) (afi-governance
+# decisions/district-api-atlas-foundation-v0.1.md). The API-Atlas honesty pair is
+# re-homed: the API Atlas now has a canonical foundation (afi.protocol-atlas.v1),
+# and the literal "not started" anchor attaches to the AFI Protocol City and the
+# AFI Participant Gateway, which are genuinely not started. Both District names
+# and the src/pipeheads ban are retained unchanged. Matched as literal substrings
+# against the raw document text.
 REQUIRED_PHRASES = [
     "District 1 — Signal Evaluation",
     "District 2 — Canonical Data",
     "API Atlas",
+    "afi.protocol-atlas.v1",
     "not started",
 ]
 
