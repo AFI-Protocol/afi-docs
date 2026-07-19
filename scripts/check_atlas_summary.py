@@ -14,7 +14,7 @@ Checks (all derived FROM the registry, never hard-coded):
     (active Districts, capabilities, structures, interfaces, typed routes,
     participant roles);
   * every participant-role display name appears;
-  * the five governed enrichment categories are named exactly and 'social' is not;
+  * the five governed enrichment categories are named exactly;
   * the current operation identifier factory.official.list is named (residue
     policing of the retired operation name is left to check_stale_refs.py);
   * the registry contract id afi.protocol-atlas.v1 is referenced.

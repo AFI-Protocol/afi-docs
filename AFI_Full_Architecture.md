@@ -147,7 +147,7 @@ Analysts may configure and run conforming UWR profiles, decay surfaces, and stra
 - It implements templates (which parameterize values, never topology), plugin/component and official-composition discovery, analyst-strategy configuration, the governed composition model (plugin-subset selection, repeated same-category nodes, sequential/concurrent ordering via explicit dependencies, bounded declarative conditional branches, deterministic multi-parent joins), **canonical hashing** (`canonical-json-hashing.v1` with domain-tagged manifest/analyst-config/plugin-set hashes, KAT-pinned), and fail-closed artifact packaging.
 - It consumes byte-pinned copies of the afi-config schema closure; nothing it emits is canonical until validated against those contracts. Its suite is 207 tests.
 
-Factory is **not** the API Atlas, **not** the Gateway, **not** the Reactor runtime, **not** a District pipehead, and **not** the source of scoring law or finality. It is a library and CLI that produces artifacts; it is **not deployed** as a service.
+Factory is **not** the API Atlas, **not** the Gateway, **not** the Reactor runtime, and **not** the source of scoring law or finality. It is a library and CLI that produces artifacts; it is **not deployed** as a service.
 
 ### 4. Gateway ingress plane **(Implemented)**
 
