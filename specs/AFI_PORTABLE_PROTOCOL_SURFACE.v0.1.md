@@ -132,7 +132,7 @@ These are **starting hypotheses** for the agent team to verify and expand:
 
 | Tension | Symptom | Desired resolution |
 |---------|---------|-------------------|
-| Reactor as “the” orchestrator | `afi-reactor/docs/AFI_ORCHESTRATOR_DOCTRINE.md` §1 | Reframe: reactor is **reference orchestrator**; protocol law is conforming DAG outputs + pinned versions |
+| Reactor as “the” orchestrator | `afi-reactor` manifest-driven `GraphExecutor` runtime | Resolved: reactor is the **reference orchestrator**; protocol law is conforming scored outputs + pinned governed registries/manifests |
 | Mongo tunnel vision | TSSD spec, gateway, reactor defaults | Docs/code should say “default reference vault”; schema already allows PG/Timescale/Influx |
 | BASE = full signal ledger | User vision vs receipt-only contracts | Spec what **must** be on-chain vs hash-anchored vs off-chain only |
 | Econ splits vs on-chain settlement | `afi-econ` gauge vs single `beneficiary` mint | Classify econ as research/simulation unless wired to production |
