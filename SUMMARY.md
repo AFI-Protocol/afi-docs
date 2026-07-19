@@ -1,21 +1,14 @@
 # Summary
 
 * [Overview](README.md)
-* [FAQ](faq.md)
 
 ## 🛠️ Developer Guides
 * [Quickstart](guides/quickstart.md)
-* [Local Dev Setup](guides/dev_setup.md)
-* [Validator Onboarding](guides/validator.md)
-* [CI/CD & Factory Droids](guides/factory.md)
 
 ## 📐 Core Specs
-* [Architecture](specs/architecture.md)
+* [Architecture](AFI_Full_Architecture.md)
 * [Mentor Protocol (Agent Lifecycle)](specs/mentor_protocol.md)
 * [The Modal (Proof-of-Intelligence Arena)](specs/modal.md)
-* [Modules & Repos](specs/modules.md)
-* [Tokenomics](specs/tokenomics.md)
-* [Governance](specs/governance.md)
 * [Research Institute Reference Services v0.1](specs/AFI_RESEARCH_INSTITUTE_REFERENCE_SERVICES.v0.1.md)
 * [Provider Adapter and BYOK Foundations v0.1](specs/AFI_PROVIDER_BYOK_FOUNDATIONS.v0.1.md)
 

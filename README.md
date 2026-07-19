@@ -44,8 +44,6 @@ gitbook serve            # open http://localhost:4000
 | Institute reference services — Gateway & oracle-ingress (v0.1) | [`specs/AFI_RESEARCH_INSTITUTE_REFERENCE_SERVICES.v0.1.md`](specs/AFI_RESEARCH_INSTITUTE_REFERENCE_SERVICES.v0.1.md) |
 | Understand agent lifecycle & mentors | [`specs/mentor_protocol.md`](specs/mentor_protocol.md) |
 | Explore the Modal (PoInt testbed) | [`specs/modal.md`](specs/modal.md) |
-| Onboard as a validator | [`guides/validator.md`](guides/validator.md) |
-| Automate with Factory droids | [`guides/factory.md`](guides/factory.md) |
 | Dive into Signal-Lore | [`/lore`](lore/) |
 
 ---

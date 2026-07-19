@@ -119,8 +119,8 @@ Convenience defaults for the AFI org’s first end-to-end path—not binding on 
 | Component | Repo | Notes |
 |-----------|------|-------|
 | Ingest gateway | `afi-gateway` | Webhooks, tenant routing |
-| Orchestrator / DAG | `afi-reactor` | Froggy pipeline, `pipelineRunner.ts` |
-| Runtime agents/tools | `afi-core` | Nodes invoked by DAG |
+| Orchestrator | `afi-reactor` | manifest-driven `GraphExecutor` over the registered pipeline graph |
+| Runtime analysts/kernels | `afi-core` | Froggy analyst + UWR/decay kernels |
 | Vault adapter | `afi-infra` | Mongo-oriented examples; multi-engine in schema |
 | Mint pipeline | `afi-mint` | Off-chain FSM → on-chain `mintForSignal` |
 | Contracts | `afi-token` | Emissions, coordinator, ERC-1155 receipts |
@@ -136,7 +136,7 @@ These are **starting hypotheses** for the agent team to verify and expand:
 | Mongo tunnel vision | TSSD spec, gateway, reactor defaults | Docs/code should say “default reference vault”; schema already allows PG/Timescale/Influx |
 | BASE = full signal ledger | User vision vs receipt-only contracts | Spec what **must** be on-chain vs hash-anchored vs off-chain only |
 | Econ splits vs on-chain settlement | `afi-econ` gauge vs single `beneficiary` mint | Classify econ as research/simulation unless wired to production |
-| Stale architecture docs | `AFI_Repository_Map.md` | Mark stale sections; align to portable protocol surface |
+| Stale architecture docs | the stale standalone repository-map duplicate has been removed; `AFI_Full_Architecture.md` is the single guardrail-enforced current-state map | Keep the architecture map aligned to the portable protocol surface |
 | Analytics/warehouse plane absent from normative layer | Considered, never built | Optional, non-normative; Mongo TSSD is the reference evidence store, warehouses pluggable per operator |
 
 ---

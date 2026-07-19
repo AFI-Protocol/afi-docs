@@ -36,7 +36,8 @@ BANNED = {
     ),
     "reactor_scored_signals_v1": (
         "Reactor-owned Mongo collection behind the removed writer; superseded by the "
-        "canonical afi.scored-signal-evidence.v1 store owned by afi-infra."
+        "canonical afi.scored-signal-evidence.v2 evidence store (MongoDB "
+        "'scored_signal_evidence') owned by afi-infra."
     ),
 }
 
