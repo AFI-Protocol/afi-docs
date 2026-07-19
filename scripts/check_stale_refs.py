@@ -34,6 +34,11 @@ BANNED = {
     "canonicalNovelty": (
         "Novelty reader; removed in afi-reactor ce4c178 with no replacement."
     ),
+    "factory.templates.list": (
+        "Factory bundled-template listing operation; renamed to factory.official.list "
+        "when the official composition became manifest-authored canonical records "
+        "(afi-factory PR #10). Only factory.official.list may be named as live."
+    ),
     "reactor_scored_signals_v1": (
         "Reactor-owned Mongo collection behind the removed writer; superseded by the "
         "canonical afi.scored-signal-evidence.v3 evidence store (MongoDB "
