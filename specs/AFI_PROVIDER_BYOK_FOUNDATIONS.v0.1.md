@@ -1,6 +1,6 @@
 # AFI Provider Adapter and BYOK Foundations v0.1
 
-**Status:** v0.1 foundation record of the provider-neutral adapter socket and secure bring-your-own-key (BYOK) credential boundary. Governed by `afi-governance/decisions/provider-byok-foundations-v0.1.md` (PBF-GOV). Documents the Wave-1 foundation delivered across `afi-config`, `afi-factory`, and `afi-reactor` on the existing configurable executor and Evidence V2. The activation of this foundation as the sole live enrichment-execution seam for all five categories is recorded by `afi-governance/decisions/five-lane-provider-runtime-v0.1.md` (FLPR-GOV) and reflected in `AFI_Full_Architecture.md`; this record intentionally describes the v0.1 foundation itself.
+**Status:** v0.1 foundation record of the provider-neutral adapter socket and secure bring-your-own-key (BYOK) credential boundary. Governed by `afi-governance/decisions/provider-byok-foundations-v0.1.md` (PBF-GOV). Documents the Wave-1 foundation delivered across `afi-config`, `afi-factory`, and `afi-reactor` on the existing configurable executor and the canonical evidence contract. The activation of this foundation as the sole live enrichment-execution seam for all five categories is recorded by `afi-governance/decisions/five-lane-provider-runtime-v0.1.md` (FLPR-GOV) and reflected in `AFI_Full_Architecture.md`; this record intentionally describes the v0.1 foundation itself.
 
 This foundation establishes the provider **socket** and the credential **boundary**. It does not complete all commercial provider integrations, and it deploys nothing.
 
@@ -44,9 +44,9 @@ Every boundary fails closed. The **SecretResolver** resolves only the exact auth
 
 Secret resolution occurs only at runtime, at the adapter edge. Factory cannot resolve secrets. Adapters receive only scoped credentials. Logs, errors, traces, canonical hashes, and Evidence exclude credentials (structural closure plus a redaction boundary). Deployment-specific secret backends (for example GCP Secret Manager) are pending a later staging wave; this foundation provisions none.
 
-## 6. Evidence V2 freeze
+## 6. Evidence and invocation provenance
 
-Evidence V2 (`afi.scored-signal-evidence.v2`) is unchanged: schema, semantics, canonical Mongo record shape, store version pin, and lifecycle status are all identical. The versioned pipeline composition may commit to a non-secret ProviderInstance reference through its existing artifact hash, but no provider credential, provider-invocation object, or new collection is persisted. Detailed provider/model **invocation provenance** is deferred to a later governed evidence decision that will determine Evidence V3 after real adapters reveal the true provenance fields. Evidence V2 does not contain provider-invocation provenance.
+The canonical scored-signal evidence contract is **`afi.scored-signal-evidence.v3`** (EV3-GOV, `afi-governance/decisions/evidence-v3-provider-provenance-v0.1.md` — the governed evidence decision this foundation reserved invocation provenance to). Every V3 record carries exactly five closed, credential-safe per-lane provider invocation proofs cryptographically bound to the scored result, plus record-level `recordHash`/`replayHash` commitments. Each proof records non-secret identity facts only — Provider, ProviderInstance, adapter, and the credential binding (explicit keyless posture or an opaque CredentialRef) — with normalized invocation input/output hashes; no provider credential, raw provider payload, or secret enters evidence. The versioned pipeline composition commits to a non-secret ProviderInstance reference through its existing artifact hash. This v0.1 foundation record establishes the socket and boundary those proofs describe.
 
 ## 7. Scoring, UWR, Tiny Brains
 

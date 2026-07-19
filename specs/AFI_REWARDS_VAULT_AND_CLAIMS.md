@@ -40,7 +40,7 @@ The word "vault" is overloaded in the AFI codebase and recon. This spec is bound
 | Object | Custodies | Layer / role | Defined by | Reward authority? |
 |--------|-----------|--------------|------------|-------------------|
 | **RewardsVault** | **Reward tokens** (the per-epoch reward budget) | Layer 4 — this document | this spec | Pays **only** against committed `claimRoot`; **never mints**, **never decides** |
-| **Canonical evidence store** (`afi.scored-signal-evidence.v2`, carrying a composition reference per afi-governance `decisions/factory-configurable-pipelines-v1.md`; `VaultedSignalRecord`) | **Data** (scored-signal evidence and lifecycle records) | Layer 1 support; off-chain (MongoDB) | doctrine §7; `afi-infra/src/evidence/*`, `afi-infra/src/tssd/*` | **None.** Holds zero tokens. Unchanged by Settlement v1. |
+| **Canonical evidence store** (`afi.scored-signal-evidence.v3`, carrying a composition reference per afi-governance `decisions/factory-configurable-pipelines-v1.md` and per-lane provider invocation proofs per `decisions/evidence-v3-provider-provenance-v0.1.md`; `VaultedSignalRecord`) | **Data** (scored-signal evidence and lifecycle records) | Layer 1 support; off-chain (MongoDB) | doctrine §7; `afi-infra/src/evidence/*`, `afi-infra/src/tssd/*` | **None.** Holds zero tokens. Unchanged by Settlement v1. |
 | **xERC20 bridge lockbox** (`XERC20Lockbox`) | **Canonical AFI for bridging** (mint/burn xAFI, rate-limited) | Token posture (doctrine §10) | doctrine §10; `afi-xerc20/.../XERC20Lockbox.sol` | **None for rewards.** Bridge custody only. |
 
 **Naming MUST rules:**
