@@ -231,7 +231,7 @@ content is not automatically written on-chain and is not automatically published
 
 The Institute is an operator, researcher, publisher, and service provider — not a
 protocol authority. Governance, config, and math retain their authority; the Gateway
-remains routes-not-writes; the Reactor constructs Evidence V2 and does not become a
+remains routes-not-writes; the Reactor constructs Evidence V3 and does not become a
 general external trust gateway; `afi-infra` remains the sole canonical writer;
 `afi-factory` authors pipeline artifacts and is not the ingress operator. The Institute
 being the MIT copyright holder of record across the organization's licenses is an

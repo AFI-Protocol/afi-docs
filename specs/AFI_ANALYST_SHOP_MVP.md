@@ -42,7 +42,7 @@ flowchart TB
     ID[Provider onboarding\nproviderId + beneficiary]
     ING[Ingest\nTelegram / TV / API → USS/CPJ]
     RX[afi-reactor\nenrich → UWR score → qualify\n→ submit evidence]
-    TSSD[(afi-infra canonical store\nafi.scored-signal-evidence.v1)]
+    TSSD[(afi-infra canonical store\nafi.scored-signal-evidence.v3)]
     MINT[afi-mint → Base Sepolia]
   end
   subgraph optional["Optional — Storefront & visibility"]
@@ -79,7 +79,7 @@ flowchart TB
 | A1 | Register as provider | `providerId`, API key, beneficiary address form | No |
 | A2 | Choose ingest source | Template: TradingView webhook URL, Telegram bot token, or REST | No |
 | A3 | Send test signal | USS/CPJ validation errors surfaced clearly | No |
-| A4 | Confirm scored | Canonical scored-signal evidence record (`afi.scored-signal-evidence.v1`) persisted by afi-infra, lifecycleState=SCORED | No |
+| A4 | Confirm scored | Canonical scored-signal evidence record (`afi.scored-signal-evidence.v3`) persisted by afi-infra, lifecycleState=SCORED | No |
 | A5 | Confirm mint (testnet) | `MintCoordinated` on Base Sepolia + stage=MINTED in TSSD record | No |
 
 **Done = shop is operational.** Analyst can mint-attributed signals on testnet.
