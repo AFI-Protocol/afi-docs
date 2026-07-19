@@ -77,7 +77,7 @@ flowchart TD
 ```
 
 **Normative authority.**
-- **afi-governance** holds the accepted decisions — object identity, lifecycle, persistence, scoring pins, math authority, districts, and economic law. Seventeen decision records sit on the current default branch.
+- **afi-governance** holds the accepted decisions — object identity, lifecycle, persistence, scoring pins, math authority, districts, and economic law. Eighteen decision records sit on the current default branch (the newest is the District / API Atlas foundation, **ATLAS-GOV**).
 - **afi-config** holds the canonical schemas, registries, conventions, and known-answer tests (KATs) that a decision delegates to it.
 - **afi-math** holds canonical deterministic kernels (the 86-billion emissions schedule, decay/Greeks surfaces) with golden vectors.
 
@@ -118,6 +118,7 @@ AFI is organized by responsibility, not by repository alone. The planes below de
 - **district-one-signal-evaluation-capability-v0.1** — the District One capability record (D1CAP-GOV): District 1 is the **active Signal Evaluation capability and authority domain** (implementation-independent — a conforming future implementation may replace the current one through accepted authority without retiring the district), with its durable responsibility boundary, its exclusions, the descriptive current-implementation mapping, and the ruling that Mission A's clean cut was an implementation retirement only — the district endures.
 - **five-lane-provider-runtime-v0.1** — the Five-Lane Provider Runtime Activation record (FLPR-GOV): the PBF-GOV provider framework is the **sole live enrichment-execution seam** for all five categories; every enabled lane node carries exactly one explicit `providerInstanceRef` (fail-closed, no silent fallback, no env-var vendor selection); the sentiment/aiMl/candlestick-pattern/SEC-EDGAR adapters and the bounded additive `candlestick` block on `afi.enrichment.pattern.v1`; the byte-level scoring-invariance obligations; and the forward-only removal of every classic direct-call category path.
 - **evidence-v3-provider-provenance-v0.1** — the Evidence V3 and provider-invocation provenance record (EV3-GOV): `afi.scored-signal-evidence.v3` as the **sole current canonical scored-signal evidence contract** (the prior record shape carried forward plus exactly three required additions — `providerInvocations`, `recordHash`, `replayHash`); exactly five closed, credential-safe, deterministically ordered per-lane provider invocation proofs (`afi.provider-invocation-proof.v1`, carried, never consumed) with the nested Tiny Brains aiMl invocation proof (`afi.aiml-invocation-proof.v1`); the registered `afi.d2.*` hash-domain assignments with an explicit canonical/replay projection separation; the all-five evaluation-completeness law (every category lane fail-fast — a failed lane yields no scored evaluation and no evidence record); capture in the one live graph pass with a fail-closed sole evidence builder in District 2 that never invokes a provider; V3-only hash-verified admission at the sole canonical writer; and the forward-only replacement of the prior evidence surfaces.
+- **district-api-atlas-foundation-v0.1** — the District / API Atlas foundation record (ATLAS-GOV): designates AFI's **canonical discoverability and relationship layer** (`afi.protocol-atlas.v1`, delegated to afi-config) over Districts, structures, capabilities, interfaces, typed routes, contracts, repositories, participant roles, and onboarding descriptors; separates maturity from visibility; forbids invented APIs and secret-capable fields; and establishes that the Atlas **describes** protocol truth and does not replace runtime, schema, contract, or governance authority (it fills the reserved ATLAS-GOV slot). It creates no District, changes no District scope, and builds no endpoint or Protocol City surface.
 
 The lifecycle state machine is governed as `INGESTED → VALIDATED → SCORED → CERTIFIED → QUALIFIED → CHALLENGE_OPEN → [CONTESTED →] FINALIZED → EPOCH_ELIGIBLE`. **The implemented lifecycle currently reaches `SCORED`.**
 
@@ -224,7 +225,7 @@ The economic plane separates governed design from implementation from deployment
 - **`.github`** is the concise public organization front door (profile), routing readers to the map and the docs; it holds no authority.
 - **afi-protocol** is the flagship "start here" repository map — deliberately thin, no authority of its own.
 - **afi-docs** is the detailed documentation hub (this document). Documentation explains authority; it does not replace it.
-- A future external read/API surface — the **API Atlas** — is **reserved for governance and not started**. No `atlas` decision exists, and Factory's capability catalog is authoring metadata, not the Atlas.
+- The **API Atlas** now has a **canonical foundation** (`afi.protocol-atlas.v1`, ATLAS-GOV): a machine-readable discoverability and relationship registry in afi-config, described in "District / API Atlas foundation" below. The foundation **describes** current capabilities, interfaces, routes, contracts, and maturity; it is not a runtime read/API surface and exposes no endpoint. Factory's capability catalog remains authoring metadata, not the Atlas.
 
 ---
 
@@ -284,7 +285,8 @@ flowchart LR
 - **Epoch accounting, incentive allocation, reward claims, and claim-root production** — no implemented owner.
 - **Live token minting** tied to the settlement design — governance-blocked on ungoverned role weights.
 - **Base mainnet settlement** — not yet governed.
-- **The API Atlas** — reserved, not started.
+- **A read/replay/verify API surface over the Atlas or evidence** — reserved to ATLAS-GOV and not built. The Atlas foundation is discoverability metadata, not a runtime endpoint.
+- **The AFI Protocol City** (the visual navigation projection of Atlas truth) and the **AFI Participant Gateway** (a registration/conformance control plane) — **not started**; the Atlas foundation is the groundwork they will later build on.
 - **The Institute Gateway hosted reference deployment** — designated for operation by AFI Research Institute (INST-GOV), not deployed.
 - **The Institute oracle-ingress reference service** and any public or partner CPJ API — designated as the authenticated external trust boundary in front of the internal Reactor CPJ route, not implemented or deployed. Reference source collectors beyond an in-repo, undeployed Telegram client are not implemented.
 - **A production or staging deployment** — the runtime is implemented and CI-proven against real infrastructure, but no deployment target (container, cloud, or Kubernetes manifest) exists in the runtime repositories, and there is no GCP staging or production deployment.
@@ -310,7 +312,47 @@ Exactly **two** Districts are formally registered (`authority-districts-v0.1`, P
 
 All five categories execute live through the provider runtime: the registered `froggy-trend-pullback v1.3.0` manifest binds an explicit `providerInstanceRef` on every lane node (the committed all-five keyless/self-hosted reference profile) and declares every category lane fail-fast — a scored evaluation requires all five lanes to succeed, and a failed lane yields no scored evaluation, no scored signal, and no evidence record (EV3-GOV D-EV3-5). Provider selection is a registry/record change under FLPR-GOV D-FLPR-4 — never category-node code, never an environment switch, never a silent fallback.
 
-**District map authority.** No canonical API Atlas exists and none is started (ATLAS-GOV reserved). District authority and the accepted decision chain — the Part D prose registry as amended — remain the current District map; a future Atlas will describe real District capabilities and interfaces, not define or execute them. No machine-readable District registry exists; creating one belongs to ATLAS-GOV.
+**District map authority.** The canonical **District / API Atlas** now has a machine-readable foundation (`afi.protocol-atlas.v1`, ATLAS-GOV; see "District / API Atlas foundation" below). Governance remains the authority: accepted decisions define District boundaries and the Atlas **describes** them; it defines no District and executes nothing. The Atlas records District One and District Two exactly as this chain establishes them, and the human-readable summary below is mechanically drift-checked against the registry.
+
+---
+
+## District / API Atlas foundation
+
+The **District / API Atlas** is AFI's canonical **discoverability and relationship layer**: a machine-readable record of what the protocol *is* — its capability/authority domains (Districts), the concrete systems that implement them (structures), the governed I/O boundaries (interfaces), the typed movement between them (routes), the contracts that govern them, the repositories that implement them, and the participant roles that use or supply them. It is authorized by **`district-api-atlas-foundation-v0.1`** (ATLAS-GOV) and its canonical machine-readable form is **`afi.protocol-atlas.v1`**, delegated to afi-config:
+
+- **Schema:** `afi-config/schemas/atlas/v1/afi-protocol-atlas.schema.json`
+- **Registry:** `afi-config/registries/afi-protocol-atlas.v1.json`
+- A byte-pinned copy is vendored here at `atlas/afi-protocol-atlas.v1.json`; `scripts/check_atlas_summary.py` mechanically drift-checks this document against it.
+
+**The Atlas describes; it does not decide or execute.** It replaces no runtime, schema, contract, or governance authority (ATLAS-GOV D-ATLAS-1). Where the Atlas and a higher authority disagree, the higher authority wins and the Atlas is the surface to correct. It runs no graph, calls no provider, scores nothing, builds no evidence, routes no live traffic, resolves no secret, activates no participant, and transfers no value.
+
+The registry records **2 active Districts** (plus **1 reserved** capability-domain), **6 capabilities**, **13 structures**, **16 interfaces**, **9 typed routes**, **21 referenced contracts**, **18 repositories**, and **7 participant roles** with onboarding descriptors.
+
+### Districts (from the registry)
+
+| districtId | Name | Maturity | Owned capabilities | Serving structures |
+|---|---|---|---|---|
+| `district-one` | **Signal Evaluation** | operational | signal ingest & normalization, five-category enrichment, deterministic scoring/UWR, pipeline composition authoring | Reactor runtime, afi-core, afi-math, Factory, Gateway, Tiny Brains, afi-config |
+| `district-two` | **Evidence and Provenance** *(registry long-form: Canonical Data & Provenance Boundary)* | operational | Evidence V3 construction, canonical evidence persistence | Reactor runtime (evidence law), afi-infra store, afi-config |
+| `chain-settlement` | Settlement, Rewards, Reputation & On-Chain Value | **reserved** *(active: false)* | — (none; **CHAIN-GOV** reserved) | afi-token, afi-mint, afi-math (emissions) |
+
+District Two **spans three repositories** (afi-reactor for Evidence V3 construction, afi-infra for persistence, afi-config for the contract) — a District is a capability/authority domain, never a repository. The reserved `chain-settlement` domain is **not** an active or numbered District: it records, exactly as `authority-districts-v0.1` Part D.2 already does, the uncreated future settlement/rewards/on-chain candidate, which requires its own CHAIN-GOV decision before it becomes a District.
+
+### Structures, interfaces, routes, and maturity
+
+Structures are concrete systems — a runtime, a shared library, a math kernel, an authoring system, a gateway, a service, a registry, a persistence store, the governance ledger, an on-chain token — and a structure is **not automatically a District**: the Reactor runtime serves both District One (execution) and District Two (Evidence V3 construction); the Gateway serves District One by **routing** its signal-submission boundary (`POST /api/v1/signals`) **without owning** that capability. The Atlas records `exposingStructure` and `routingStructure` separately from the owning capability/District (ATLAS-GOV D-ATLAS-4).
+
+The Atlas keeps **maturity** (`operational` / `partial` / `underConstruction` / `planned` / `reserved`) **separate from visibility** (`public` / `restricted` / `internal`): an entity is `operational` only with cited implementation + test evidence, and the org-wide posture stays non-production regardless. A non-`operational` interface carries **no** address or operation identifier (no invented APIs, D-ATLAS-7). Routes are typed by flow — `data`, `control`, `identityTrust`, `evidence`, `buildArtifact`, `value` — and never imply a network hop for an in-process handoff (the District One → District Two evidence handoff is an in-process typed submit, not a network route). Interfaces span HTTP APIs, governed schema boundaries, the persistence admission boundary, the Factory SDK/CLI/MCP operation surface (including the current operation `factory.official.list`), and the self-hosted Tiny Brains endpoints — the API Atlas is not an HTTP-endpoint inventory. Contracts are **referenced, never duplicated**: the Atlas points at `afi.scored-signal-evidence.v3`, `afi.usignal.v1.1`, the five `afi.enrichment.{technical,pattern,sentiment,news,aiMl}.v1` category contracts, and the rest, without copying their schema content.
+
+### Participant roles and onboarding
+
+The Atlas is **onboarding-ready without implementing onboarding** (D-ATLAS-10): it describes roles, the contracts they use, and honest onboarding maturity, but performs no onboarding, identity verification, credential issuance, or activation, and holds no secret. The current participant roles are: **Signal provider**, **Analyst / scorer**, **Data / enrichment provider**, **Validator**, **Operator**, **Builder / developer**, and **Application integrator**. Validator role authority is honestly **reserved** (role weights are unfiled, CHAIN-GOV); a self-serve onboarding control plane does not yet exist, so onboarding descriptors are `planned`/`underConstruction`. "Investor" is **not** a protocol-conformance role — it appears only as a non-conformance audience descriptor.
+
+**AFI-operated onboarding is a reference entrance, not the only entrance** (D-ATLAS-11): third parties may build competing conformant onboarding, education, developer, validator, provider, analyst, or operator experiences against AFI's canonical conformance requirements, and compete on experience and services — but may not redefine or bypass the canonical conformance and activation requirements set by governance and the governed contracts.
+
+### Atlas vs. runtime vs. Protocol City
+
+The Atlas is not the runtime (it describes the runtime, and the runtime authority is the code + governed contracts) and not the Protocol City. The future **AFI Protocol City** is a visualization/navigation projection of Atlas truth — a City landmark has exactly the authority its underlying Atlas entity has, and the visual metaphor creates no architectural authority (D-ATLAS-13). Mission Atlas-0 builds only this foundation: the **AFI Protocol City** and the **AFI Participant Gateway** control plane are **not started**.
 
 ---
 
