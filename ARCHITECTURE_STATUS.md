@@ -1,6 +1,6 @@
 # AFI Protocol — Architecture Status
 
-**Last updated:** 2026-07-18  
+**Last updated:** 2026-07-19  
 **Purpose:** Orchestration-focused status snapshot of how AFI scoring is implemented today. The organization-wide current-state map is [AFI_Full_Architecture.md](AFI_Full_Architecture.md).
 
 ---
@@ -27,11 +27,20 @@
   instantiation, manifest validation, and canonical (timestamp-free) hashing.
   Nothing the Factory emits is canonical until validated against the delegated
   `afi-config` contracts.
-- **Evidence**: the Reactor constructs `afi.scored-signal-evidence.v2` records
-  carrying a thin `afi.composition-ref.v1` composition reference (pipeline
-  identity, analyst-config hash, scorer and plugin-set references, hash-addressed
-  execution summaries); `afi-infra` validates and persists them at the sole
-  canonical persistence interface.
+- **Evidence**: the Reactor constructs `afi.scored-signal-evidence.v3` records —
+  the sole current canonical evidence contract — carrying a thin
+  `afi.composition-ref.v1` composition reference (pipeline identity,
+  analyst-config hash, scorer and plugin-set references, hash-addressed
+  execution summaries), exactly five credential-safe per-lane provider
+  invocation proofs (`afi.provider-invocation-proof.v1`, unique by category,
+  deterministically ordered; the `aiMl` proof nests the Tiny Brains invocation
+  proof `afi.aiml-invocation-proof.v1`), and record-level
+  `recordHash`/`replayHash` commitments; `afi-infra` validates, hash-verifies,
+  and persists them at the sole canonical persistence interface.
+- **Evaluation completeness**: a scored evaluation requires all five category
+  lanes to succeed (EV3-GOV) — every lane node in the registered manifest is
+  fail-fast, and a failed lane yields no scored evaluation, no scored signal,
+  and no evidence record (bounded operational diagnostics only).
 
 Implementation lives under:
 
@@ -53,7 +62,7 @@ Implementation lives under:
 | Graph orchestration | `afi-reactor/src/pipeline/` |
 | Pipeline authoring (templates, validation, hashing) | `afi-factory` |
 | Validators, scoring, decay | `afi-core` |
-| Schemas & registries (USS, `afi.pipeline.v1` family, evidence v2) | `afi-config/schemas/`, `afi-config/registries/` |
+| Schemas & registries (USS, `afi.pipeline.v1` family, evidence v3) | `afi-config/schemas/`, `afi-config/registries/` |
 | Canonical evidence store | `afi-infra` |
 | On-chain mint | `afi-token` |
 | Off-chain mint coordination | `afi-mint` |
@@ -75,7 +84,7 @@ Implementation lives under:
 | Registered strategy | An analyst-strategy registry entry binding a pipeline, scorer, UWR profile, and decay configuration (`afi-config/registries/analyst-strategies/`) |
 | Analysis category | One of the five canonical categories: `technical`, `pattern`, `sentiment`, `news`, `aiMl` |
 | Scorer terminal | The exactly-one scoring node terminating a valid pipeline; performs the sole `VALIDATED → SCORED` transition |
-| Composition reference | The thin `afi.composition-ref.v1` object carried on `afi.scored-signal-evidence.v2`, binding evidence to the executed composition by canonical hashes |
+| Composition reference | The thin `afi.composition-ref.v1` object carried on `afi.scored-signal-evidence.v3`, binding evidence to the executed composition by canonical hashes |
 | District 1 — Signal Evaluation | The **active** Signal Evaluation capability and authority domain (`district-one-signal-evaluation-capability-v0.1`, D1CAP-GOV): canonical input → five-category enrichment → deterministic join → analyst/scorer/UWR seam → District-2 handoff. Its current implementation is the live GraphExecutor pipeline (`afi-reactor/src/pipeline/`); implementations may be replaced through accepted authority without retiring the district |
 | District 2 — Evidence & Provenance | The active canonical data & provenance boundary: receives the scored evaluation result from District 1 and owns evidence construction, validation, and the canonical persistence handoff. Live law in `afi-reactor/src/evidence/provenance/` |
 | Pipehead | The bounded stage discipline of the Pipehead Addendum (one node → one validated category result → merge → one scorer seam), implemented today by the live pipeline nodes. District 1's former non-production Pipehead POC implementation was retired and deleted by Mission A (DSC-GOV) — an implementation retirement only, not a District retirement (D1CAP-GOV); git history preserves the former implementation |
