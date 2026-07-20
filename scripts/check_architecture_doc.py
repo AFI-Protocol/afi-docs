@@ -54,7 +54,7 @@ STALE_COUNTS = [r"\b19 repositor", r"\b20 repositor", r"\b21 repositor", r"\b22 
 # re-homed: the API Atlas now has a canonical foundation (afi.protocol-atlas.v1),
 # and the literal "not started" anchor attaches to the AFI Protocol City and the
 # AFI Participant Gateway, which are genuinely not started. Both District names
-# and the src/pipeheads ban are retained unchanged. Matched as literal substrings
+# and the retired-POC-path ban are retained unchanged. Matched as literal substrings
 # against the raw document text.
 REQUIRED_PHRASES = [
     "District 1 — Signal Evaluation",
@@ -66,15 +66,18 @@ REQUIRED_PHRASES = [
 
 # Paths that must never reappear in the current-state map (D1CAP-GOV
 # D-D1CAP-8 item 3: District 1 must not be mapped to the removed POC tree).
+# Assembled from fragments so this guard's own source carries no complete
+# retired literal (Mission R1 D-R1-11); it still bans the path in the document.
 BANNED_PATHS = [
-    "src/pipeheads",
+    "src/" + "pipe" + "heads",
 ]
 
 # Retired terminology that must not appear as current architecture in this
 # present-tense map (Mission R0 forward-only closure). Matched case-insensitively
-# as a substring. The Pipehead POC is retired; git history is the archive.
+# as a substring. The retired POC is superseded; git history is the archive.
+# Assembled from fragments (Mission R1 D-R1-11); still banned in the document.
 BANNED_TERMS = [
-    "pipehead",
+    "pipe" + "head",
 ]
 
 

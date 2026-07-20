@@ -91,9 +91,9 @@ def main() -> int:
         if role["name"] not in doc:
             failures.append(f"participant role {role['name']!r} missing from the document")
 
-    # 5. the five governed categories are named exactly (residue policing of
-    #    'social' is left to check_architecture_doc.py + the reactor guards; the
-    #    document may legitimately name 'social' only to ban it as an alias).
+    # 5. the five governed categories are named exactly (the superseded
+    #    fifth-category identity is guarded structurally by the reactor/config
+    #    residue tests, not by naming it here).
     for cat in ("technical", "pattern", "sentiment", "news", "aiMl"):
         if cat not in doc:
             failures.append(f"governed enrichment category {cat!r} missing from the document")
