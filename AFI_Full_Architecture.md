@@ -120,7 +120,7 @@ AFI is organized by responsibility, not by repository alone. The planes below de
 - **evidence-v3-provider-provenance-v0.1** — the Evidence V3 and provider-invocation provenance record (EV3-GOV): `afi.scored-signal-evidence.v3` as the **sole current canonical scored-signal evidence contract** (the prior record shape carried forward plus exactly three required additions — `providerInvocations`, `recordHash`, `replayHash`); exactly five closed, credential-safe, deterministically ordered per-lane provider invocation proofs (`afi.provider-invocation-proof.v1`, carried, never consumed) with the nested Tiny Brains aiMl invocation proof (`afi.aiml-invocation-proof.v1`); the registered `afi.d2.*` hash-domain assignments with an explicit canonical/replay projection separation; the all-five evaluation-completeness law (every category lane fail-fast — a failed lane yields no scored evaluation and no evidence record); capture in the one live graph pass with a fail-closed sole evidence builder in District 2 that never invokes a provider; V3-only hash-verified admission at the sole canonical writer; and the forward-only replacement of the prior evidence surfaces.
 - **district-api-atlas-foundation-v0.1** — the District / API Atlas foundation record (ATLAS-GOV): designates AFI's **canonical discoverability and relationship layer** (`afi.protocol-atlas.v1`, delegated to afi-config) over Districts, structures, capabilities, interfaces, typed routes, contracts, repositories, participant roles, and onboarding descriptors; separates maturity from visibility; forbids invented APIs and secret-capable fields; and establishes that the Atlas **describes** protocol truth and does not replace runtime, schema, contract, or governance authority (it fills the reserved ATLAS-GOV slot). It creates no District, changes no District scope, and builds no endpoint or Protocol City surface.
 
-The lifecycle state machine is governed as `INGESTED → VALIDATED → SCORED → CERTIFIED → QUALIFIED → CHALLENGE_OPEN → [CONTESTED →] FINALIZED → EPOCH_ELIGIBLE`. **The implemented lifecycle currently reaches `SCORED`.**
+The lifecycle state machine is governed as `INGESTED → VALIDATED → SCORED → CERTIFIED → QUALIFIED → FINALIZED → EPOCH_ELIGIBLE`. **The implemented lifecycle currently reaches `SCORED`.**
 
 ### 2. Contract and registry plane **(Governed)**
 
@@ -278,8 +278,8 @@ flowchart LR
     style Z fill:#5b3a00,stroke:#3a2500,color:#ffffff
 ```
 
-- **Post-`SCORED` transitions** (`CERTIFIED`, `QUALIFIED`, challenge, `FINALIZED`) — the single finality writer is defined in law but intentionally unimplemented pending new authorization.
-- **Market-outcome observation and challenge windows** in the live path.
+- **Post-`SCORED` transitions** (`CERTIFIED`, `QUALIFIED`, `FINALIZED`) — the single finality writer is defined in law but intentionally unimplemented pending new authorization.
+- **Market-outcome observation** in the live path.
 - **Live PoInsight from finalized receipts** — the benchmark computes PoInsight from fixtures only.
 - **Participant reputation updates** in the protocol.
 - **Epoch accounting, incentive allocation, reward claims, and claim-root production** — no implemented owner.
