@@ -27,7 +27,7 @@ AFI accelerates the **back office** (ingest → score → commit). Ably accelera
 | **Ingest** | Webhook or bot posts signals into AFI | USS v1.1 or CPJ v0.1 conformant payload |
 | **Processing** | Enrichment + UWR score + qualify/reject | `afi-reactor` (reference) or any conforming orchestrator |
 | **Commitment** | Mint to beneficiary when qualified | `afi-mint` → Base Sepolia |
-| **Audit trail** | Immutable history for challenge/replay | Mongo TSSD scored signal record |
+| **Audit trail** | Immutable history for replay/verification | Mongo TSSD scored signal record |
 | ***(Optional)* Proof feed** | Subscribers see SCORED/MINTED live | Ably (or polling, Telegram mirror, etc.) |
 
 **Shop is “open” when rows 1–5 work.** Row 6 is marketing and trust, not protocol membership.
@@ -63,7 +63,7 @@ flowchart TB
 | Ingest API | `afi-gateway` webhook | **Yes** | Getting signals into protocol |
 | Orchestration | **afi-reactor** (not Ably) | **Yes** | Reliable score → mint handoff |
 | Scoring | `afi-reactor` + UWR | **Yes** | Deterministic qualify/mint path |
-| Evidence | Mongo TSSD vault | **Yes** | Replay, challenge, audit |
+| Evidence | Mongo TSSD vault | **Yes** | Replay, verification, audit |
 | Commitment | `afi-token` / `afi-mint` on Base Sepolia | **Yes** | Rewards attribution |
 | Live proof | **Ably** | No | Subscriber trust, dashboard UX |
 | Distribution | Telegram/Discord (analyst’s own) | No* | Reach (*analyst usually already has this) |

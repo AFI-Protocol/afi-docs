@@ -32,7 +32,7 @@ Building AFI required concreteness. You cannot protocol-ize in the abstract fore
 ingest (gateway/webhooks) → enrich + score (afi-reactor DAG) → persist (TSSD vault) → commit (BASE mint/receipt)
 ```
 
-That spine is valuable. The trap is **narrative drift**: when collaborators (or future-you) read the spine as the spec. Rabbit holes amplified this—vault design, enrichment APIs, emissions math, mint FSM, econ simulation, doctrine docs—each layer has gravity. Over time “AFI” started to mean “this repo layout” instead of “these rules for proposing, enriching, scoring, committing, and challenging signal intelligence.”
+That spine is valuable. The trap is **narrative drift**: when collaborators (or future-you) read the spine as the spec. Rabbit holes amplified this—vault design, enrichment APIs, emissions math, mint FSM, econ simulation, doctrine docs—each layer has gravity. Over time “AFI” started to mean “this repo layout” instead of “these rules for proposing, enriching, scoring, committing, and independently verifying signal intelligence.”
 
 **This document recenters the portable protocol** and charters work to solidify it.
 
@@ -42,7 +42,7 @@ That spine is valuable. The trap is **narrative drift**: when collaborators (or 
 
 ### 3.1 One-Sentence North Star
 
-> **AFI is the rules for how signal intelligence is proposed, enriched, scored, committed, and challenged—not the database or DAG framework used to build the first working example.**
+> **AFI is the rules for how signal intelligence is proposed, enriched, scored, committed, and independently verified—not the database or DAG framework used to build the first working example.**
 
 ### 3.2 Layer Model
 
@@ -51,7 +51,7 @@ AFI is best understood as **separated planes**, not one monolithic stack:
 | Plane | Role | What strangers must agree on | Typical implementations (non-normative) |
 |-------|------|------------------------------|-------------------------------------------|
 | **Commitment** | Immutable attestation of what the network accepted | BASE: mint events, receipts, emissions caps, epoch linkage, content anchors/hashes (present + future) | `afi-token`, `afi-mint` |
-| **Evidence** | Dense per-signal lifecycle for replay and challenge | Full RAW → ENRICHED → ANALYZED → SCORED → MINTED → REPLAYED record; public vs proprietary surface | Mongo, PostgreSQL, TimescaleDB, InfluxDB (per `vault.schema.json`) |
+| **Evidence** | Dense per-signal lifecycle for replay and verification | Full RAW → ENRICHED → ANALYZED → SCORED → MINTED → REPLAYED record; public vs proprietary surface | Mongo, PostgreSQL, TimescaleDB, InfluxDB (per `vault.schema.json`) |
 | **Scoring DAG** | Deterministic transforms on declared inputs | Pinned topology, plugin/analyst/validator versions; conforming outputs | `afi-reactor`, custom DAG, any conforming orchestrator (if outputs conform) |
 | **Market / analytics** | Continuous context at scale (not per-signal canon) | Published feature schemas, snapshot refs for replay | warehouses/streams chosen per operator — non-normative, never AFI's evidence store |
 | **Ingest boundary** | Valid entry dialect into the protocol | USS v1.1, CPJ v0.1, lens extensions | `afi-gateway`, webhooks, SDKs |
@@ -80,7 +80,7 @@ Any validator or operator may erect their own database and DAG pipeline if:
 2. **Pinned transforms** — Pipeline/DAG identity and versions are recorded so replay is possible.
 3. **Determinism** — Same inputs + same pinned rules ⇒ same scored outputs (modulo explicitly snapshotted external API data).
 4. **Commitment linkage** — On-chain artifacts link to off-chain evidence via `signalId`, epoch, and (where specified) content hashes.
-5. **Challenge-ready evidence** — Enough dense lifecycle data exists for an independent party on a different stack to reproduce or dispute.
+5. **Verification-ready evidence** — Enough dense lifecycle data exists for an independent party on a different stack to reproduce the result exactly.
 
 Reputation, registries, and governance influence **selection and allocation**—they must not override deterministic scoring or protocol finality (`afi-config/docs/REGISTRIES_AND_REPUTATION.v0.1.md`).
 
@@ -148,7 +148,7 @@ The investigation and follow-on work should move AFI toward:
 1. **Published Protocol Surface** — Single doc (successor to this one) listing normative schemas, invariants, and on-chain/off-chain division of responsibility.
 2. **Reference Implementation Index** — Which repos implement which spine segment; explicitly non-mandatory for external validators.
 3. **Contradiction Register** — Every place code, docs, or comments imply Mongo-only, reactor-only, or full payload on-chain.
-4. **Anchor Specification** — Minimum on-chain commitments + required off-chain evidence for replay/challenge (the “HTTP headers” of AFI).
+4. **Anchor Specification** — Minimum on-chain commitments + required off-chain evidence for replay/verification (the “HTTP headers” of AFI).
 5. **Replay Contract** — Cross-repo checklist: what a third-party validator needs to reproduce a mint decision without org infra.
 6. **Doc hygiene** — Stale docs tagged; architecture maps updated or archived.
 

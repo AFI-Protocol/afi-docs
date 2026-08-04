@@ -120,7 +120,7 @@ AFI is organized by responsibility, not by repository alone. The planes below de
 - **evidence-v3-provider-provenance-v0.1** — the Evidence V3 and provider-invocation provenance record (EV3-GOV): `afi.scored-signal-evidence.v3` as the **sole current canonical scored-signal evidence contract** (the prior record shape carried forward plus exactly three required additions — `providerInvocations`, `recordHash`, `replayHash`); exactly five closed, credential-safe, deterministically ordered per-lane provider invocation proofs (`afi.provider-invocation-proof.v1`, carried, never consumed) with the nested Tiny Brains aiMl invocation proof (`afi.aiml-invocation-proof.v1`); the registered `afi.d2.*` hash-domain assignments with an explicit canonical/replay projection separation; the all-five evaluation-completeness law (every category lane fail-fast — a failed lane yields no scored evaluation and no evidence record); capture in the one live graph pass with a fail-closed sole evidence builder in District 2 that never invokes a provider; V3-only hash-verified admission at the sole canonical writer; and the forward-only replacement of the prior evidence surfaces.
 - **district-api-atlas-foundation-v0.1** — the District / API Atlas foundation record (ATLAS-GOV): designates AFI's **canonical discoverability and relationship layer** (`afi.protocol-atlas.v1`, delegated to afi-config) over Districts, structures, capabilities, interfaces, typed routes, contracts, repositories, participant roles, and onboarding descriptors; separates maturity from visibility; forbids invented APIs and secret-capable fields; and establishes that the Atlas **describes** protocol truth and does not replace runtime, schema, contract, or governance authority (it fills the reserved ATLAS-GOV slot). It creates no District, changes no District scope, and builds no endpoint or Protocol City surface.
 
-The lifecycle state machine is governed as `INGESTED → VALIDATED → SCORED → CERTIFIED → QUALIFIED → CHALLENGE_OPEN → [CONTESTED →] FINALIZED → EPOCH_ELIGIBLE`. **The implemented lifecycle currently reaches `SCORED`.**
+The lifecycle state machine is governed as `INGESTED → VALIDATED → SCORED → CERTIFIED → QUALIFIED → FINALIZED → EPOCH_ELIGIBLE`. **The implemented lifecycle currently reaches `SCORED`.**
 
 ### 2. Contract and registry plane **(Governed)**
 
@@ -215,7 +215,7 @@ The economic plane separates governed design from implementation from deployment
 
 - **afi-token (Implemented; Deployed on testnet).** `AFIToken` is an xERC20-based ERC-20 with an on-chain hard cap of **86,000,000,000 AFI**, enforced in its sole mint entrypoint (`mintEmissions`, gated by an emissions role granted to explicit addresses, never the deployer). The contract suite passes its Foundry tests. It is deployed on **Base Sepolia testnet** (chain 84532, symbol `tAFI`), with roles held by a Treasury Safe. **There is no Base mainnet deployment.**
 - **afi-xerc20 (Reference).** The vendored defi-wonderland xERC20 standard (`XERC20`, `XERC20Lockbox`, `XERC20Factory`), consumed by afi-token as a pinned submodule. Its multichain deploy artifacts are inherited upstream boilerplate, not AFI deployments.
-- **afi-mint (Implemented off-chain; on-chain not wired).** The off-chain orchestration is implemented in TypeScript — signal-state management, a challenge-window/appeal model, dispute resolution, a mint executor, a validator daemon, and a governance client — and the per-signal emission math is implemented and parity-tested against the afi-math 86B schedule. The link to a live on-chain mint is **not wired**: the mint executor targets an abstract contract interface with no concrete binding, the Solidity contracts are stubs, and reputation-weighted emission logic is a placeholder awaiting governed values.
+- **afi-mint (Implemented off-chain; on-chain not wired).** The off-chain orchestration is implemented in TypeScript — signal-state management, a mint executor, a validator daemon, and a generic Snapshot DAO client — and the per-signal emission math is implemented and parity-tested against the afi-math 86B schedule. The challenge/appeal model and dispute resolution were removed with the challenge layer (CHR-GOV). The link to a live on-chain mint is **not wired**: the mint executor targets an abstract contract interface with no concrete binding, the Solidity stubs were deleted, and reputation-weighted emission logic is a placeholder awaiting governed values.
 - **Settlement (Governed doctrine; not implemented).** AFI Settlement v1 is accepted doctrine — epoch-settled rewards through a custodial rewards vault with Merkle claims, funded from an epoch settlement manifest, with provenance decoupled from payout and concrete address+chainId as source of truth. It **implements no contracts**: no rewards-vault, receipt, Merkle-claim, or settlement-manifest contract exists in any repository.
 - **Participant claim roles (Governed doctrine; closure in draft).** Accepted Settlement v1 doctrine mandates at least three participant reward tracks — **Provider**, **Analyst/Scorer**, and **Validator** — as distinct allocation tracks. The tighter closure to *exactly* these three (barring public goods and governance as claimants) currently lives in draft specs and schema and is not yet accepted governance. Operational overhead and the DAO operations vault are treasury policy administered by governance, not a claim role.
 - **Live mint is governance-blocked.** The v1 mint-settlement skeleton is governed (epoch budget → role pools → pro-rata verified credits), but the numeric baseline role weights are not yet governed and are a required decision before any live mint. Mainnet settlement is not yet governed.
@@ -269,7 +269,7 @@ The lifecycle is governed beyond `SCORED`, but the following are **not** impleme
 
 ```mermaid
 flowchart LR
-    S(["SCORED<br/>implemented"]) -. "not implemented" .-> X["CERTIFIED · QUALIFIED · CHALLENGE · FINALIZED"]
+    S(["SCORED<br/>implemented"]) -. "not implemented" .-> X["CERTIFIED · QUALIFIED · FINALIZED"]
     X -. "not implemented" .-> Y["epoch accounting · rewards · claims"]
     Y -. "not implemented" .-> Z["live mint · mainnet settlement"]
     style S fill:#1f6f43,stroke:#0d3b24,color:#ffffff
@@ -278,8 +278,8 @@ flowchart LR
     style Z fill:#5b3a00,stroke:#3a2500,color:#ffffff
 ```
 
-- **Post-`SCORED` transitions** (`CERTIFIED`, `QUALIFIED`, challenge, `FINALIZED`) — the single finality writer is defined in law but intentionally unimplemented pending new authorization.
-- **Market-outcome observation and challenge windows** in the live path.
+- **Post-`SCORED` transitions** (`CERTIFIED`, `QUALIFIED`, `FINALIZED`) — the single finality writer is defined in law but intentionally unimplemented pending new authorization.
+- **Market-outcome observation** in the live path.
 - **Live PoInsight from finalized receipts** — the benchmark computes PoInsight from fixtures only.
 - **Participant reputation updates** in the protocol.
 - **Epoch accounting, incentive allocation, reward claims, and claim-root production** — no implemented owner.
