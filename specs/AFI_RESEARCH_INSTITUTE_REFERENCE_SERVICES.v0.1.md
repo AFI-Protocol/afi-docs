@@ -215,8 +215,7 @@ instructions are within the designated services' scope.
 This role does **not** imply that every submitted signal, raw message, or proprietary
 alpha artifact is public, and it does **not** claim any production PoInsight or
 reputation integration exists — those remain research surfaces
-([`afi-benchkit`](https://github.com/AFI-Protocol/afi-benchkit) computes PoInsight from
-fixtures only). Institute-operated services may set their own transparent research and
+(the per-analyst off-chain input is the governed analyst calibration record, `afi.analyst-calibration.v1` — CAL-GOV; PoI and PoInsight themselves remain reserved primitives, CONST-GOV D-CONST-5). Institute-operated services may set their own transparent research and
 privacy policies (retention, PII, consent, disclosure, access control); those policies
 apply to Institute-operated instances and do not become protocol law. Raw source
 content is not automatically written on-chain and is not automatically published.

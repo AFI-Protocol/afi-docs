@@ -26,7 +26,7 @@ CURRENT_REPOS = [
     "afi-governance", "afi-config", "afi-math",
     "afi-core", "afi-reactor", "afi-infra", "afi-gateway", "afi-mint", "afi-token",
     "afi-factory", "afi-xerc20", "afi-docs", "afi-tiny-brains",
-    "afi-econ", "afi-benchkit", "afi-artifacts",
+    "afi-econ", "afi-artifacts",
     "afi-protocol", ".github",
 ]
 
@@ -36,7 +36,7 @@ CURRENT_REPOS = [
 # repo) does not trip the "afi-ops" pattern.
 REMOVED_REPOS = [
     "afi-assets", "afi-plugins", "afi-cli-framework",
-    "afi-skills", "afi-labs", "afi-ops",
+    "afi-skills", "afi-labs", "afi-ops", "afi-benchkit",
 ]
 
 # Historical-transition vocabulary. The document is present-tense only.
@@ -46,7 +46,7 @@ BANNED_VOCAB = [
 ]
 
 # Stale organization counts that must not appear.
-STALE_COUNTS = [r"\b19 repositor", r"\b20 repositor", r"\b21 repositor", r"\b22 repositor"]
+STALE_COUNTS = [r"\b18 repositor", r"\b19 repositor", r"\b20 repositor", r"\b21 repositor", r"\b22 repositor"]
 
 # District/Atlas anchors. Originally mandated by D1CAP-GOV D-D1CAP-8 item 3;
 # AMENDED by ATLAS-GOV D-ATLAS-9(3) (afi-governance
@@ -106,8 +106,8 @@ def main() -> int:
             line = low.count("\n", 0, m.start()) + 1
             failures.append(f"stale org count: {text[m.start():m.start()+16]!r} (line {line})")
 
-    if not re.search(r"\b18 repositor", low):
-        failures.append("missing the current organization count ('18 repositories')")
+    if not re.search(r"\b17 repositor", low):
+        failures.append("missing the current organization count ('17 repositories')")
 
     for repo in CURRENT_REPOS:
         if repo not in text:

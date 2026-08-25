@@ -161,7 +161,7 @@ These reduce time-to-shop more than Ably:
 | TradingView | Webhook URL + secret + field mapping doc | USS v1.1 (see `afi-reactor` TV path) |
 | Telegram | Bot + CPJ parser preset | CPJ v0.1 → USS |
 | REST / SDK | `POST /api/v1/signals` + OpenAPI snippet | Gateway ingest |
-| Manual | CLI `afi submit` for testnet | Demo / benchkit |
+| Manual | CLI `afi submit` for testnet | Demo |
 
 **Priority for T1:** TradingView + Telegram templates (highest analyst channel overlap).
 

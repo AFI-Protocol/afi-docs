@@ -26,7 +26,7 @@ A governed requirement is not automatically implemented; implemented code is not
 
 ## The organization
 
-The AFI organization is exactly **18 repositories** — 17 public and 1 private. They fall into five roles.
+The AFI organization is exactly **17 repositories** — 16 public and 1 private. They fall into five roles.
 
 | Repository | Current role | Authority status | Runtime status |
 |---|---|---|---|
@@ -44,12 +44,11 @@ The AFI organization is exactly **18 repositories** — 17 public and 1 private.
 | **afi-docs** | Documentation hub | Reference | Not runtime |
 | **afi-tiny-brains** *(private)* | Bounded first-party aiMl orchestration service: one internal orchestrator runs the ProviderInstance-selected profile of approved experts through a deterministic resolver, fail-closed (does not affect UWR scoring); also hosts the deterministic pattern kernel | Support | Bounded, fenced enrichment |
 | **afi-econ** | Economic research kit (non-canonical) | Research | Not runtime |
-| **afi-benchkit** | PoI / PoInsight benchmark + reproducibility harness | Research | Standalone benchmark tool |
 | **afi-artifacts** | Frozen, DOI-minted paper reproducibility bundle | Reference | Frozen snapshot |
 | **afi-protocol** | Public flagship repository map ("start here") | Reference | Not runtime |
 | **.github** | Organization profile and defaults | Reference | Not runtime |
 
-Grouped by role: **3** normative + **6** governed implementation + **4** support/reference (`afi-factory`, `afi-xerc20`, `afi-docs`, `afi-tiny-brains`) + **3** research/records (`afi-econ`, `afi-benchkit`, `afi-artifacts`) + **2** organization surfaces (`afi-protocol`, `.github`) = **18**.
+Grouped by role: **3** normative + **6** governed implementation + **4** support/reference (`afi-factory`, `afi-xerc20`, `afi-docs`, `afi-tiny-brains`) + **2** research/records (`afi-econ`, `afi-artifacts`) + **2** organization surfaces (`afi-protocol`, `.github`) = **17**.
 
 ---
 
@@ -85,7 +84,7 @@ The precedence order is governance → config → math → implementation → te
 
 **Governed implementation** is carried by six repositories — `afi-core`, `afi-reactor`, `afi-infra`, `afi-gateway`, `afi-mint`, `afi-token` — each replaceable by any implementation honoring the same contracts and handoffs.
 
-**Support, research, and reference** repositories (`afi-factory`, `afi-xerc20`, `afi-docs`, `afi-tiny-brains`, `afi-econ`, `afi-benchkit`, `afi-artifacts`, `afi-protocol`, `.github`) never hold normative authority.
+**Support, research, and reference** repositories (`afi-factory`, `afi-xerc20`, `afi-docs`, `afi-tiny-brains`, `afi-econ`, `afi-artifacts`, `afi-protocol`, `.github`) never hold normative authority.
 
 ### Canonical objects and identity **(Governed)**
 
@@ -200,12 +199,7 @@ Every record persisted today carries `lifecycleState = SCORED` and `finalized = 
 
 ### 8. Benchmarking and research plane **(Research)**
 
-`afi-benchkit` is a standalone public benchmark and reproducibility harness with no private-repository dependency (a guardrail test enforces this).
-
-- It provides two seeded suites: **PoI** (capability — coverage, vitality, determinism, latency) and **PoInsight** (usefulness — information coefficient, hit rate, Sharpe over 1h/4h horizons).
-- It is deterministic and reproducible: fixed seeds, stamped artifacts (data hash + git SHA + timestamp), golden-hash-locked plots, an `afi-bench` CLI, and a hash-locked container **published by CI to `ghcr.io/afi-protocol/afi-benchkit`**.
-- Its input is **static CSV fixtures**; it has **no live finalized-receipt feed and no production reputation or incentive integration**. Its composite reputation number (a weighted combination of PoI and PoInsight) is a local research computation over benchmark outputs, **not** the protocol's reputation or incentive law. Fixture-backed PoInsight is not PoInsight computed from finalized live receipts.
-- Current test state: outside the pinned container, exactly **two** golden-image plot tests fail (`test_calibration_plot_golden`, `test_poi_capability_golden`) as SHA-256 mismatches from a matplotlib version difference; the remaining benchmark tests pass.
+Analyst calibration is recorded by the governed **analyst calibration record** (`afi.analyst-calibration.v1`, afi-config `schemas/analyst-calibration/v1`; builder in afi-reactor; CAL-GOV) — a sealed, per-analyst, append-only record of counts, rates with cluster-robust intervals, and a reliability table, never a scalar. PoI and PoInsight remain the reserved on-chain per-analyst reputation primitives (CONST-GOV D-CONST-5); the calibration record is their off-chain evidentiary input and names no member for either.
 
 `afi-econ` is a non-canonical economic research kit (its models are self-declared placeholder/toy and are not protocol law unless promoted by governance). `afi-artifacts` is a frozen, DOI-minted paper reproducibility bundle (Zenodo). **AFI Research Institute** is AFI's sole research and legal identity — the copyright holder across the organization's licenses — reflecting an open-protocol, auditable, replayable research posture. Committed to open research, it is **designated to operate AFI's official open reference services (Reference)**: a hosted **Gateway reference service** (§4) and a designated **oracle-ingress / CPJ-normalization reference service** (§5), governed by `research-institute-reference-services-v0.1` (INST-GOV) and specified in [`specs/AFI_RESEARCH_INSTITUTE_REFERENCE_SERVICES.v0.1.md`](specs/AFI_RESEARCH_INSTITUTE_REFERENCE_SERVICES.v0.1.md). These are **non-exclusive** reference instances — operating them confers no protocol authority, no economic or validator privilege, and no exclusive network role; independent conforming operators remain free to run their own ingress and collectors. No Institute-hosted deployment is claimed (none exists).
 
@@ -326,7 +320,7 @@ The **District / API Atlas** is AFI's canonical **discoverability and relationsh
 
 **The Atlas describes; it does not decide or execute.** It replaces no runtime, schema, contract, or governance authority (ATLAS-GOV D-ATLAS-1). Where the Atlas and a higher authority disagree, the higher authority wins and the Atlas is the surface to correct. It runs no graph, calls no provider, scores nothing, builds no evidence, routes no live traffic, resolves no secret, activates no participant, and transfers no value.
 
-The registry records **2 active Districts** (plus **1 reserved** capability-domain), **6 capabilities**, **13 structures**, **16 interfaces**, **9 typed routes**, **21 referenced contracts**, **18 repositories**, and **7 participant roles** with onboarding descriptors.
+The registry records **2 active Districts** (plus **1 reserved** capability-domain), **6 capabilities**, **12 structures**, **16 interfaces**, **9 typed routes**, **21 referenced contracts**, **17 repositories**, and **7 participant roles** with onboarding descriptors.
 
 ### Districts (from the registry)
 
@@ -371,6 +365,6 @@ The Atlas is not the runtime (it describes the runtime, and the runtime authorit
 | **Analyst / strategy author** | the UWR profile registry and KATs in `afi-config`; author pipelines and configs with `afi-factory`. |
 | **Validator** | the `scored-signal-evidence` v3 schema and vectors in `afi-config`; store semantics in `afi-infra`. |
 | **Operator** | `afi-gateway` (submission boundary) and `afi-infra` (canonical store). |
-| **Researcher** | `afi-docs`, `afi-econ`, `afi-benchkit`, and the frozen record in `afi-artifacts`. |
+| **Researcher** | `afi-docs`, `afi-econ`, and the frozen record in `afi-artifacts`. |
 
 Conformance is defined by the contracts, registries, and KATs — a conforming analyst pipeline needs no permission. Authority lives in `afi-governance`, `afi-config`, and `afi-math`; everything else is a replaceable implementation of those contracts.
