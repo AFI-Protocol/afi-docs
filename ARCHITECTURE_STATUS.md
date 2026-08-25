@@ -66,7 +66,7 @@ Implementation lives under:
 | Canonical evidence store | `afi-infra` |
 | On-chain mint | `afi-token` |
 | Off-chain mint coordination | `afi-mint` |
-| Validator benchmarks | `afi-benchkit` |
+| Analyst calibration record | `afi-config` (`afi.analyst-calibration.v1`) + `afi-reactor` (builder) |
 
 ---
 

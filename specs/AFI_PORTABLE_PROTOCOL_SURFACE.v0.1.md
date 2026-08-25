@@ -68,7 +68,7 @@ AFI is best understood as **separated planes**, not one monolithic stack:
 | Immutable audit (server logs, CDN edge) | BASE commitments (events, receipts) |
 | Message body | Off-chain evidence vault (operator’s choice) |
 | Client (curl, browser, fetch) | Reactor, custom Python, any conforming orchestrator |
-| CDN / analytics / log pipeline | warehouses, streams, benchkit, research tooling |
+| CDN / analytics / log pipeline | warehouses, streams, research tooling |
 
 HTTP did not mandate Apache. AFI must not mandate Mongo or `afi-reactor`—only **conforming artifacts and behavior**.
 
@@ -175,7 +175,7 @@ Audit **all repositories** in the AFI-Protocol GitHub organization—public **an
 
 **Known local workspace repos (non-exhaustive):**
 
-`afi-artifacts`, `afi-benchkit`, `afi-config`, `afi-core`, `afi-docs`, `afi-econ`, `afi-factory`, `afi-gateway`, `afi-governance`, `afi-infra`, `afi-math`, `afi-mint`, `afi-protocol`, `afi-reactor`, `afi-research-site`, `afi-tiny-brains`, `afi-token`, `afi-xerc20`
+`afi-artifacts`, `afi-config`, `afi-core`, `afi-docs`, `afi-econ`, `afi-factory`, `afi-gateway`, `afi-governance`, `afi-infra`, `afi-math`, `afi-mint`, `afi-protocol`, `afi-reactor`, `afi-research-site`, `afi-tiny-brains`, `afi-token`, `afi-xerc20`
 
 Also check for renamed, archived, or external-reference repos (e.g. historical `afi-pipeline` references in older docs).
 
